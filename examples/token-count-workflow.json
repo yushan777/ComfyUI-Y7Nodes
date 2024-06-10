@@ -1,0 +1,157 @@
+{
+  "last_node_id": 22,
+  "last_link_id": 20,
+  "nodes": [
+    {
+      "id": 7,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        925,
+        -180
+      ],
+      "size": [
+        295,
+        100
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            19
+          ],
+          "shape": 3,
+          "slot_index": 1
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "SD1-5/sd_v1-5_vae.ckpt"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "easy showAnything",
+      "pos": [
+        1530,
+        -185
+      ],
+      "size": [
+        420,
+        655
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 20
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "SD1 CLIP MODEL\nTotal Token Count: 127, split across 2 chunks\nChunk[0] = 77 tokens\nChunk[1] = 50 tokens\n\n=========== Chunk[0] : 77 tokens ===========\n49406: <|startoftext|>\n00320: a            07823: magical      04167: forest       \n00536: at           14512: twilight     00267: ,            \n06064: bath         00538: ed           00530: in           \n00320: a            03773: soft         00267: ,            \n40925: ethereal     10111: glow         00269: .            \n00518: the          04682: trees        00631: are          \n07771: tall         00537: and          05810: ancient      \n00267: ,            00593: with         02455: gn           \n00516: ar           00912: led          15843: branches     \n05537: twi          01271: sting        34915: upwards      \n00537: and          05603: covered      00530: in           \n16263: lush         01901: green        12815: moss         \n00269: .            00518: the          04167: forest       \n04125: floor        00533: is           00811: car          \n00661: pe           00775: ted          00593: with         \n14270: vibrant      00267: ,            21683: multic       \n00562: ol           06956: oured        04023: flowers      \n00537: and          02442: small        00267: ,            \n18437: glowing      14730: mushrooms    00269: .            \n00530: in           00518: the          03694: middle       \n00539: of           00518: the          04167: forest       \n00267: ,            00997: there        00533: is           \n00320: a            06517: crystal      00268: -            \n03143: clear        10750: pond         19700: reflecting   \n00518: the          05496: purple       00537: and          \n49407: <|endoftext|>\n\n=========== Chunk[1] : 50 tokens ===========\n49406: <|startoftext|>\n04287: orange     38003: hues       00539: of         \n00518: the        05264: setting    02176: sun        \n00269: .          00320: a          34122: mystical   \n14317: creature   00267: ,          16916: resemb     \n01358: ling       00320: a          03417: cross      \n01957: between    00320: a          08700: deer       \n00537: and        00320: a          15660: unicorn    \n00267: ,          06446: stands     00638: by         \n00518: the        10750: pond       00267: ,          \n05778: drinking   01573: water      00269: .          \n00518: the        14317: creature   00791: has        \n00320: a          11986: shim       41060: mering     \n07356: coat       00593: with       02155: iri        \n19375: descent    22891: scales     00537: and        \n47720: antlers    00682: that       37230: resemble   \n18768: delicate   15843: branches   00269: .          \n49407: <|endoftext|>\n\n"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 22,
+      "type": "Count_Tokens_(Y7)",
+      "pos": [
+        1230,
+        -185
+      ],
+      "size": [
+        290,
+        345
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            20
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Count_Tokens_(Y7)"
+      },
+      "widgets_values": [
+        true,
+        3,
+        true,
+        "A magical forest at twilight, bathed in a soft, ethereal glow. The trees are tall and ancient, with gnarled branches twisting upwards and covered in lush green moss. The forest floor is carpeted with vibrant, multicoloured flowers and small, glowing mushrooms. In the middle of the forest, there is a crystal-clear pond reflecting the purple and orange hues of the setting sun. A mystical creature, resembling a cross between a deer and a unicorn, stands by the pond, drinking water. The creature has a shimmering coat with iridescent scales and antlers that resemble delicate branches. "
+      ]
+    }
+  ],
+  "links": [
+    [
+      19,
+      7,
+      1,
+      22,
+      0,
+      "CLIP"
+    ],
+    [
+      20,
+      22,
+      0,
+      21,
+      0,
+      "*"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "0246.VERSION": [
+      0,
+      0,
+      4
+    ],
+    "ds": {
+      "scale": 1.3310000000000008,
+      "offset": [
+        -681.3134944133055,
+        306.070753010764
+      ]
+    }
+  },
+  "version": 0.4
+}
