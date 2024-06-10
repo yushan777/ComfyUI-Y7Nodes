@@ -3,6 +3,9 @@ Only one for now.
 
 # Installation
 Clone this repo into the `custom_nodes` folder.<br>
+```
+git clone https://github.com/yushan777/ComfyUI-Y7Nodes.git
+```
 No dependencies
 
 # Nodes:
