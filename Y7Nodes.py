@@ -1,6 +1,6 @@
 import os 
 
-# tokenization process splits the tokens into multiple lists when the number of tokens exceeds a certain threshold (in this case, 77).
+# tokenization process splits the tokens into multiple lists when the number of tokens exceeds a certain threshold (77).
 
 # 49406 = BOS (beginning of sentence)
 # 49407 = EOS (end of sentence)
