@@ -21,5 +21,6 @@ By default will just show the totals. If you wish to see a breakdown of how the 
 
 `hide_end_of_word_tag` will remove the `</w>` tag and is purely for readability purposes. 
 
+![Alt text](https://github.com/yushan777/ComfyUI-Y7Nodes/blob/main/examples/count-tokens-workflow.png)
 
 
