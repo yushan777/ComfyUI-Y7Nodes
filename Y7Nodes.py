@@ -24,8 +24,6 @@ import os
 # FOR SDXL
 # for some reason g pads with 0, and l pads with 49407
 
-
-
 # tokens = {
 #     'g': [
 #         [(49406, 1.0), (25602, 1.0), (1125, 1.0), ...],
@@ -113,20 +111,23 @@ class CountTokens:
 
         # number of lists of tokens, (broken up into sets of 77 if more than than that number)
         num_of_lists = len(tokens[token_key])
-        
-        # text_output += f'Number of Token Lists: {num_of_lists}\n'
-
+            
         token_sublists = []
         for index, token_list in enumerate(tokens[token_key]):
         
             real_tokens = self.filter_padding_tokens(token_list, model_type)
 
             total_token_count += len(real_tokens)
-            # text_output += f'List[{index}] = {len(real_tokens)} tokens\n'
+            
             token_sublists.append(f'Chunk[{index}] = {len(real_tokens)} tokens\n')
         
-        text_output += f'Total Token Count: {total_token_count}, split across {num_of_lists} chunks\n'
-        # text_output += f'Number of Token Chunks: {num_of_lists}\n'
+
+        if num_of_lists == 1:
+            text_output += f'Total Token Count: {total_token_count}, in {num_of_lists} chunk\n'
+        elif num_of_lists > 1:
+            text_output += f'Total Token Count: {total_token_count}, split across {num_of_lists} chunks\n'
+        
+        
 
         for tlist in token_sublists:
             text_output += tlist
