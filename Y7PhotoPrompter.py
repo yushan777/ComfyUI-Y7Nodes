@@ -116,7 +116,7 @@ class PhotoPromptGenerator:
 
         prompt = " ".join(components)
 
-        return (prompt, seed)
+        return prompt, seed
 
 
         
