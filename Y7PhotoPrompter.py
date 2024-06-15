@@ -89,7 +89,7 @@ class PhotoPromptGenerator:
         components.append(f'{technique}, ')        
         # ------------------------------------------------------------
         # SUBJECT STYLE
-        subject_style = kwargs.ET("subject_style", "portrait")
+        subject_style = kwargs.get("subject_style", "portrait")
         components.append(f'{subject_style}, ')        
         # ------------------------------------------------------------
         # ------------------------------------------------------------
