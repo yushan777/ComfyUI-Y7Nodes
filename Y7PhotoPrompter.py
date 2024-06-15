@@ -13,37 +13,42 @@ import logging
 class PhotoPromptGenerator:
     logging.basicConfig(level=logging.DEBUG)
 
+    # Load JSON as class variables
+    COLOR_MODE_01 = None
+    STYLE_TYPE_02 = None
+    SUBJECT_CLASS_03 = None
+
+
     def __init__(self, seed=None):
         self.rng = random.Random(seed)
 
-        COLOR_MODE_01 = self.load_json_file("01_color_mode.json")
-        TECHNIQUE_02 = self.load_json_file("02_technique.json")
-        SUBJECT_STYLE_03 = self.load_json_file("03_subject_style.json")
+    @classmethod
+    def initialize_class_variables(cls):
+        cls.COLOR_MODE_01 = cls.load_json_file("01_color_mode.json")
+        cls.STYLE_TYPE_02 = cls.load_json_file("02_style_type.json")
+        cls.SUBJECT_CLASS_03 = xxxx
 
-
-    # Function to load data from a JSON file
-    def load_json_file(self, file_name):
-        # Construct the absolute path to the data file
+    @classmethod
+    def load_json_file(cls, file_name):
+        # This method should be updated to handle class level file access if necessary
         file_path = os.path.join(os.path.dirname(__file__), "data", file_name)
         with open(file_path, "r") as file:
             return json.load(file)
         
     @classmethod
-    def INPUT_TYPES(self, cls):
+    def INPUT_TYPES(cls):
+        cls.initialize_class_variables()  # Ensure variables are loaded
+
         return {
             "required": {
                 "seed": ("INT", {"default": 0, "min": 0, "max": 1125899906842624}),
                 "custom": ("STRING", {}),
                 "color_mode": (
-                    ["random"] + self.COLOR_MODE_01,
+                    ["disabled"] + ["random"] + cls.COLOR_MODE_01,
                     {"default": "color"},            
                 ),
-                "technique": (
-                    ["disabled"] + ["random"] + self.TECHNIQUE_02,
-                    {"default": "disabled"},               
-                ),
-                "subject_style": (
-                    ["disabled"] + ["random"] + self.SUBJECT_STYLE_03,
+                "style_type": (
+                    ["disabled"] + ["random"] + cls.STYLE_TYPE_02,
                     {"default": "disabled"},              
                 ),
 
@@ -83,22 +88,20 @@ class PhotoPromptGenerator:
         custom = kwargs.get("custom", "")
         # if not empty, append custom string to components list
         if custom != "":
-            components.append(custom)
+            components.append(f'{custom},')
 
+        components.append(f'a')  
         # ------------------------------------------------------------
         # COLOR MODE
         # get color_mode, if nothing is passed in, default to "color"
         color_mode = kwargs.get("color_mode", "color")
-        components.append(f'{color_mode}, ')
+        components.append(f'{color_mode}')
         # ------------------------------------------------------------
-        # TECHNIQUE
-        # get technique, if nothing is passed in, default to "disabled"
-        technique = kwargs.get("technique", "disabled")
-        components.append(f'{technique}, ')        
-        # ------------------------------------------------------------
-        # SUBJECT STYLE
-        subject_style = kwargs.get("subject_style", "portrait")
-        components.append(f'{subject_style}, ')        
+        # STYLE/TYPE
+        # get style/type, if nothing is passed in, default to "disabled"
+        style_or_type = kwargs.get("style_type", "disabled")
+        components.append(f'{style_or_type}')  
+        components.append(f'photo of')  
         # ------------------------------------------------------------
         # ------------------------------------------------------------
         # ------------------------------------------------------------
@@ -122,6 +125,7 @@ class PhotoPromptGenerator:
         # ------------------------------------------------------------
         # ------------------------------------------------------------
 
+        # concatenate a list of strings with each element separated by a space
         prompt = " ".join(components)
 
         return prompt, seed
