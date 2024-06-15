@@ -62,7 +62,7 @@ class CountTokens:
 
             print(tokens)
             model_type = self.detect_model(tokens)
-            logging.info("Counting Tokens for text: %s", text)
+            # logging.info("Counting Tokens for text: %s", text)
 
             summary_text, tokenid_word_pairs_string = '', ''
             
@@ -83,13 +83,13 @@ class CountTokens:
     # ===================================================================
     def detect_model(self, tokens):
         if 'g' in tokens and 'l' in tokens:
-            logging.info('sdxl model detected')
+            # logging.info('sdxl model detected')
             return 'sdxl'
         elif 'g' not in tokens and 'l' in tokens:
-            logging.info('sd1 model detected')
+            # logging.info('sd1 model detected')
             return 'sd1'
         elif 'g' not in tokens and 'l' not in tokens and 'h' in tokens:
-            logging.info('sd2 model detected')
+            # logging.info('sd2 model detected')
             return 'sd2'
         
         return 'none'
