@@ -114,7 +114,9 @@ class PhotoPromptGenerator:
         # ------------------------------------------------------------
         # ------------------------------------------------------------
 
+        prompt = " ".join(components)
 
+        return self.process_string(prompt, seed)
 
 
         
