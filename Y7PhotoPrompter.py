@@ -123,4 +123,11 @@ class PhotoPromptGenerator:
     def __init__(self, seed=None):
         self.rng = random.Random(seed)
     
-        
+NODE_CLASS_MAPPINGS = {
+    "PhotoPrompter_(Y7)": PhotoPromptGenerator
+}
+
+# Human readable names for the nodes
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "PhotoPrompter_(Y7)": "Auto Prompter (Y7)"
+}        
