@@ -1,5 +1,2 @@
 .DS_Store
-._.DS_Store
-.___init__.py
-._Y7PhotoPrompter.py
-__pycache__
+*._
