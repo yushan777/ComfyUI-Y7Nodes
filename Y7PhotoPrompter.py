@@ -9,7 +9,7 @@ import logging
 class PhotoPromptGenerator:
     logging.basicConfig(level=logging.DEBUG)
 
-    VOWELS = "AEIOUaeiou"
+    
     DISABLED = "disabled"
     RANDOM = "random"
 
@@ -29,9 +29,11 @@ class PhotoPromptGenerator:
     PRIMARY_ACTION = None 
     GAZE = None 
     HANDS = None 
-    LOCATION = None
+    LOCATION_INT = None
+    LOCATION_EXT = None
     TIME_OF_DAY = None 
     WEATHER = None
+    ADDITIONAL_DETAILS = None
 
     def __init__(self, seed=None):
         self.rng = random.Random(seed)
@@ -53,9 +55,12 @@ class PhotoPromptGenerator:
         cls.PRIMARY_ACTION = cls.load_json_file("10_primary_action.json")
         cls.GAZE = cls.load_json_file("11_gaze.json")
         cls.HANDS = cls.load_json_file("12_hands.json")
-        cls.LOCATION = cls.load_json_file("13_location.json")
-        cls.TIME_OF_DAY = cls.load_json_file("14_time_of_day.json")
-        cls.WEATHER = cls.load_json_file("15_weather.json")
+        cls.LOCATION_INT = cls.load_json_file("13_location_interior.json")
+        cls.LOCATION_EXT = cls.load_json_file("14_location_exterior.json")        
+        cls.TIME_OF_DAY = cls.load_json_file("15_time_of_day.json")
+        cls.WEATHER = cls.load_json_file("16_weather.json")
+        cls.ADDITIONAL_DETAILS = cls.load_json_file("17_additional_details.json")
+
     @classmethod
     def load_json_file(cls, file_name):
         # This method should be updated to handle class level file access if necessary
@@ -131,10 +136,14 @@ class PhotoPromptGenerator:
                     ["disabled", "random"] + cls.HANDS,
                     {"default": "random"},
                 ),   
-                "location": (
-                    ["disabled", "random"] + cls.LOCATION,
+                "location_interior": (
+                    ["disabled", "random"] + cls.LOCATION_INT,
                     {"default": "random"},
                 ),
+                "location_exterior": (
+                    ["disabled", "random"] + cls.LOCATION_EXT,
+                    {"default": "random"},
+                ),                
                 "time_of_day": (
                     ["disabled", "random"] + cls.TIME_OF_DAY,
                     {"default": "random"},
@@ -142,7 +151,12 @@ class PhotoPromptGenerator:
                 "weather": (
                     ["disabled", "random"] + cls.WEATHER,
                     {"default": "random"},
-                ),                                                            
+                ),   
+                "additional_details": (
+                    ["disabled", "random"] + cls.ADDITIONAL_DETAILS,
+                    {"default": "random"},
+                ),   
+
             },
         }
 
@@ -182,19 +196,7 @@ class PhotoPromptGenerator:
         if custom != "":
             components.append(f'{custom},')
 
-        components.append(f'a')  
-        # ------------------------------------------------------------
-        # COLOR MODE
-        # get color_mode, if nothing is passed in, default to "color"
-        color_mode = kwargs.get("color_mode", "color")
-        if color_mode == "disabled":
-            color_mode = ""
-        elif color_mode == "random":
-            color_mode = self.select_random_choice(self.COLOR_MODE)
-
-        if color_mode:  # Only append if truthy (is not an empty string)
-            components.append(f'{color_mode}')            
-        
+                           
         # ------------------------------------------------------------
         # FRAMING 
         framing = kwargs.get("framing", "disabled")
@@ -205,15 +207,27 @@ class PhotoPromptGenerator:
 
         # Only append if truthy (is not an empty string)
         if framing:
-            print(framing)
-            # if last element is still "a" (color mode was disabled)
-            if components[-1] == "a":
-                # if framing word begins with vowel
-                if framing[0] in self.VOWELS: 
-                    # change "a" to "an"
-                    components[-1] = "an" 
+            # if framing string begins with a vowel
+            if self.begins_with_vowel(framing) == True:
+                # set either "a" or "an"
+                components.append(f'an')  
+            else:
+                components.append(f'a')  
+
             # now add framing 
-            components.append(f'{framing}')          
+            components.append(f'{framing},')  
+        # ------------------------------------------------------------
+        # COLOR MODE
+        # get color_mode, if nothing is passed in, default to "color"
+        color_mode = kwargs.get("color_mode", "color")
+        if color_mode == "disabled":
+            color_mode = ""
+        elif color_mode == "random":
+            color_mode = self.select_random_choice(self.COLOR_MODE)
+
+        if color_mode:  # Only append if truthy (is not an empty string)
+            components.append(f'{color_mode}') 
+
         # ------------------------------------------------------------
         # STYLE/TYPE
         # get style/type, if nothing is passed in, default to "disabled"
@@ -381,22 +395,38 @@ class PhotoPromptGenerator:
             components.append(f'with') 
             components.append(f'{hands}.') 
         # ------------------------------------------------------------
-        # LOCATION
-        location = kwargs.get("location", "random")
-        if location == self.DISABLED:
-            location = ""
-        elif location == self.RANDOM:
-            location = self.select_random_choice(self.LOCATION)   
+        # LOCATION - INT / EXT
+        location_interior = kwargs.get("location_interior", "random")
+        if location_interior == self.DISABLED:
+            location_interior = ""
+        elif location_interior == self.RANDOM:
+            location_interior = self.select_random_choice(self.LOCATION_INT)   
 
         # Only append if truthy (is not an empty string) 
-        if location:
+        if location_interior:
             if re.search(r'\bman\b', subject_or_class.lower()):
                 components.append("He is")
             elif re.search(r'\bwoman\b', subject_or_class.lower()):
                 components.append("She is")
+            components.append(f'{location_interior},') 
+        else:
+            location_exterior = kwargs.get("location_exterior", "random")
+            if location_exterior == self.DISABLED:
+                location_exterior = ""
+            elif location_exterior == self.RANDOM:
+                location_exterior = self.select_random_choice(self.LOCATION_EXT)   
 
-            components.append(f'{location},') 
+            # Only append if truthy (is not an empty string) 
+            if location_exterior:
+                if re.search(r'\bman\b', subject_or_class.lower()):
+                    components.append("He is")
+                elif re.search(r'\bwoman\b', subject_or_class.lower()):
+                    components.append("She is")
 
+                components.append(f'{location_exterior},') 
+
+        # ------------------------------------------------------------
+        
         # ------------------------------------------------------------
         # TIME-OF-DAY
         time_of_day = kwargs.get("time_of_day", "random")
@@ -418,10 +448,18 @@ class PhotoPromptGenerator:
 
         # Only append if truthy (is not an empty string) 
         if weather:
-            components.append(f'and it is {weather}.')        
+            components.append(f'and the weather is {weather}.')        
         # ------------------------------------------------------------
         # ADDITIONAL DETAILS OF ENVIRONMENT
+        additional_details = kwargs.get("additional_details", "random")
+        if additional_details == self.DISABLED:
+            additional_details = ""
+        elif additional_details == self.RANDOM:
+            additional_details = self.select_random_choice(self.ADDITIONAL_DETAILS)   
 
+        # Only append if truthy (is not an empty string) 
+        if additional_details:
+            components.append(f'{additional_details}.') 
         # ------------------------------------------------------------
         # ------------------------------------------------------------
         # ------------------------------------------------------------
@@ -439,7 +477,14 @@ class PhotoPromptGenerator:
     # ==============================================================================================================
     def select_random_choice(self, available_choices):
         return self.rng.choices(available_choices, k=1)[0]
-        
+    
+    # ==============================================================================================================        
+    def begins_with_vowel(self, str_input):
+        VOWELS = "AEIOUaeiou"
+        if str_input[0] in VOWELS:
+            return True
+        else:
+            return False 
     
 NODE_CLASS_MAPPINGS = {
     "PhotoPrompter_(Y7)": PhotoPromptGenerator

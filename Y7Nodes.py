@@ -60,9 +60,8 @@ class CountTokens:
         try:
             tokens = clip.tokenize(text)
 
-            print(tokens)
             model_type = self.detect_model(tokens)
-            logging.info("Counting Tokens for text: %s", text)
+            # logging.info("Counting Tokens for text: %s", text)
 
             summary_text, tokenid_word_pairs_string = '', ''
             
