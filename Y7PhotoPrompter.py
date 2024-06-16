@@ -4,6 +4,7 @@ import re
 import os
 import logging
 
+
 # ==================================================================
 
 class PhotoPromptGenerator:
@@ -177,7 +178,14 @@ class PhotoPromptGenerator:
 
     FUNCTION = "generate_prompt"
     CATEGORY = "Y7/PromptGenerator"
-    
+    DESCRIPTION = """
+- **Notes:**
+Too many combos to try to contain so you will get some reallly weird combos if you set everything to random
+- **location_interior / exterior:**
+if interior is active or random, then exterior will be ignored.  Otherwise if exterior will be considered if it is not also disabled.
+- **custom:**
+If you normally use a token or token + class you can add it here and it will appear at the start of the prompt
+"""
     
     def generate_prompt(self, **kwargs):
         # get seed. if not provided then default to 0
@@ -215,7 +223,7 @@ class PhotoPromptGenerator:
                 components.append(f'a')  
 
             # now add framing 
-            components.append(f'{framing},')  
+            components.append(f'{framing}')  
         # ------------------------------------------------------------
         # COLOR MODE
         # get color_mode, if nothing is passed in, default to "color"
