@@ -6,10 +6,6 @@ import logging
 
 # ==================================================================
 
-    
-
-
-
 class PhotoPromptGenerator:
     logging.basicConfig(level=logging.DEBUG)
 
@@ -26,7 +22,7 @@ class PhotoPromptGenerator:
     def initialize_class_variables(cls):
         cls.COLOR_MODE_01 = cls.load_json_file("01_color_mode.json")
         cls.STYLE_TYPE_02 = cls.load_json_file("02_style_type.json")
-        cls.SUBJECT_CLASS_03 = xxxx
+        cls.SUBJECT_CLASS_03 = cls.load_json_file("03_subject_class.json")
 
     @classmethod
     def load_json_file(cls, file_name):
@@ -51,7 +47,10 @@ class PhotoPromptGenerator:
                     ["disabled"] + ["random"] + cls.STYLE_TYPE_02,
                     {"default": "disabled"},              
                 ),
-
+                "subject_class": (
+                    ["disabled"] + ["random"] + cls.SUBJECT_CLASS_03,
+                    {"default": "a man"},              
+                ),
             },
         }
 
@@ -103,6 +102,9 @@ class PhotoPromptGenerator:
         components.append(f'{style_or_type}')  
         components.append(f'photo of')  
         # ------------------------------------------------------------
+        # SUBJECT / CLASS
+        subject_or_class = kwargs.get("subject_class", "a man")
+        components.append(f'{subject_or_class}')          
         # ------------------------------------------------------------
         # ------------------------------------------------------------
         # ------------------------------------------------------------
