@@ -30,7 +30,7 @@ class PhotoPromptGenerator:
     PRIMARY_ACTION = None 
     GAZE = None 
     HANDS = None 
-    LOCATION_INT = None
+    LOCATION_INTERIOR = None
     LOCATION_EXT = None
     TIME_OF_DAY = None 
     WEATHER = None
@@ -56,7 +56,7 @@ class PhotoPromptGenerator:
         cls.PRIMARY_ACTION = cls.load_json_file("10_primary_action.json")
         cls.GAZE = cls.load_json_file("11_gaze.json")
         cls.HANDS = cls.load_json_file("12_hands.json")
-        cls.LOCATION_INT = cls.load_json_file("13b_location_interior.json") # this json, each object has 2 properties (description and detail for longer descriptions)
+        cls.LOCATION_INTERIOR = cls.load_json_file("13b_location_interior.json") # this json, each object has 2 properties (description and detail for longer descriptions)
         cls.LOCATION_EXT = cls.load_json_file("14_location_exterior.json")        
         cls.TIME_OF_DAY = cls.load_json_file("15_time_of_day.json")
         cls.WEATHER = cls.load_json_file("16_weather.json")
@@ -139,9 +139,10 @@ class PhotoPromptGenerator:
                 ),   
                 "show_detailed_location": (
                     "BOOLEAN", {"default": True}
-                ),                     
+                ),                    
+                # use a dictionary comprehension to extract only the "description" values: 
                 "location_interior": (
-                    ["disabled", "random"] + cls.LOCATION_INT,
+                    ["disabled", "random"] + [location["description"] for location in cls.LOCATION_INTERIOR],
                     {"default": "random"},
                 ),
                 "location_exterior": (
@@ -181,14 +182,7 @@ class PhotoPromptGenerator:
 
     FUNCTION = "generate_prompt"
     CATEGORY = "Y7/PromptGenerator"
-    DESCRIPTION = """
-- **Notes:**
-Too many combos to try to contain so you will get some reallly weird combos if you set everything to random
-- **location_interior / exterior:**
-if interior is active or random, then exterior will be ignored.  Otherwise if exterior will be considered if it is not also disabled.
-- **custom:**
-If you normally use a token or token + class you can add it here and it will appear at the start of the prompt
-"""
+    DESCRIPTION = ""
     
     def generate_prompt(self, **kwargs):
         # get seed. if not provided then default to 0
@@ -411,11 +405,19 @@ If you normally use a token or token + class you can add it here and it will app
 
         # ------------------------------------------------------------
         # LOCATION - INT / EXT
-        location_interior = kwargs.get("location_interior", "random")
+        # get initial selection froom drop down
+        location_interior = kwargs.get("location_interior", "random")        
         if location_interior == self.DISABLED:
             location_interior = ""
         elif location_interior == self.RANDOM:
-            location_interior = self.select_random_choice(self.LOCATION_INT)   
+            location_interior = self.select_random_choice(self.LOCATION_INTERIOR)   
+        else:
+            # Find the selected location object based on the description
+            location_interior = None
+            for location in self.LOCATION_INTERIOR:
+                if location["description"] == location_interior:
+                    location_interior = location
+                    break
 
         # Only append if truthy (is not an empty) 
         if location_interior:
