@@ -56,7 +56,7 @@ class PhotoPromptGenerator:
         cls.PRIMARY_ACTION = cls.load_json_file("10_primary_action.json")
         cls.GAZE = cls.load_json_file("11_gaze.json")
         cls.HANDS = cls.load_json_file("12_hands.json")
-        cls.LOCATION_INT = cls.load_json_file("13_location_interior.json")
+        cls.LOCATION_INT = cls.load_json_file("13b_location_interior.json") # this json, each object has 2 properties (description and detail for longer descriptions)
         cls.LOCATION_EXT = cls.load_json_file("14_location_exterior.json")        
         cls.TIME_OF_DAY = cls.load_json_file("15_time_of_day.json")
         cls.WEATHER = cls.load_json_file("16_weather.json")
@@ -137,6 +137,9 @@ class PhotoPromptGenerator:
                     ["disabled", "random"] + cls.HANDS,
                     {"default": "random"},
                 ),   
+                "show_detailed_location": (
+                    "BOOLEAN", {"default": True}
+                ),                     
                 "location_interior": (
                     ["disabled", "random"] + cls.LOCATION_INT,
                     {"default": "random"},
@@ -144,7 +147,7 @@ class PhotoPromptGenerator:
                 "location_exterior": (
                     ["disabled", "random"] + cls.LOCATION_EXT,
                     {"default": "random"},
-                ),                
+                ),           
                 "time_of_day": (
                     ["disabled", "random"] + cls.TIME_OF_DAY,
                     {"default": "random"},
@@ -403,6 +406,10 @@ If you normally use a token or token + class you can add it here and it will app
             components.append(f'with') 
             components.append(f'{hands}.') 
         # ------------------------------------------------------------
+        # SHOW DETAILED LOCATION DESCRIPTION (OR NOT)
+        show_detailed_location = kwargs.get("show_detailed_location", True)
+
+        # ------------------------------------------------------------
         # LOCATION - INT / EXT
         location_interior = kwargs.get("location_interior", "random")
         if location_interior == self.DISABLED:
@@ -410,14 +417,20 @@ If you normally use a token or token + class you can add it here and it will app
         elif location_interior == self.RANDOM:
             location_interior = self.select_random_choice(self.LOCATION_INT)   
 
-        # Only append if truthy (is not an empty string) 
+        # Only append if truthy (is not an empty) 
         if location_interior:
             if re.search(r'\bman\b', subject_or_class.lower()):
                 components.append("He is")
             elif re.search(r'\bwoman\b', subject_or_class.lower()):
                 components.append("She is")
-            components.append(f'{location_interior},') 
-        else:
+
+            if show_detailed_location:
+                location_string = f'{location_interior["description"]}, {location_interior["detail"]}'
+            else:
+                location_string = location_interior["description"]
+            components.append(f'{location_string},') 
+
+        else: # Exterior Location
             location_exterior = kwargs.get("location_exterior", "random")
             if location_exterior == self.DISABLED:
                 location_exterior = ""
