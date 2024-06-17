@@ -79,7 +79,7 @@ class PhotoPromptGenerator:
                 "custom": ("STRING", {}),
                 "color_mode": (
                     ["disabled", "random"] + cls.COLOR_MODE,
-                    {"default": "color"},            
+                    {"default": "colored"},            
                 ),
                 "framing": (
                     ["disabled", "random"] + cls.FRAMING,
