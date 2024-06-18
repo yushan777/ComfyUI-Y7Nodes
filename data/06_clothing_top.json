@@ -1,94 +1,179 @@
 [
-    "bath robe",
-    "bikini top and bottom",
-    "bikini top",
-    "blazer",
-    "blazer",
-    "blouse",
-    "bodysuit",
-    "bra",
-    "bralette",
-    "business suit",
-    "button-up dress",
-    "camo sports bra",
-    "cardigan",
-    "corset top",
-    "corset",
-    "crochet dress",
-    "crochet top",
-    "crocheted bikini",
-    "crop-top",
-    "cropped shirt",
-    "cropped t-shirt",
-    "cropped top",
-    "cupless bra",
-    "cut-out dress",
-    "dark top",
-    "deep v-neck top",
-    "denim jacket",
-    "dress",
-    "dress, sleeveless, v-neckline",      
-    "floral dress",
-    "fur-lined hood",
-    "geometric patterned bodysuit",
-    "halter dress",
-    "halter top",
-    "hat",
-    "hoodie",
-    "jacket",
-    "jacket",
-    "jumpsuit",
-    "lace dress",
-    "lace lingerie",
-    "lace top",
-    "lace-up top",
-    "latex bodysuit",
-    "leather dress",
-    "leopard print halter-top",
-    "long-sleeve dress",
-    "long-sleeve top",
-    "off-shoulder top",
-    "oversized t-shirt",
-    "peehole bra",
-    "polka-dot bikini",
-    "polka-dot dress",
-    "ribbed dress",
-    "ribbed sweater",
-    "ribbed top",
-    "satin dress",
-    "satin lingerie",
-    "satin nightdress",
-    "satin top",
-    "sequined dress",
-    "sheer bra",
-    "shiny dress",
-    "shirt",
-    "silk lingerie",
-    "silk nightdress",
-    "sleeveless dress",
-    "sleeveless top",
-    "sports bra",
-    "strap top",
-    "strapless dress",
-    "strapless top",
-    "strappy dress",    
-    "striped swimsuit",
-    "striped top",
-    "suit",
-    "sweater",
-    "sweatshirt",
-    "swimsuit",
-    "t-shirt",
-    "tank top",
-    "tie-dye bikini",
-    "top",
-    "topless",
-    "towel",
-    "tracksuit",
-    "trenchcoat",
-    "tube top",
-    "turtleneck dress",
-    "turtleneck shirt",
-    "v-neck top",
-    "winter coat"
+    {
+        "item": "bath robe",
+        "default_color": "white"
+    },
+    {
+        "item": "bikini",
+        "default_color": "black"
+    },
+    {
+        "item": "blazer",
+        "default_color": "navy"
+    },
+    {
+        "item": "blouse",
+        "default_color": "cream"
+    },
+    {
+        "item": "bodysuit",
+        "default_color": "nude"
+    },
+    {
+        "item": "bra",
+        "default_color": "white"
+    },
+    {
+        "item": "bralette",
+        "default_color": "pink"
+    },
+    {
+        "item": "business suit",
+        "default_color": "grey"
+    },
+    {
+        "item": "button-up dress",
+        "default_color": "blue"
+    },
+    {
+        "item": "sports bra",
+        "default_color": "grey"
+    },
+    {
+        "item": "cardigan",
+        "default_color": "beige"
+    },
+    {
+        "item": "corset top",
+        "default_color": "black"
+    },
+    {
+        "item": "corset",
+        "default_color": "red"
+    },
+    {
+        "item": "crochet dress",
+        "default_color": "white"
+    },
+    {
+        "item": "crochet top",
+        "default_color": "ivory"
+    },
+    {
+        "item": "crocheted bikini",
+        "default_color": "multi"
+    },
+    {
+        "item": "crop-top",
+        "default_color": "black"
+    },
+    {
+        "item": "cropped shirt",
+        "default_color": "blue"
+    },
+    {
+        "item": "cropped t-shirt",
+        "default_color": "grey"
+    },
+    {
+        "item": "cupless bra",
+        "default_color": "black"
+    },
+    {
+        "item": "cut-out dress",
+        "default_color": "black"
+    },
+    {
+        "item": "dark top",
+        "default_color": "black"
+    },
+    {
+        "item": "deep v-neck top",
+        "default_color": "black"
+    },
+    {
+        "item": "denim jacket",
+        "default_color": "blue"
+    },
+    {
+        "item": "dress",
+        "default_color": "red"
+    },
+    {
+        "item": "dress, sleeveless, v-neckline",
+        "default_color": "navy"
+    },
+    {
+        "item": "floral dress",
+        "default_color": "multi-colored"
+    },
+    {
+        "item": "fur-lined hood",
+        "default_color": "grey"
+    },
+    {
+        "item": "geometric patterned bodysuit",
+        "default_color": "dark"
+    },
+    {
+        "item": "halter dress",
+        "default_color": "red"
+    },
+    {
+        "item": "halter top",
+        "default_color": "black"
+    },
+    {
+        "item": "hat",
+        "default_color": "black"
+    },
+    {
+        "item": "hoodie",
+        "default_color": "grey"
+    },
+    {
+        "item": "jacket",
+        "default_color": "black"
+    },
+    {
+        "item": "jumpsuit",
+        "default_color": "black"
+    },
+    {
+        "item": "lace dress",
+        "default_color": "white"
+    },
+    {
+        "item": "lace lingerie",
+        "default_color": "black"
+    },
+    {
+        "item": "lace top",
+        "default_color": "white"
+    },
+    {
+        "item": "lace-up top",
+        "default_color": "black"
+    },
+    {
+        "item": "latex bodysuit",
+        "default_color": "black"
+    },
+    {
+        "item": "leather dress",
+        "default_color": "black"
+    },
+    {
+        "item": "long-sleeve dress",
+        "default_color": "blue"
+    },
+    {
+        "item": "long-sleeve top",
+        "default_color": "grey"
+    },
+    {
+        "item": "peephole bra",
+        "default_color": "black"
+    }
+    
 ]

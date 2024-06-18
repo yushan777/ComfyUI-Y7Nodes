@@ -15,14 +15,11 @@ class PhotoPromptGenerator:
     RANDOM = "random"
 
     # Load JSON as class variables
-    COLOR_MODE = None
-    FRAMING = None
-    STYLE_TYPE = None
+    STYLE_AND_FRAMING = None
     SUBJECT_CLASS = None
     HAIRSTYLE = None
-    CLOTHING_UPPER_COLOR = None
+    CLOTHING_PRESETS = None
     CLOTHING_UPPER = None
-    CLOTHING_LOWER_COLOR = None
     CLOTHING_LOWER = None
     FOOTWEAR_COLOR = None
     FOOTWEAR = None
@@ -45,14 +42,10 @@ class PhotoPromptGenerator:
 
     @classmethod
     def initialize_class_variables(cls):
-        cls.COLOR_MODE = cls.load_json_file("00_color_mode.json")
-        cls.FRAMING = cls.load_json_file("01_framing.json")
-        cls.STYLE_TYPE = cls.load_json_file("02_style_type.json")
+        cls.STYLE_AND_FRAMING = cls.load_json_file("01_style_and_framing.json")
         cls.SUBJECT_CLASS = cls.load_json_file("03_subject_class.json")
         cls.HAIRSTYLE = cls.load_json_file("04_hairstyle.json")
-        cls.CLOTHING_UPPER_COLOR = cls.load_json_file("05_clothing_color.json")
         cls.CLOTHING_UPPER = cls.load_json_file("06_clothing_top.json")
-        cls.CLOTHING_LOWER_COLOR = cls.load_json_file("05_clothing_color.json")
         cls.CLOTHING_LOWER = cls.load_json_file("07_clothing_lower.json")
         cls.FOOTWEAR_COLOR = cls.load_json_file("05_clothing_color.json")
         cls.FOOTWEAR = cls.load_json_file("08_footwear.json")
@@ -83,17 +76,9 @@ class PhotoPromptGenerator:
             "required": {
                 "seed": ("INT", {"default": 0, "min": 0, "max": 1125899906842624}),
                 "custom": ("STRING", {}),
-                "color_mode": (
-                    ["disabled", "random"] + cls.COLOR_MODE,
-                    {"default": "colored"},            
-                ),
-                "framing": (
-                    ["disabled", "random"] + cls.FRAMING,
+                "style_and_framing": (
+                    ["disabled", "random"] + cls.STYLE_AND_FRAMING,
                     {"default": "random"},            
-                ),
-                "style_type": (
-                    ["disabled", "random"] + cls.STYLE_TYPE,
-                    {"default": "disabled"},              
                 ),
                 "subject_class": (
                     ["disabled", "random"] + cls.SUBJECT_CLASS,
@@ -103,16 +88,9 @@ class PhotoPromptGenerator:
                     ["disabled", "random"] + cls.HAIRSTYLE,
                     {"default": "random"},              
                 ),
-                "clothing_upper_color": (
-                    ["disabled", "random"] + cls.CLOTHING_UPPER_COLOR,
-                    {"default": "random"},
-                ),
+                # use a dictionary comprehension to extract only the "item" values for the list: 
                 "clothing_upper": (
-                    ["disabled", "random"] + cls.CLOTHING_UPPER,
-                    {"default": "random"},
-                ),
-                "clothing_lower_color": (
-                    ["disabled", "random"] + cls.CLOTHING_LOWER_COLOR,
+                    ["disabled", "random"] + [clothing_upper["item"] for clothing_upper in cls.CLOTHING_UPPER],
                     {"default": "random"},
                 ),
                 "clothing_lower": (
@@ -217,57 +195,59 @@ class PhotoPromptGenerator:
 
                            
         # ------------------------------------------------------------
-        # FRAMING 
-        framing = kwargs.get("framing", "disabled")
-        if framing == "disabled":
-            framing = ""
-        elif framing == "random":
-            framing = self.select_random_choice(self.FRAMING)      
+        # STYLE_AND_FRAMING 
+        style_and_framing = kwargs.get("style_and_framing", "disabled")
+        if style_and_framing == "disabled":
+            style_and_framing = ""
+        elif style_and_framing == "random":
+            style_and_framing = self.select_random_choice(self.STYLE_AND_FRAMING)      
 
         # Only append if truthy (is not an empty string)
-        if framing:
+        if style_and_framing:
             # if framing string begins with a vowel
-            if self.begins_with_vowel(framing) == True:
+            if self.begins_with_vowel(style_and_framing) == True:
                 # set either "a" or "an"
                 components.append(f'an')  
             else:
                 components.append(f'a')  
 
             # now add framing 
-            components.append(f'{framing}')  
+            components.append(f'{style_and_framing}')  
+
+        components.append(f'photo of')  
         # ------------------------------------------------------------
         # COLOR MODE
         # get color_mode, if nothing is passed in, default to "color"
-        color_mode = kwargs.get("color_mode", "color")
-        if color_mode == "disabled":
-            color_mode = ""
-        elif color_mode == "random":
-            color_mode = self.select_random_choice(self.COLOR_MODE)
+        # color_mode = kwargs.get("color_mode", "colored")
+        # if color_mode == "disabled":
+        #     color_mode = ""
+        # elif color_mode == "random":
+        #     color_mode = self.select_random_choice(self.COLOR_MODE)
 
-        if color_mode:  # Only append if truthy (is not an empty string)
-            components.append(f'{color_mode}') 
+        # if color_mode:  # Only append if truthy (is not an empty string)
+        #     components.append(f'{color_mode}') 
 
         # ------------------------------------------------------------
         # STYLE/TYPE
         # get style/type, if nothing is passed in, default to "disabled"
-        style_or_type = kwargs.get("style_type", "disabled")
-        if style_or_type == "disabled":
-            style_or_type = ""
-        elif style_or_type == "random":
-            style_or_type = self.select_random_choice(self.STYLE_TYPE)      
+        # style_or_type = kwargs.get("style_type", "disabled")
+        # if style_or_type == "disabled":
+        #     style_or_type = ""
+        # elif style_or_type == "random":
+        #     style_or_type = self.select_random_choice(self.STYLE_TYPE)      
 
-        # Only append if truthy (is not an empty string)
-        if style_or_type:
-            # if last element is still "a" (framing was disabled)
-            if components[-1] == "a":
-                # if style type word begins with vowel
-                if style_or_type[0] in self.VOWELS: 
-                    # change "a" to "an"
-                    components[-1] = "an"          
-            # add style or type   
-            components.append(f'{style_or_type}')  
+        # # Only append if truthy (is not an empty string)
+        # if style_or_type:
+        #     # if last element is still "a" (framing was disabled)
+        #     if components[-1] == "a":
+        #         # if style type word begins with vowel
+        #         if style_or_type[0] in self.VOWELS: 
+        #             # change "a" to "an"
+        #             components[-1] = "an"          
+        #     # add style or type   
+        #     components.append(f'{style_or_type}')  
 
-        components.append(f'photo of')  
+        # components.append(f'photo of')  
         # ------------------------------------------------------------
         # SUBJECT / CLASS
         subject_or_class = kwargs.get("subject_class", "a man")
@@ -290,22 +270,21 @@ class PhotoPromptGenerator:
         if hairstyle:      
             components.append(f'{hairstyle},')           
         # ------------------------------------------------------------             
-        # ------------------------------------------------------------
-        # CLOTHING UPPER COLOR
-        clothing_upper_color = kwargs.get("clothing_upper_color", "random")
-        if clothing_upper_color == "disabled":
-            clothing_upper_color = ""
-        elif clothing_upper_color == "random":
-            clothing_upper_color = self.select_random_choice(self.CLOTHING_UPPER_COLOR)   
+        # # CLOTHING UPPER COLOR
+        # clothing_upper_color = kwargs.get("clothing_upper_color", "random")
+        # if clothing_upper_color == "disabled":
+        #     clothing_upper_color = ""
+        # elif clothing_upper_color == "random":
+        #     clothing_upper_color = self.select_random_choice(self.CLOTHING_UPPER_COLOR)   
 
-        if clothing_upper_color == "orange":
-            components.append(f'wearing an')
-        else:
-            components.append(f'wearing a')    
+        # if clothing_upper_color == "orange":
+        #     components.append(f'wearing an')
+        # else:
+        #     components.append(f'wearing a')    
 
-        # Only append if truthy (is not an empty string)    
-        if clothing_upper_color:  
-            components.append(f'{clothing_upper_color}')          
+        # # Only append if truthy (is not an empty string)    
+        # if clothing_upper_color:  
+        #     components.append(f'{clothing_upper_color}')          
         # ------------------------------------------------------------
         # CLOTHING UPPER
         clothing_upper = kwargs.get("clothing_upper", "random")
@@ -313,22 +292,21 @@ class PhotoPromptGenerator:
             clothing_upper = ""
         elif clothing_upper == "random":
             clothing_upper = self.select_random_choice(self.CLOTHING_UPPER)          
+        else:
+            # Find the whole selected location object based on the description
+            for cloth in self.CLOTHING_UPPER:
+                if cloth["item"] == clothing_upper:
+                    clothing_upper = cloth
+                    break
 
         # Only append if truthy (is not an empty string) 
         if clothing_upper:
-            components.append(f'{clothing_upper},')           
+            item = clothing_upper.get('item', 'none')  # Use a default item if none is found
+            color = clothing_upper.get('default_color', 'no-color')  # Use a default color if none is found
+            article = 'an' if self.begins_with_vowel(item) else 'a'
+            clothing_string = f'wearing {article} {color} {item}'
+            components.append(clothing_string)      
         # ------------------------------------------------------------
-        # CLOTHING LOWER COLOR
-        clothing_lower_color = kwargs.get("clothing_lower_color", "random")
-        if clothing_lower_color == "disabled":
-            clothing_lower_color = ""
-        elif clothing_lower_color == "random":
-            clothing_lower_color = self.select_random_choice(self.CLOTHING_LOWER_COLOR)    
-
-        # Only append if truthy (is not an empty string) 
-        if clothing_lower_color:
-            components.append(f'{clothing_lower_color}')   
-
         # ------------------------------------------------------------
         # CLOTHING LOWER 
         clothing_lower = kwargs.get("clothing_lower", "random")
@@ -425,13 +403,12 @@ class PhotoPromptGenerator:
             location_interior = ""
         elif location_interior == self.RANDOM:
             location_interior = self.select_random_choice(self.LOCATION_INTERIOR)   
-        else: # else is a selected value
-            # Find the selected location object based on the description            
-            # for location in self.LOCATION_INTERIOR:
-            #     if location["description"] == location_interior:
-            #         location_interior = location
-            #         break
-            pass
+        else: # else is a selected value                    
+            # Find the whole selected location object based on the description
+            for loc in self.LOCATION_INTERIOR:
+                if loc["description"] == location_interior:
+                    location_interior = loc
+                    break
 
         # Only append if truthy (is not an empty) 
         if location_interior:
@@ -443,7 +420,7 @@ class PhotoPromptGenerator:
             if show_detailed_location:
                 location_string = f'{location_interior["description"]}, {location_interior["detail"]}'
             else:
-                location_string = location_interior["description"]
+                location_string = location_interior[0]
             components.append(f'{location_string},') 
 
         # ELSE IF INT LOCATION IS EMPTY, THEN WE LOOK AT EXTERNAL LOCATION
@@ -455,7 +432,11 @@ class PhotoPromptGenerator:
             elif location_exterior == self.RANDOM:
                 location_exterior = self.select_random_choice(self.LOCATION_EXTERIOR)   
             else:
-                pass
+                # Find the whole selected location object based on the description
+                for loc in self.LOCATION_EXTERIOR:
+                    if loc["description"] == location_exterior:
+                        location_interior = loc
+                        break
 
             # Only append if truthy (is not an empty string) 
             if location_exterior:
