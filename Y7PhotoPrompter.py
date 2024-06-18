@@ -31,9 +31,13 @@ class PhotoPromptGenerator:
     GAZE = None 
     HANDS = None 
     LOCATION_INTERIOR = None
-    LOCATION_EXT = None
+    LOCATION_EXTERIOR = None
     TIME_OF_DAY = None 
+    LIGHTING = None
     WEATHER = None
+    CAMERA_OR_FILM = None
+    PHOTOGRAPHER = None
+
     ADDITIONAL_DETAILS = None
 
     def __init__(self, seed=None):
@@ -57,10 +61,12 @@ class PhotoPromptGenerator:
         cls.GAZE = cls.load_json_file("11_gaze.json")
         cls.HANDS = cls.load_json_file("12_hands.json")
         cls.LOCATION_INTERIOR = cls.load_json_file("13b_location_interior.json") # this json, each object has 2 properties (description and detail for longer descriptions)
-        cls.LOCATION_EXT = cls.load_json_file("14_location_exterior.json")        
-        cls.TIME_OF_DAY = cls.load_json_file("15_time_of_day.json")
-        cls.WEATHER = cls.load_json_file("16_weather.json")
-        cls.ADDITIONAL_DETAILS = cls.load_json_file("17_additional_details.json")
+        cls.LOCATION_EXTERIOR = cls.load_json_file("14b_location_exterior.json") 
+        cls.LIGHTING = cls.load_json_file("15_lighting.json")       
+        cls.TIME_OF_DAY = cls.load_json_file("16_time_of_day.json")
+        cls.WEATHER = cls.load_json_file("17_weather.json")
+        cls.CAMERA_OR_FILM = cls.load_json_file("18_camera_or_film.json")
+        cls.PHOTOGRAPHER = cls.load_json_file("19_photographer.json")
 
     @classmethod
     def load_json_file(cls, file_name):
@@ -140,15 +146,20 @@ class PhotoPromptGenerator:
                 "show_detailed_location": (
                     "BOOLEAN", {"default": True}
                 ),                    
-                # use a dictionary comprehension to extract only the "description" values: 
+                # use a dictionary comprehension to extract only the "description" values for the list: 
                 "location_interior": (
                     ["disabled", "random"] + [location["description"] for location in cls.LOCATION_INTERIOR],
                     {"default": "random"},
                 ),
+                # use a dictionary comprehension to extract only the "description" values for the list: 
                 "location_exterior": (
-                    ["disabled", "random"] + cls.LOCATION_EXT,
+                    ["disabled", "random"] + [location["description"] for location in cls.LOCATION_EXTERIOR],
                     {"default": "random"},
                 ),           
+                "lighting": (
+                    ["disabled", "random"] + cls.LIGHTING,
+                    {"default": "random"},
+                ),                  
                 "time_of_day": (
                     ["disabled", "random"] + cls.TIME_OF_DAY,
                     {"default": "random"},
@@ -157,11 +168,14 @@ class PhotoPromptGenerator:
                     ["disabled", "random"] + cls.WEATHER,
                     {"default": "random"},
                 ),   
-                "additional_details": (
-                    ["disabled", "random"] + cls.ADDITIONAL_DETAILS,
+                "camera_or_film": (
+                    ["disabled", "random"] + cls.CAMERA_OR_FILM,
                     {"default": "random"},
                 ),   
-
+                "photographer": (
+                    ["disabled", "random"] + cls.PHOTOGRAPHER,
+                    {"default": "random"},
+                ),   
             },
         }
 
@@ -404,20 +418,20 @@ class PhotoPromptGenerator:
         show_detailed_location = kwargs.get("show_detailed_location", True)
 
         # ------------------------------------------------------------
-        # LOCATION - INT / EXT
+        # LOCATION - INT 
         # get initial selection froom drop down
         location_interior = kwargs.get("location_interior", "random")        
         if location_interior == self.DISABLED:
             location_interior = ""
         elif location_interior == self.RANDOM:
             location_interior = self.select_random_choice(self.LOCATION_INTERIOR)   
-        else:
-            # Find the selected location object based on the description
-            location_interior = None
-            for location in self.LOCATION_INTERIOR:
-                if location["description"] == location_interior:
-                    location_interior = location
-                    break
+        else: # else is a selected value
+            # Find the selected location object based on the description            
+            # for location in self.LOCATION_INTERIOR:
+            #     if location["description"] == location_interior:
+            #         location_interior = location
+            #         break
+            pass
 
         # Only append if truthy (is not an empty) 
         if location_interior:
@@ -432,12 +446,16 @@ class PhotoPromptGenerator:
                 location_string = location_interior["description"]
             components.append(f'{location_string},') 
 
-        else: # Exterior Location
+        # ELSE IF INT LOCATION IS EMPTY, THEN WE LOOK AT EXTERNAL LOCATION
+        else: # LOCATION - EXT
+            # get initial selection froom drop down
             location_exterior = kwargs.get("location_exterior", "random")
             if location_exterior == self.DISABLED:
                 location_exterior = ""
             elif location_exterior == self.RANDOM:
-                location_exterior = self.select_random_choice(self.LOCATION_EXT)   
+                location_exterior = self.select_random_choice(self.LOCATION_EXTERIOR)   
+            else:
+                pass
 
             # Only append if truthy (is not an empty string) 
             if location_exterior:
@@ -446,10 +464,24 @@ class PhotoPromptGenerator:
                 elif re.search(r'\bwoman\b', subject_or_class.lower()):
                     components.append("She is")
 
-                components.append(f'{location_exterior},') 
+                if show_detailed_location:
+                    location_string = f'{location_exterior["description"]}, {location_exterior["detail"]}'
+                else:
+                    location_string = location_exterior["description"]     
+
+                components.append(f'{location_string},') 
 
         # ------------------------------------------------------------
+        # LIGHTING
+        lighting = kwargs.get("lighting", "random")
+        if lighting == self.DISABLED:
+            lighting = ""
+        elif lighting == self.RANDOM:    
+            lighting = self.select_random_choice(self.LIGHTING) 
         
+        # Only append if truthy (is not an empty string) 
+        if lighting:
+            components.append(f'{lighting},')
         # ------------------------------------------------------------
         # TIME-OF-DAY
         time_of_day = kwargs.get("time_of_day", "random")
@@ -473,17 +505,27 @@ class PhotoPromptGenerator:
         if weather:
             components.append(f'and the weather is {weather}.')        
         # ------------------------------------------------------------
-        # ADDITIONAL DETAILS OF ENVIRONMENT
-        additional_details = kwargs.get("additional_details", "random")
-        if additional_details == self.DISABLED:
-            additional_details = ""
-        elif additional_details == self.RANDOM:
-            additional_details = self.select_random_choice(self.ADDITIONAL_DETAILS)   
+        # CAMERA OR FILM
+        camera_or_film = kwargs.get("camera_or_film", "random")
+        if camera_or_film == self.DISABLED:
+            camera_or_film = ""
+        elif camera_or_film == self.RANDOM:
+            camera_or_film = self.select_random_choice(self.CAMERA_OR_FILM)   
 
         # Only append if truthy (is not an empty string) 
-        if additional_details:
-            components.append(f'{additional_details}.') 
+        if camera_or_film:
+            components.append(f'{camera_or_film}.') 
         # ------------------------------------------------------------
+        # PHOTOGRAPHER
+        photographer = kwargs.get("photographer", "random")
+        if photographer == self.DISABLED:
+            photographer = ""
+        elif photographer == self.RANDOM:
+            photographer = self.select_random_choice(self.PHOTOGRAPHER)   
+
+        # Only append if truthy (is not an empty string) 
+        if photographer:
+            components.append(f'Shot by {photographer}.')         
         # ------------------------------------------------------------
         # ------------------------------------------------------------
         # ------------------------------------------------------------
