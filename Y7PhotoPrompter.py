@@ -17,6 +17,7 @@ class PhotoPromptGenerator:
     # Load JSON as class variables
     STYLE_AND_FRAMING = None
     SUBJECT_CLASS = None
+    ROLE = None  # if active, it will override hairstyle, bodyshape, clothes, accessories
     HAIRSTYLE = None
     BODY_SHAPE = None
     CLOTHING_PRESETS = None
@@ -41,9 +42,15 @@ class PhotoPromptGenerator:
         self.rng = random.Random(seed)
 
     @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return ""
+    
+    @classmethod
     def initialize_class_variables(cls):
+        
         cls.STYLE_AND_FRAMING = cls.load_json_file("style_and_framing.json")
         cls.SUBJECT_CLASS = cls.load_json_file("subject_class.json")
+        cls.ROLE = cls.load_json_file("roles.json")
         cls.HAIRSTYLE = cls.load_json_file("hairstyle.json")
         cls.BODY_SHAPE = cls.load_json_file("body_shape.json")
         cls.CLOTHING_UPPER = cls.load_json_file("clothing_top.json")
@@ -84,11 +91,16 @@ class PhotoPromptGenerator:
                     ["disabled", "random"] + cls.SUBJECT_CLASS,
                     {"default": "a man"},              
                 ),
-                "hairstyle": (
-                    ["disabled", "random"] + cls.HAIRSTYLE,
+                "role": (
+                    ["disabled", "random"] + cls.ROLE,
                     {"default": "random"},              
                 ),
-                # use a dictionary comprehension to extract only the "item" values for the list: 
+                # use a dictionary comprehension to extract only the "style_name" values for the list: 
+                "hairstyle": (
+                    ["disabled", "random"] + [hairstyle["style_name"] for hairstyle in cls.HAIRSTYLE],
+                    {"default": "random"},              
+                ),
+                # use a dictionary comprehension to extract only the "description" values for the list: 
                 "body_shape": (
                     ["disabled", "random"] + [body_shape["description"] for body_shape in cls.BODY_SHAPE],
                     {"default": "random"},              
@@ -232,16 +244,34 @@ class PhotoPromptGenerator:
         if subject_or_class:       
             components.append(f'{subject_or_class}')          
         # ------------------------------------------------------------
+        # ROLE
+        role = kwargs.get("role", "random")
+        if role == "disabled":
+            role = ""
+        elif role == "random":
+            role = self.select_random_choice(self.ROLE)    
+
+        if role:
+            article = 'an' if self.begins_with_vowel(role) else 'a'
+            components.append(f'as {article} {role}') 
+
+        # ------------------------------------------------------------
         # HAIR STYLE
         hairstyle = kwargs.get("hairstyle", "random")
         if hairstyle == "disabled":
             hairstyle = ""
         elif hairstyle == "random":
             hairstyle = self.select_random_choice(self.HAIRSTYLE)    
+        else:
+            # get whole hairstyle obj so we have access to whole string
+            for hstyle in self.HAIRSTYLE:
+                if hstyle['style_name'] == hairstyle:
+                    hairstyle = hstyle
+                    break
 
-        # Only append if truthy (is not an empty string)
-        if hairstyle:      
-            components.append(f'{hairstyle},')           
+        if hairstyle: # if not empty
+            full_string = hairstyle.get('full_string')
+            components.append(f'{full_string},')           
         # ------------------------------------------------------------   
         # BODY SHAPE
         body_shape = kwargs.get("body_shape", "random")
@@ -250,10 +280,10 @@ class PhotoPromptGenerator:
         elif body_shape == "random":
             body_shape = self.select_random_choice(self.BODY_SHAPE)    
         else:
-            # so far we only have the item property, not the whole obj that also contains the "default_color" attribute, so
-            # we the whole selected location object based on the "item" attribute
+            # if user has made selection, then we only have the 'description' value, not the whole obj that also contains the "detail" attribute, so
+            # we look for the whole object based on the 'description'
             for bs in self.BODY_SHAPE:
-                if bs["item"] == body_shape:
+                if bs["description"] == body_shape:
                     body_shape = bs
                     break
 
@@ -271,7 +301,7 @@ class PhotoPromptGenerator:
         elif clothing_upper == "random":
             clothing_upper = self.select_random_choice(self.CLOTHING_UPPER)          
         else:
-            # so far we only have the item property, not the whole obj that also contains the "default_color" attribute, so
+            # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
             for cloth in self.CLOTHING_UPPER:
                 if cloth["item"] == clothing_upper:
@@ -292,7 +322,7 @@ class PhotoPromptGenerator:
         elif clothing_lower == "random":
             clothing_lower = self.select_random_choice(self.CLOTHING_LOWER)   
         else:
-            # so far we only have the item property, not the whole obj that also contains the "default_color" attribute, so
+            # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
             for cloth in self.CLOTHING_LOWER:
                 if cloth["item"] == clothing_lower:
@@ -320,7 +350,7 @@ class PhotoPromptGenerator:
         elif footwear == "random":
             footwear = self.select_random_choice(self.FOOTWEAR) 
         else: 
-            # so far we only have the item property, not the whole obj that also contains the "default_color" attribute, so
+            # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
             for fw in self.CLOTHING_LOWER:
                 if footwear["item"] == fw:
@@ -423,6 +453,7 @@ class PhotoPromptGenerator:
 
         # ELSE IF INT LOCATION IS EMPTY, THEN WE LOOK AT EXTERNAL LOCATION
         else: # LOCATION - EXT
+            print('interior is empty - looking at exterior....')
             # get initial selection froom drop down
             location_exterior = kwargs.get("location_exterior", "random")
             if location_exterior == self.DISABLED:
@@ -433,7 +464,7 @@ class PhotoPromptGenerator:
                 # Find the whole selected location object based on the description
                 for loc in self.LOCATION_EXTERIOR:
                     if loc["description"] == location_exterior:
-                        location_interior = loc
+                        location_exterior = loc
                         break
 
             # Only append if truthy (is not an empty string) 

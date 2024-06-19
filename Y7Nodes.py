@@ -245,9 +245,7 @@ class CountTokens:
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
-        return float("NaN")
-
-        return float("NaN")
+        return ""       
 
 
 NODE_CLASS_MAPPINGS = {
