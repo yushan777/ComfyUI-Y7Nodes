@@ -1,0 +1,142 @@
+[
+    {
+        "description": "athletic",
+        "detail": "slim but muscular figure"
+    },
+    {
+        "description": "beefy",
+        "detail": "broad and very muscular figure"
+    },
+    {
+        "description": "big-boned",
+        "detail": "large, sturdy figure"
+    },
+    {
+        "description": "buff",
+        "detail": "strongly built and muscular figure"
+    },
+    {
+        "description": "burly",
+        "detail": "large and strong, heavily built figure"
+    },
+    {
+        "description": "buxom",
+        "detail": "full-bosomed and curvaceous figure"
+    },
+    {
+        "description": "chubby",
+        "detail": "plump and rounded figure"
+    },
+    {
+        "description": "curvy, hourglass",
+        "detail": "well-proportioned figure with a narrow waist"
+    },
+    {
+        "description": "fat",
+        "detail": "large and rounded figure"
+    },
+    {
+        "description": "fit",
+        "detail": "healthy and strong, physically active figure"
+    },
+    {
+        "description": "flabby",
+        "detail": "soft, loose, and fleshy figure"
+    },
+    {
+        "description": "hefty",
+        "detail": "large and heavy, muscular figure"
+    },
+    {
+        "description": "lanky",
+        "detail": "tall and thin figure with long limbs"
+    },
+    {
+        "description": "muscular",
+        "detail": "with well-developed figure with large muscles"
+    },
+    {
+        "description": "obese",
+        "detail": "extremely overweight figure, with a lot of body fat"
+    },
+    {
+        "description": "overweight",
+        "detail": "larger than normal figure"
+    },
+    {
+        "description": "petite",
+        "detail": "small and slender, delicately built figure"
+    },
+    {
+        "description": "plump",
+        "detail": "having a full rounded shape, slightly overweight figure"
+    },
+    {
+        "description": "portly",
+        "detail": "stout, overweight figure"
+    },
+    {
+        "description": "pudgy",
+        "detail": "short and slightly fat figure"
+    },
+    {
+        "description": "rotund",
+        "detail": "round-shaped figure"
+    },
+    {
+        "description": "skinny",
+        "detail": "very thin, boney figure"
+    },
+    {
+        "description": "slender",
+        "detail": "gracefully thin figure"
+    },
+    {
+        "description": "slight",
+        "detail": "delicately small and thin figure"
+    },
+    {
+        "description": "slim",
+        "detail": "thin and attractive figure"
+    },
+    {
+        "description": "stocky",
+        "detail": "broad and sturdily built figure"
+    },
+    {
+        "description": "stout",
+        "detail": "somewhat fat or of heavy build figure"
+    },
+    {
+        "description": "svelte",
+        "detail": "slender and elegant figure"
+    },
+    {
+        "description": "thicc",
+        "detail": "curvy and voluptuous figure, large hips and thighs"
+    },
+    {
+        "description": "thick",
+        "detail": "curvy and voluptuous figure, large hips and thighs"
+    },
+    {
+        "description": "thick-bodied",
+        "detail": "broad and solidly built figure"
+    },
+    {
+        "description": "toned",
+        "detail": "slightly muscular with defined shape"
+    },
+    {
+        "description": "tubby",
+        "detail": "slightly fat and round figure"
+    },
+    {
+        "description": "voluptuous",
+        "detail": "full-figured and curvy figure, typically with a strong sexual appeal"
+    },
+    {
+        "description": "well-built",
+        "detail": "physically strong and muscular figure"
+    }
+]

@@ -12,7 +12,6 @@
     "mild",
     "overcast",    
     "raining",
-    "scorching hot",
     "slightly overcast",
     "stormy with angry looking clouds",
     "stormy with thunderstorms",
@@ -20,5 +19,5 @@
     "sunny with no clouds",
     "wet and drizzly",
     "wet and rainy",
-    "windy"
+    "wet and windy"
 ]

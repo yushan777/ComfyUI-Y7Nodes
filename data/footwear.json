@@ -1,0 +1,194 @@
+[
+    {
+        "item": "ankle boots",
+        "default_color": "black"
+    },
+    {
+        "item": "ballerina pumps",
+        "default_color": "nude"
+    },
+    {
+        "item": "ballet flats",
+        "default_color": "black"
+    },
+    {
+        "item": "ballet shoes",
+        "default_color": "pink"
+    },
+    {
+        "item": "barefoot",
+        "default_color": "n/a"
+    },
+    {
+        "item": "basketball shoes",
+        "default_color": "white"
+    },
+    {
+        "item": "boat shoes",
+        "default_color": "brown"
+    },
+    {
+        "item": "boots",
+        "default_color": "brown"
+    },
+    {
+        "item": "brogues",
+        "default_color": "tan"
+    },
+    {
+        "item": "chelsea boots",
+        "default_color": "black"
+    },
+    {
+        "item": "chukka boots",
+        "default_color": "brown"
+    },
+    {
+        "item": "clogs",
+        "default_color": "brown"
+    },
+    {
+        "item": "combat boots",
+        "default_color": "black"
+    },
+    {
+        "item": "cowboy boots",
+        "default_color": "brown"
+    },
+    {
+        "item": "dress shoes",
+        "default_color": "black"
+    },
+    {
+        "item": "edwardian oxfords",
+        "default_color": "black"
+    },
+    {
+        "item": "espadrilles",
+        "default_color": "beige"
+    },
+    {
+        "item": "flip-flops",
+        "default_color": "blue"
+    },
+    {
+        "item": "gladiator sandals",
+        "default_color": "black"
+    },
+    {
+        "item": "high heels",
+        "default_color": "red"
+    },
+    {
+        "item": "hiking boots",
+        "default_color": "grey"
+    },
+    {
+        "item": "kitten heels",
+        "default_color": "black"
+    },
+    {
+        "item": "knee-high boots",
+        "default_color": "black"
+    },
+    {
+        "item": "loafers",
+        "default_color": "brown"
+    },
+    {
+        "item": "mary janes",
+        "default_color": "black"
+    },
+    {
+        "item": "moccasins",
+        "default_color": "tan"
+    },
+    {
+        "item": "mules",
+        "default_color": "black"
+    },
+    {
+        "item": "over-the-knee boots",
+        "default_color": "black"
+    },
+    {
+        "item": "oxfords",
+        "default_color": "black"
+    },
+    {
+        "item": "peep-toe heels",
+        "default_color": "nude"
+    },
+    {
+        "item": "platform shoes",
+        "default_color": "black"
+    },
+    {
+        "item": "pointed-toe flats",
+        "default_color": "black"
+    },
+    {
+        "item": "pumps",
+        "default_color": "black"
+    },
+    {
+        "item": "rain boots",
+        "default_color": "yellow"
+    },
+    {
+        "item": "roller skates",
+        "default_color": "multi"
+    },
+    {
+        "item": "running shoes",
+        "default_color": "white"
+    },
+    {
+        "item": "saddle shoes",
+        "default_color": "black and white"
+    },
+    {
+        "item": "sandals",
+        "default_color": "brown"
+    },
+    {
+        "item": "slingbacks",
+        "default_color": "black"
+    },
+    {
+        "item": "slippers",
+        "default_color": "grey"
+    },
+    {
+        "item": "sneakers",
+        "default_color": "white"
+    },
+    {
+        "item": "snow boots",
+        "default_color": "black"
+    },
+    {
+        "item": "stilettos",
+        "default_color": "black"
+    },
+    {
+        "item": "tap shoes",
+        "default_color": "black"
+    },
+    {
+        "item": "tennis shoes",
+        "default_color": "white"
+    },
+    {
+        "item": "wedges",
+        "default_color": "brown"
+    },
+    {
+        "item": "wellington boots",
+        "default_color": "green"
+    },
+    {
+        "item": "work boots",
+        "default_color": "tan"
+    }
+]

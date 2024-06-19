@@ -1,0 +1,206 @@
+[
+    {
+        "item": "bell bottoms",
+        "default_color": "blue"
+    },
+    {
+        "item": "bikini bottom",
+        "default_color": "black"
+    },
+    {
+        "item": "bodycon skirt",
+        "default_color": "black"
+    },
+    {
+        "item": "bootcut pants",
+        "default_color": "denim"
+    },
+    {
+        "item": "bottoms",
+        "default_color": "grey"
+    },
+    {
+        "item": "capri pants",
+        "default_color": "navy"
+    },
+    {
+        "item": "cargo pants",
+        "default_color": "olive"
+    },
+    {
+        "item": "chinos",
+        "default_color": "khaki"
+    },
+    {
+        "item": "culottes",
+        "default_color": "black"
+    },
+    {
+        "item": "denim bottoms",
+        "default_color": "denim"
+    },
+    {
+        "item": "denim shorts",
+        "default_color": "denim"
+    },
+    {
+        "item": "fishnet stockings",
+        "default_color": "black"
+    },
+    {
+        "item": "harem pants",
+        "default_color": "black"
+    },
+    {
+        "item": "high-cut bottoms",
+        "default_color": "black"
+    },
+    {
+        "item": "high-waisted pants",
+        "default_color": "black"
+    },
+    {
+        "item": "high-waisted skirt",
+        "default_color": "black"
+    },
+    {
+        "item": "hotpants shorts",
+        "default_color": "denim"
+    },    
+    {
+        "item": "jeans",
+        "default_color": "denim"
+    },
+    {
+        "item": "jeggings",
+        "default_color": "denim"
+    },
+    {
+        "item": "business suit with a red and white striped tie",
+        "default_color": "gray"
+    },
+    {
+        "item": "knee-high socks",
+        "default_color": "white"
+    },
+    {
+        "item": "knickers",
+        "default_color": "white"
+    },
+    {
+        "item": "leather pants",
+        "default_color": "black"
+    },
+    {
+        "item": "leggings",
+        "default_color": "black"
+    },
+    {
+        "item": "maxi skirt",
+        "default_color": "black"
+    },
+    {
+        "item": "mini skirt",
+        "default_color": "red"
+    },
+    {
+        "item": "opaque stockings, 60 denier",
+        "default_color": "black"
+    },
+    {
+        "item": "palazzo pants",
+        "default_color": "black"
+    },
+    {
+        "item": "pants",
+        "default_color": "grey"
+    },
+    {
+        "item": "panties",
+        "default_color": "nude"
+    },
+    {
+        "item": "pantyhose",
+        "default_color": "nude"
+    },
+    {
+        "item": "pencil skirt",
+        "default_color": "black"
+    },
+    {
+        "item": "plaid skirt",
+        "default_color": "red"
+    },
+    {
+        "item": "pleated skirt",
+        "default_color": "navy"
+    },
+    {
+        "item": "ripped jeans",
+        "default_color": "denim"
+    },
+    {
+        "item": "romper",
+        "default_color": "floral"
+    },
+    {
+        "item": "sarong",
+        "default_color": "multi"
+    },
+    {
+        "item": "sheer stockings, 20 denier",
+        "default_color": "nude"
+    },
+    {
+        "item": "shorts",
+        "default_color": "khaki"
+    },
+    {
+        "item": "skates",
+        "default_color": "white"
+    },
+    {
+        "item": "skirt",
+        "default_color": "black"
+    },
+    {
+        "item": "socks",
+        "default_color": "white"
+    },
+    {
+        "item": "striped pants",
+        "default_color": "navy"
+    },
+    {
+        "item": "sweatpants",
+        "default_color": "grey"
+    },
+    {
+        "item": "tennis skirt",
+        "default_color": "white"
+    },
+    {
+        "item": "track pants",
+        "default_color": "black"
+    },
+    {
+        "item": "trousers",
+        "default_color": "black"
+    },
+    {
+        "item": "tulle skirt",
+        "default_color": "pink"
+    },
+    {
+        "item": "tutu",
+        "default_color": "pink"
+    },
+    {
+        "item": "wrap skirt",
+        "default_color": "black"
+    },
+    {
+        "item": "yoga pants",
+        "default_color": "black"
+    }
+]
