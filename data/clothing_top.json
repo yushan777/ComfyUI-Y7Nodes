@@ -174,6 +174,9 @@
     {
         "item": "peephole bra",
         "default_color": "black"
+    },
+    {
+        "item": "uniform shirt",
+        "default_color": "dark blue"
     }
-    
 ]

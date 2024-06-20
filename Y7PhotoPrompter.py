@@ -93,7 +93,7 @@ class PhotoPromptGenerator:
                 ),
                 "role": (
                     ["disabled", "random"] + cls.ROLE,
-                    {"default": "random"},              
+                    {"default": "disabled"},              
                 ),
                 # use a dictionary comprehension to extract only the "style_name" values for the list: 
                 "hairstyle": (
