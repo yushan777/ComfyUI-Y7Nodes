@@ -192,7 +192,10 @@ class PhotoPromptGenerator:
 
     FUNCTION = "generate_prompt"
     CATEGORY = "Y7/PromptGenerator"
-    DESCRIPTION = ""
+    DESCRIPTION = """
+## Advice
+It is strongly advised to enable Badge numbers in the Manager: _#ID Nickname_
+"""
     
     def generate_prompt(self, **kwargs):
         # get seed. if not provided then default to 0

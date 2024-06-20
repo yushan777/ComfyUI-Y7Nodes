@@ -6,5 +6,6 @@ from .Y7PhotoPrompter import NODE_CLASS_MAPPINGS as PhotoMappings, NODE_DISPLAY_
 NODE_CLASS_MAPPINGS = {**NodeMappings, **PhotoMappings}
 NODE_DISPLAY_NAME_MAPPINGS = {**NodeDisplayNames, **PhotoDisplayNames}
 
-
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
+
+
