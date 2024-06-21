@@ -85,8 +85,6 @@ class PhotoPromptGenerator:
         default_path = os.path.join(base_dir, "data/default", file_name)
         custom_path = os.path.join(base_dir, "data/custom", file_name)
 
-        print(f'------------------?>>{default_path}')
-
         # Load the default file
         with open(default_path, "r") as file:
             data = json.load(file)
@@ -489,7 +487,7 @@ class PhotoPromptGenerator:
 
         # Only append if truthy (is not an empty string) 
         if gaze:
-            components.append(f'{gaze}') 
+            components.append(f'{gaze},') 
 
         # ------------------------------------------------------------
         # HANDS
