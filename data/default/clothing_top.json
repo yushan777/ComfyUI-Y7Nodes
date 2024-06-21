@@ -14,6 +14,7 @@
     {"item": "cable knit sweater", "default_color": "cream", "gender": "unisex"},
     {"item": "camisole", "default_color": "nude", "gender": "female"},
     {"item": "cardigan", "default_color": "beige", "gender": "unisex"},
+    {"item": "cheongsam", "default_color": "floral multi-colored", "gender": "female"},    
     {"item": "corset top", "default_color": "black", "gender": "female"},
     {"item": "corset", "default_color": "red", "gender": "female"},
     {"item": "crochet dress", "default_color": "white", "gender": "female"},
@@ -31,14 +32,15 @@
     {"item": "flannel shirt", "default_color": "plaid", "gender": "unisex"},
     {"item": "floral dress", "default_color": "multi-colored", "gender": "female"},
     {"item": "fur-lined hood", "default_color": "grey", "gender": "unisex"},
-    {"item": "graphic tee", "default_color": "multi", "gender": "unisex"},
+    {"item": "fur coat", "default_color": "cream", "gender": "female"},
+    {"item": "graphic t-shirt", "default_color": "multi", "gender": "unisex"},
     {"item": "halter dress", "default_color": "red", "gender": "female"},
     {"item": "halter top", "default_color": "black", "gender": "female"},
     {"item": "henley shirt", "default_color": "maroon", "gender": "unisex"},
     {"item": "hoodie", "default_color": "maroon", "gender": "unisex"},
     {"item": "jacket", "default_color": "black", "gender": "unisex"},
     {"item": "jumpsuit", "default_color": "black", "gender": "female"},
-    {"item": "kimono top", "default_color": "deep purple", "gender": "unisex"},
+    {"item": "kimono", "default_color": "deep purple", "gender": "unisex"},
     {"item": "lace dress", "default_color": "white", "gender": "female"},
     {"item": "lace lingerie", "default_color": "black", "gender": "female"},
     {"item": "lace top", "default_color": "white", "gender": "female"},
@@ -68,5 +70,6 @@
     {"item": "top", "default_color": "black", "gender": "unisex"},
     {"item": "turtleneck", "default_color": "charcoal", "gender": "unisex"},
     {"item": "uniform shirt", "default_color": "dark blue", "gender": "unisex"},
-    {"item": "wrap dress", "default_color": "emerald green", "gender": "female"}
+    {"item": "wrap dress", "default_color": "emerald green", "gender": "female"},
+    {"item": "yukata", "default_color": "floral multi-colored", "gender": "female"}
 ]

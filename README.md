@@ -27,7 +27,9 @@ By default will just show the totals. If you wish to see a breakdown of how the 
 
 Inspired by dagthomas's Auto Prompter node.  I decided to make my own variation that aligns more with how I tend to prompt.  Also to separate photography and art styles into separate nodes. 
 
-I did think about restricting certain types of clothes to gender types, but in the end decided to not to, sometimes you might get some interesting results that way. 
+If clothing and footwear are set to `random` then they will the selection will correspond to the gender of the selected subject (if any).  If manually selected, then all items are possible. 
+
+Default data are stored in data/default`. if you wish to add your own to the lists then create them in `data/custom` with the same filename and same format as the original file. 
 
 | Attribute                  | Description                                                  |
 | :------------------------- | ------------------------------------------------------------ |
@@ -40,9 +42,9 @@ I did think about restricting certain types of clothes to gender types, but in t
 | `hairstyle`                | hair styles                                                  |
 | `body_shape`               | body shapes and types                                        |
 | `randomize_clothing_color` | If on then clothing and footwear will be randomized instead of using default. |
-| `clothing_upper`           | Upper clothing items. Includes default color per item.       |
-| `clothing_lower`           | Lower clothing items. Includes default color per item.       |
-| `footwear`                 | Footwear. Includes default color per item.                   |
+| `clothing_upper`           | Upper clothing items. Includes default color per item.  If set to `random`  then the random selection will correspond to the gender of the selected subject (if any). |
+| `clothing_lower`           | Lower clothing items. Includes default color per item. If set to `random`  then the random selection will correspond to the gender of the selected subject (if any). |
+| `footwear`                 | Footwear. Includes default color per item. If set to `random`  then the random selection will correspond to the gender of the selected subject (if any). |
 | `accessories`              | Smaller wearable or carryable items such as hats, necklaces, bags |
 | `primary_action`           | Standing, sitting etc                                        |
 | `gaze`                     | Direction of where subject is looking at                     |

@@ -11,7 +11,6 @@ class SUBJECT_TYPE(Enum):
     OTHER = 3
 
 # ==================================================================
-# CLOTHING ITEMS WILL HAVE A DEFAULT COLOR, BUT A SWITCH TO MAKE COLORS RANDOM WILL SELECT A RANDOM COLOR FROM COLORS 
 
 class PhotoPromptGenerator:
     logging.basicConfig(level=logging.DEBUG)
@@ -78,13 +77,30 @@ class PhotoPromptGenerator:
         # used for random solection of colors, not selectable by user
         cls.COLORS = cls.load_json_file("color.json")
 
+    #  ==================================================================================
     @classmethod
     def load_json_file(cls, file_name):
-        # This method should be updated to handle class level file access if necessary
-        file_path = os.path.join(os.path.dirname(__file__), "data", file_name)
-        with open(file_path, "r") as file:
-            return json.load(file)
+        # Define the path for default and custom files
+        base_dir = os.path.dirname(__file__)
+        default_path = os.path.join(base_dir, "data/default", file_name)
+        custom_path = os.path.join(base_dir, "data/custom", file_name)
+
+        print(f'------------------?>>{default_path}')
+
+        # Load the default file
+        with open(default_path, "r") as file:
+            data = json.load(file)
         
+        # Check if a custom variant of default file exists and merge it with the default
+        if os.path.exists(custom_path):
+            with open(custom_path, "r") as file:
+                custom_data = json.load(file)
+            # Assuming the data structure is a list
+            data.extend(custom_data)
+
+        return data
+            
+    #  ==================================================================================
     @classmethod
     def INPUT_TYPES(cls):
         cls.initialize_class_variables()  # Ensure variables are loaded
@@ -190,14 +206,14 @@ class PhotoPromptGenerator:
 
     RETURN_TYPES = (
         "STRING",
-        "INT",
+        # "INT",
         # "STRING",
         # "STRING",
         # "STRING"
     )
     RETURN_NAMES = (
-        "prompt",
-        "seed",
+        "Full Prompt",
+        # "seed",
         # "t5xxl",
         # "clip_l",
         # "clip_g",
@@ -320,28 +336,24 @@ class PhotoPromptGenerator:
         randomize_clothing_color = kwargs.get("randomize_clothing_color", False)
 
         # ------------------------------------------------------------
-        # BUILD MALE/FEMALE ONLY CLOTHES LISTS 
-        # ------------------------------------------------------------
-        filtered_clothes_upper = None
-        filtered_clothes_lower = None
-        filtered_footwear = None
-        if subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.MAN:
-            pass
-        elif subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.WOMAN:
-            pass
-        else:
-            pass
-
-        # ------------------------------------------------------------
         # CLOTHING UPPER
         # ------------------------------------------------------------
-        clothing_upper = kwargs.get("clothing_upper", "random")
+        clothing_upper = kwargs.get("clothing_upper", "random") # get clothing selection, default to random if none found.
         if clothing_upper == "disabled":
             clothing_upper = ""
         elif clothing_upper == "random":
-            clothing_upper = self.select_random_choice(self.CLOTHING_UPPER)          
+            # if set to random, we will lock it to the gender so it's less crazy              
+            if self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.MAN:
+                FOOTWEAR_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.MAN, self.CLOTHING_UPPER)
+                clothing_upper = self.select_random_choice(FOOTWEAR_FILTERED)    
+            elif self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.WOMAN:
+                FOOTWEAR_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.WOMAN, self.CLOTHING_UPPER) 
+                clothing_upper = self.select_random_choice(FOOTWEAR_FILTERED)      
+            else: # select random from full list                 
+                clothing_upper = self.select_random_choice(self.CLOTHING_UPPER)          
         else:
-            # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
+            # if user has made selection from the full list, then we only have 'item' property, 
+            # not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
             for cloth in self.CLOTHING_UPPER:
                 if cloth["item"] == clothing_upper:
@@ -366,7 +378,15 @@ class PhotoPromptGenerator:
         if clothing_lower == "disabled":
             clothing_lower = ""
         elif clothing_lower == "random":
-            clothing_lower = self.select_random_choice(self.CLOTHING_LOWER)   
+            # if set to random, we will lock it to the gender so it's less crazy              
+            if self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.MAN:
+                FOOTWEAR_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.MAN, self.CLOTHING_LOWER)
+                clothing_lower = self.select_random_choice(FOOTWEAR_FILTERED)    
+            elif self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.WOMAN:
+                FOOTWEAR_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.WOMAN, self.CLOTHING_LOWER) 
+                clothing_lower = self.select_random_choice(FOOTWEAR_FILTERED)      
+            else: # select random from full list                                 
+                clothing_lower = self.select_random_choice(self.CLOTHING_LOWER)   
         else:
             # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
@@ -399,13 +419,21 @@ class PhotoPromptGenerator:
         if footwear == "disabled":
             footwear = ""
         elif footwear == "random":
-            footwear = self.select_random_choice(self.FOOTWEAR) 
+            # if set to random, we will lock it to the gender so it's less crazy              
+            if self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.MAN:
+                FOOTWEAR_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.MAN, self.FOOTWEAR)
+                footwear = self.select_random_choice(FOOTWEAR_FILTERED)    
+            elif self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.WOMAN:
+                FOOTWEAR_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.WOMAN, self.FOOTWEAR) 
+                footwear = self.select_random_choice(FOOTWEAR_FILTERED)      
+            else: # select random from full list                                              
+                footwear = self.select_random_choice(self.FOOTWEAR) 
         else: 
             # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
-            for fw in self.CLOTHING_LOWER:
-                if footwear["item"] == fw:
-                    footwear = fw
+            for ftwear in self.CLOTHING_LOWER:
+                if footwear["item"] == ftwear:
+                    footwear = ftwear
                     break         
         
         if footwear:  # if not an empty   
@@ -434,7 +462,7 @@ class PhotoPromptGenerator:
 
         # Only append if truthy (is not an empty string) 
         if accessories:
-            components.append(f'and a {accessories}.')            
+            components.append(f'{accessories}.')            
         # ------------------------------------------------------------
         # PRIMARY ACTION
         primary_action = kwargs.get("primary_action", "random")
@@ -616,10 +644,12 @@ class PhotoPromptGenerator:
         return prompt, seed
 
     # ==============================================================================================================
+    # @classmethod
     def select_random_choice(self, available_choices):
         return self.rng.choices(available_choices, k=1)[0]
     
     # ==============================================================================================================        
+    # @classmethod
     def begins_with_vowel(self, str_input):
         VOWELS = "AEIOUaeiou"
         if str_input[0] in VOWELS:
@@ -627,8 +657,9 @@ class PhotoPromptGenerator:
         else:
             return False 
         
-    # ==============================================================================================================                
-    def subject_is_man_or_woman(subject_or_class):
+    # ==============================================================================================================  
+    # @classmethod              
+    def subject_is_man_or_woman(self, subject_or_class):
         # Check if the subject or class description contains the word 'man'
         if re.search(r'\bman\b', subject_or_class.lower()):
             return SUBJECT_TYPE.MAN
@@ -636,7 +667,28 @@ class PhotoPromptGenerator:
         elif re.search(r'\bwoman\b', subject_or_class.lower()):
             return SUBJECT_TYPE.WOMAN
         else:
-            return SUBJECT_TYPE.OTHER    
+            return SUBJECT_TYPE.OTHER   
+
+    # ==============================================================================================================  
+    # @classmethod
+    def filter_clothing_by_gender(self, st: SUBJECT_TYPE, clothing_list):
+        filtered_items = []  # Create an empty list to store the filtered items
+
+        for item in clothing_list:  # Loop through each item in the class variable
+        
+            if st == SUBJECT_TYPE.MAN:
+                    # if male or unisex then is good
+                    if item['gender'] == 'male' or item['gender'] == 'unisex':  
+                        filtered_items.append(item)  # Add the item to the filtered list
+            elif st == SUBJECT_TYPE.WOMAN:
+                    # if female or unisex then is good
+                    if item['gender'] == 'female' or item['gender'] == 'unisex':  
+                        filtered_items.append(item)  # Add the item to the filtered list        
+                    
+        return filtered_items
+
+
+
 NODE_CLASS_MAPPINGS = {
     "PhotoPrompter_(Y7)": PhotoPromptGenerator
 }

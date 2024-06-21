@@ -30,6 +30,8 @@
     {"item": "peep-toe heels", "default_color": "nude", "gender": "female"},
     {"item": "platform shoes", "default_color": "black", "gender": "unisex"},
     {"item": "pointed-toe flats", "default_color": "black", "gender": "female"},
+    {"item": "round-toe flats", "default_color": "black", "gender": "female"},
+    {"item": "almond-toe high heels", "default_color": "black", "gender": "female"},
     {"item": "pumps", "default_color": "black", "gender": "female"},
     {"item": "rain boots", "default_color": "yellow", "gender": "unisex"},
     {"item": "roller skates", "default_color": "multi", "gender": "unisex"},
