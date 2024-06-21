@@ -23,4 +23,36 @@ By default will just show the totals. If you wish to see a breakdown of how the 
 
 ![Alt text](https://github.com/yushan777/ComfyUI-Y7Nodes/blob/main/examples/count-tokens-workflow.png)
 
+**Photo Prompter**<br>
 
+Inspired by dagthomas's Auto Prompter node.  I decided to make my own variation that aligns more with how I tend to prompt.  Also to separate photography and art styles into separate nodes. 
+
+I did think about restricting certain types of clothes to gender types, but in the end decided to not to, sometimes you might get some interesting results that way. 
+
+| Attribute                  | Description                                                  |
+| :------------------------- | ------------------------------------------------------------ |
+| `seed`                     | Used to randomize attributes                                 |
+| `control_after_generate`   | Seed control                                                 |
+| `custom`                   | For custom word(s) to be included in the prompt. Will be placed at the beginning. |
+| `style_and_framing`        | Photographic style and framing.                              |
+| `subject_class`            | `man`, `woman` etc                                           |
+| `role`                     | character types, roles and professions                       |
+| `hairstyle`                | hair styles                                                  |
+| `body_shape`               | body shapes and types                                        |
+| `randomize_clothing_color` | If on then clothing and footwear will be randomized instead of using default. |
+| `clothing_upper`           | Upper clothing items. Includes default color per item.       |
+| `clothing_lower`           | Lower clothing items. Includes default color per item.       |
+| `footwear`                 | Footwear. Includes default color per item.                   |
+| `accessories`              | Smaller wearable or carryable items such as hats, necklaces, bags |
+| `primary_action`           | Standing, sitting etc                                        |
+| `gaze`                     | Direction of where subject is looking at                     |
+| `hands`                    | Positioning of hands                                         |
+| `show_detailed_location`   | If on then Location descriptions will be longer and more verbose. |
+| `location_interior`        | Interior locations                                           |
+| `location_exterior`        | Exterior locations.  Will be active if interior locations is disabled. |
+| `lighting`                 | Lighting conditions or styles                                |
+| `time_of_day`              | Time of day : `morning`, `midday`, `afternoon`, `evening` etc |
+| `weather`                  | Weather conditions. if location is interior then description will describe conditions outside of the interior location. |
+| `camera_or_film`           | Snalog film types, digital camera models                     |
+| `photographer`             | Photographer names                                           |
+| `remove_commas_periods`    | Remove all  commas and periods from the prompt               |

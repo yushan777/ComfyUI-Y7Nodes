@@ -3,9 +3,15 @@ import json
 import re
 import os
 import logging
+from enum import Enum
 
+class SUBJECT_TYPE(Enum):
+    MAN = 1
+    WOMAN = 2
+    OTHER = 3
 
 # ==================================================================
+# CLOTHING ITEMS WILL HAVE A DEFAULT COLOR, BUT A SWITCH TO MAKE COLORS RANDOM WILL SELECT A RANDOM COLOR FROM COLORS 
 
 class PhotoPromptGenerator:
     logging.basicConfig(level=logging.DEBUG)
@@ -36,6 +42,7 @@ class PhotoPromptGenerator:
     CAMERA_OR_FILM = None
     PHOTOGRAPHER = None
 
+    COLORS = None
     ADDITIONAL_DETAILS = None
 
     def __init__(self, seed=None):
@@ -53,8 +60,8 @@ class PhotoPromptGenerator:
         cls.ROLE = cls.load_json_file("roles.json")
         cls.HAIRSTYLE = cls.load_json_file("hairstyle.json")
         cls.BODY_SHAPE = cls.load_json_file("body_shape.json")
-        cls.CLOTHING_UPPER = cls.load_json_file("clothing_top.json")
-        cls.CLOTHING_LOWER = cls.load_json_file("clothing_lower.json")
+        cls.CLOTHING_UPPER = cls.load_json_file("clothing_top.json") # (item, default color, gender)
+        cls.CLOTHING_LOWER = cls.load_json_file("clothing_lower.json") # (item, default color, gender)
         cls.FOOTWEAR = cls.load_json_file("footwear.json")
         cls.ACCESSORIES = cls.load_json_file("accessories.json")
         cls.PRIMARY_ACTION = cls.load_json_file("primary_action.json")
@@ -67,6 +74,9 @@ class PhotoPromptGenerator:
         cls.WEATHER = cls.load_json_file("weather.json")
         cls.CAMERA_OR_FILM = cls.load_json_file("camera_or_film.json")
         cls.PHOTOGRAPHER = cls.load_json_file("photographer.json")
+
+        # used for random solection of colors, not selectable by user
+        cls.COLORS = cls.load_json_file("color.json")
 
     @classmethod
     def load_json_file(cls, file_name):
@@ -105,6 +115,9 @@ class PhotoPromptGenerator:
                     ["disabled", "random"] + [body_shape["description"] for body_shape in cls.BODY_SHAPE],
                     {"default": "random"},              
                 ),                
+                "randomize_clothing_color": (
+                    "BOOLEAN", {"default": True}
+                ),                 
                 # use a dictionary comprehension to extract only the "item" values for the list: 
                 "clothing_upper": (
                     ["disabled", "random"] + [clothing_upper["item"] for clothing_upper in cls.CLOTHING_UPPER],
@@ -193,8 +206,7 @@ class PhotoPromptGenerator:
     FUNCTION = "generate_prompt"
     CATEGORY = "Y7/PromptGenerator"
     DESCRIPTION = """
-## Advice
-It is strongly advised to enable Badge numbers in the Manager: _#ID Nickname_
+## Description
 """
     
     def generate_prompt(self, **kwargs):
@@ -206,17 +218,18 @@ It is strongly advised to enable Badge numbers in the Manager: _#ID Nickname_
         # components hold all the separate prompt parts together
         components = []
 
-        # ------------------------------------------------------------
+        # ------------------------------------------------------------        
         # CUSTOM
+        # ------------------------------------------------------------
         # get custom string, if nothing is passed in, default to ""
         custom = kwargs.get("custom", "")
         # if not empty, append custom string to components list
         if custom != "":
             components.append(f'{custom},')
-
                            
         # ------------------------------------------------------------
         # STYLE_AND_FRAMING 
+        # ------------------------------------------------------------        
         style_and_framing = kwargs.get("style_and_framing", "disabled")
         if style_and_framing == "disabled":
             style_and_framing = ""
@@ -238,16 +251,19 @@ It is strongly advised to enable Badge numbers in the Manager: _#ID Nickname_
         components.append(f'photo of')  
         # ------------------------------------------------------------
         # SUBJECT / CLASS
+        # ------------------------------------------------------------
         subject_or_class = kwargs.get("subject_class", "a man")
         if subject_or_class == "disabled":
             subject_or_class = ""
         elif subject_or_class == "random":
             subject_or_class = self.select_random_choice(self.SUBJECT_CLASS)  
 
+        
         if subject_or_class:       
             components.append(f'{subject_or_class}')          
         # ------------------------------------------------------------
         # ROLE
+        # ------------------------------------------------------------
         role = kwargs.get("role", "random")
         if role == "disabled":
             role = ""
@@ -260,6 +276,7 @@ It is strongly advised to enable Badge numbers in the Manager: _#ID Nickname_
 
         # ------------------------------------------------------------
         # HAIR STYLE
+        # ------------------------------------------------------------
         hairstyle = kwargs.get("hairstyle", "random")
         if hairstyle == "disabled":
             hairstyle = ""
@@ -277,6 +294,7 @@ It is strongly advised to enable Badge numbers in the Manager: _#ID Nickname_
             components.append(f'{full_string},')           
         # ------------------------------------------------------------   
         # BODY SHAPE
+        # ------------------------------------------------------------
         body_shape = kwargs.get("body_shape", "random")
         if body_shape == "disabled":
             body_shape = ""
@@ -297,7 +315,26 @@ It is strongly advised to enable Badge numbers in the Manager: _#ID Nickname_
             bs_string = f'with {article} {desc}, {detail}'
             components.append(f'{bs_string},')                             
         # ------------------------------------------------------------
+        # GET RANDOM COLOR FLAG
+        # ------------------------------------------------------------
+        randomize_clothing_color = kwargs.get("randomize_clothing_color", False)
+
+        # ------------------------------------------------------------
+        # BUILD MALE/FEMALE ONLY CLOTHES LISTS 
+        # ------------------------------------------------------------
+        filtered_clothes_upper = None
+        filtered_clothes_lower = None
+        filtered_footwear = None
+        if subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.MAN:
+            pass
+        elif subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.WOMAN:
+            pass
+        else:
+            pass
+
+        # ------------------------------------------------------------
         # CLOTHING UPPER
+        # ------------------------------------------------------------
         clothing_upper = kwargs.get("clothing_upper", "random")
         if clothing_upper == "disabled":
             clothing_upper = ""
@@ -313,8 +350,14 @@ It is strongly advised to enable Badge numbers in the Manager: _#ID Nickname_
 
         if clothing_upper: # if not an empty
             item = clothing_upper.get('item')  # defaults to 'none' if key does not exist
-            color = clothing_upper.get('default_color')  # defaults to 'none' if key does not exist
-            article = 'an' if self.begins_with_vowel(item) else 'a'
+            color = ""
+            if randomize_clothing_color:
+                color = self.select_random_choice(self.COLORS)        
+            else:
+                # use default color associated with the item of clothing
+                color = clothing_upper.get('default_color')  # defaults to 'none' if key does not existpass
+            
+            article = 'an' if self.begins_with_vowel(color) else 'a'
             clothing_string = f'wearing {article} {color} {item}'
             components.append(f'{clothing_string},')      
         # ------------------------------------------------------------
@@ -334,18 +377,23 @@ It is strongly advised to enable Badge numbers in the Manager: _#ID Nickname_
 
         if clothing_lower: # if not an empty      
             item = clothing_lower.get('item')  # defaults to 'none' if key does not exist
-            color = clothing_lower.get('default_color')  # defaults to 'none' if key does not exist    
+            color = ""
+            if randomize_clothing_color:
+                color = self.select_random_choice(self.COLORS)        
+            else:
+                # use default color associated with the item of clothing
+                color = clothing_lower.get('default_color')  # defaults to 'none' if key does not existpass
+
             article = ""
             # if no upper clothing 
             if not clothing_upper:
-                article = 'an' if self.begins_with_vowel(item) else 'a'
+                article = 'an' if self.begins_with_vowel(color) else 'a'
                 clothing_string = f'wearing {article} {color} {item}' 
             else:
                 clothing_string = f'{color} {item}' 
 
             components.append(f'{clothing_string},')            
         # ------------------------------------------------------------       
-        # ------------------------------------------------------------
         # FOOTWEAR
         footwear = kwargs.get("footwear", "random")
         if footwear == "disabled":
@@ -362,7 +410,12 @@ It is strongly advised to enable Badge numbers in the Manager: _#ID Nickname_
         
         if footwear:  # if not an empty   
             item = footwear.get('item')  # defaults to 'none' if key does not exist
-            color = footwear.get('default_color')  # defaults to 'none' if key does not exist    
+            color = ""
+            if randomize_clothing_color:
+                color = self.select_random_choice(self.COLORS)        
+            else:
+                # use default color associated with the item of clothing
+                color = footwear.get('default_color')  # defaults to 'none' if key does not existpass
             article = ""
             # if no upper clothing AND no lower clothing
             if not clothing_upper and not clothing_lower:
@@ -573,7 +626,17 @@ It is strongly advised to enable Badge numbers in the Manager: _#ID Nickname_
             return True
         else:
             return False 
-    
+        
+    # ==============================================================================================================                
+    def subject_is_man_or_woman(subject_or_class):
+        # Check if the subject or class description contains the word 'man'
+        if re.search(r'\bman\b', subject_or_class.lower()):
+            return SUBJECT_TYPE.MAN
+        # Check if the subject or class description contains the word 'woman'
+        elif re.search(r'\bwoman\b', subject_or_class.lower()):
+            return SUBJECT_TYPE.WOMAN
+        else:
+            return SUBJECT_TYPE.OTHER    
 NODE_CLASS_MAPPINGS = {
     "PhotoPrompter_(Y7)": PhotoPromptGenerator
 }
