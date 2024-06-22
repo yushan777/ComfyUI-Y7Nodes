@@ -1,4 +1,5 @@
 .DS_Store
 ._*
 __pycache__/
-data/._*
+data/default/._*
+data/custom/*
