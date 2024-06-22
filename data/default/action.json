@@ -1,7 +1,5 @@
 [
         "bending over",
-        "brushing hair",
-        "brushing teeth",
         "climbing",
         "cooking",
         "crouching",
@@ -10,6 +8,7 @@
         "daydreaming",
         "doing push-ups",
         "doing sit-ups",
+        "doing yoga",
         "drawing",
         "drinking",
         "eating",
@@ -60,7 +59,7 @@
         "typing on a computer",
         "walking",
         "waving",
-        "writing",
-        "yoga pose"
+        "writing"
+        
 ]
 

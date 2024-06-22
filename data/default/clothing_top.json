@@ -59,6 +59,7 @@
     {"item": "peplum top", "default_color": "red", "gender": "female"},
     {"item": "polo shirt", "default_color": "navy", "gender": "unisex"},
     {"item": "poncho", "default_color": "tan", "gender": "unisex"},
+    {"item": "post-apocalyptic jacket", "default_color": "yellow", "gender": "unisex"},
     {"item": "romper", "default_color": "light blue", "gender": "female"},
     {"item": "sequin top", "default_color": "silver", "gender": "female"},
     {"item": "sheath dress", "default_color": "black", "gender": "female"},

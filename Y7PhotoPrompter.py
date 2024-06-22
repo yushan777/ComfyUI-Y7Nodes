@@ -30,7 +30,7 @@ class PhotoPromptGenerator:
     CLOTHING_LOWER = None
     FOOTWEAR = None
     ACCESSORIES = None
-    PRIMARY_ACTION = None 
+    ACTION = None 
     GAZE = None 
     HANDS = None 
     LOCATION_INTERIOR = None
@@ -63,11 +63,11 @@ class PhotoPromptGenerator:
         cls.CLOTHING_LOWER = cls.load_json_file("clothing_lower.json") # (item, default color, gender)
         cls.FOOTWEAR = cls.load_json_file("footwear.json")
         cls.ACCESSORIES = cls.load_json_file("accessories.json")
-        cls.PRIMARY_ACTION = cls.load_json_file("primary_action.json")
+        cls.ACTION = cls.load_json_file("action.json")
         cls.GAZE = cls.load_json_file("gaze.json")
         cls.HANDS = cls.load_json_file("hands.json")
-        cls.LOCATION_INTERIOR = cls.load_json_file("location_interior.json") # this json, each object has 2 properties (description and detail) for longer descriptions)
-        cls.LOCATION_EXTERIOR = cls.load_json_file("location_exterior.json") 
+        cls.LOCATION_INTERIOR = cls.load_json_file("location_interior.json") # this json, each object has 3 properties (description, detail, preposition)
+        cls.LOCATION_EXTERIOR = cls.load_json_file("location_exterior.json") # this json, each object has 3 properties (description, detail, preposition)
         cls.LIGHTING = cls.load_json_file("lighting.json")       
         cls.TIME_OF_DAY = cls.load_json_file("time_of_day.json")
         cls.WEATHER = cls.load_json_file("weather.json")
@@ -77,6 +77,9 @@ class PhotoPromptGenerator:
         # used for random solection of colors, not selectable by user
         cls.COLORS = cls.load_json_file("color.json")
 
+        # Sort LOCATION_INTERIOR by "description" values in place
+        cls.LOCATION_INTERIOR.sort(key=lambda x: x['description'])
+        cls.LOCATION_EXTERIOR.sort(key=lambda x: x['description'])
     #  ==================================================================================
     @classmethod
     def load_json_file(cls, file_name):
@@ -109,11 +112,11 @@ class PhotoPromptGenerator:
                 "custom": ("STRING", {}),
                 "style_and_framing": (
                     ["disabled", "random"] + cls.STYLE_AND_FRAMING,
-                    {"default": "random"},            
+                    {"default": "medium closeup"},            
                 ),
                 "subject_class": (
                     ["disabled", "random"] + cls.SUBJECT_CLASS,
-                    {"default": "a man"},              
+                    {"default": "a woman"},              
                 ),
                 "role": (
                     ["disabled", "random"] + cls.ROLE,
@@ -151,8 +154,8 @@ class PhotoPromptGenerator:
                     ["disabled", "random"] + cls.ACCESSORIES,
                     {"default": "random"},
                 ),
-                "primary_action": (
-                    ["disabled", "random"] + cls.PRIMARY_ACTION,
+                "action": (
+                    ["disabled", "random"] + cls.ACTION,
                     {"default": "random"},
                 ),    
                 "gaze": (
@@ -462,21 +465,23 @@ class PhotoPromptGenerator:
         if accessories:
             components.append(f'{accessories}.')            
         # ------------------------------------------------------------
-        # PRIMARY ACTION
-        primary_action = kwargs.get("primary_action", "random")
-        if primary_action == self.DISABLED:
-            primary_action = ""
-        elif primary_action == self.RANDOM:
-            primary_action = self.select_random_choice(self.PRIMARY_ACTION)   
+        # MAIN ACTION
+        action = kwargs.get("action", "random")
+        if action == self.DISABLED:
+            action = ""
+        elif action == self.RANDOM:
+            action = self.select_random_choice(self.ACTION)   
 
         # Only append if truthy (is not an empty string) 
-        if primary_action:
-            if re.search(r'\bman\b', subject_or_class.lower()):
+        if action:
+            if self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.MAN:
                 components.append("He is")
-            elif re.search(r'\bwoman\b', subject_or_class.lower()):
+            elif self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.WOMAN:
                 components.append("She is")
+            else:
+                components.append("It is")
             
-            components.append(f'{primary_action},') 
+            components.append(f'{action},') 
         # ------------------------------------------------------------
         # GAZE
         gaze = kwargs.get("gaze", "random")
@@ -487,6 +492,14 @@ class PhotoPromptGenerator:
 
         # Only append if truthy (is not an empty string) 
         if gaze:
+            if action == "": # if no action, add pronoun prefix
+                if self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.MAN:
+                    components.append("He is")
+                elif self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.WOMAN:
+                    components.append("She is")
+                else:
+                    components.append("It is")    
+
             components.append(f'{gaze},') 
 
         # ------------------------------------------------------------
@@ -499,14 +512,23 @@ class PhotoPromptGenerator:
 
         # Only append if truthy (is not an empty string) 
         if hands:
-            components.append(f'with') 
+            if action == "" and gaze == "" : # if no action and no gaze, add pronoun prefix
+                if self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.MAN:
+                    components.append("His")
+                elif self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.WOMAN:
+                    components.append("Her")
+                else:
+                    components.append("Its")
+            else:                
+                components.append(f'with') 
+
             components.append(f'{hands}.') 
         # ------------------------------------------------------------
         # SHOW DETAILED LOCATION DESCRIPTION (OR NOT)
         show_detailed_location = kwargs.get("show_detailed_location", True)
 
         # ------------------------------------------------------------
-        # LOCATION - INT 
+        # LOCATION - INTERIOR
         # get initial selection froom drop down
         location_interior = kwargs.get("location_interior", "random")        
         if location_interior == self.DISABLED:
@@ -517,7 +539,7 @@ class PhotoPromptGenerator:
             # Find the whole selected location object based on the description
             for loc in self.LOCATION_INTERIOR:
                 if loc["description"] == location_interior:
-                    location_interior = loc
+                    location_interior = loc # get whol object
                     break
 
         # Only append if truthy (is not an empty) 
@@ -528,9 +550,9 @@ class PhotoPromptGenerator:
                 components.append("She is")
 
             if show_detailed_location:
-                location_string = f'{location_interior["description"]}, {location_interior["detail"]}'
+                location_string = f'{location_interior["preposition"]} {location_interior["description"]}, {location_interior["detail"]}'
             else:
-                location_string = location_interior[0]
+                location_string = f'{location_interior["preposition"]} {location_interior["description"]}'
             components.append(f'{location_string},') 
 
         # ELSE IF INT LOCATION IS EMPTY, THEN WE LOOK AT EXTERNAL LOCATION
@@ -557,9 +579,9 @@ class PhotoPromptGenerator:
                     components.append("She is")
 
                 if show_detailed_location:
-                    location_string = f'{location_exterior["description"]}, {location_exterior["detail"]}'
+                    location_string = f'{location_exterior["preposition"]} {location_exterior["description"]}, {location_exterior["detail"]}'
                 else:
-                    location_string = location_exterior["description"]     
+                    location_string = f'{location_exterior["preposition"]} {location_exterior["description"]}'     
 
                 components.append(f'{location_string},') 
 
