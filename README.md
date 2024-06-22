@@ -48,7 +48,7 @@ Changes to the lists can potentially make reproduceability difficult since the r
 | `clothing_lower`           | Lower clothing items. Includes default color per item. If set to `random`  then the random selection will correspond to the gender of the selected subject (if any). |
 | `footwear`                 | Footwear. Includes default color per item. If set to `random`  then the random selection will correspond to the gender of the selected subject (if any). |
 | `accessories`              | Smaller wearable or carryable items such as hats, necklaces, bags |
-| `primary_action`           | Standing, sitting etc                                        |
+| `action`                   | Standing, sitting etc                                        |
 | `gaze`                     | Direction of where subject is looking at                     |
 | `hands`                    | Positioning of hands                                         |
 | `show_detailed_location`   | If on then Location descriptions will be longer and more verbose. |
