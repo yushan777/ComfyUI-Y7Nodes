@@ -58,3 +58,5 @@ Default data are stored in data/default. If you wish to add your own custom item
 | `camera_or_film`           | Snalog film types, digital camera models                     |
 | `photographer`             | Photographer names                                           |
 | `remove_commas_periods`    | Remove all  commas and periods from the prompt               |
+
+**Art Style Prompter**
