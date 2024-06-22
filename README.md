@@ -29,7 +29,7 @@ Inspired by dagthomas's Auto Prompter node.  I decided to make my own variation 
 
 If clothing and footwear are set to `random` then they will the selection will correspond to the gender of the selected subject (if any).  If manually selected, then all items are possible. 
 
-Default data are stored in data/default`. if you wish to add your own to the lists then create them in `data/custom` with the same filename and same format as the original file. 
+Default data are stored in data/default. If you wish to add your own custom items to the lists then create them in `data/custom` with the same filename and same format as the original file. This is to ensure if that if changes are made to the defaults then your custom items do not get wiped out. 
 
 | Attribute                  | Description                                                  |
 | :------------------------- | ------------------------------------------------------------ |
