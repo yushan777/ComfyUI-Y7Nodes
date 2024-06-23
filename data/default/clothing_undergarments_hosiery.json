@@ -1,0 +1,80 @@
+[
+	{
+		"item": "knee-high socks",
+		"default_color": "white",
+		"gender": "female",
+		"category": "socks"
+	},
+	{
+		"item": "over-knee socks",
+		"default_color": "black",
+		"gender": "female",
+		"category": "socks"
+	},	
+	{
+		"item": "over-calf socks",
+		"default_color": "black",
+		"gender": "female",
+		"category": "socks"
+	},		
+	{
+		"item": "socks",
+		"default_color": "white",
+		"gender": "unisex",
+		"category": "socks"
+	},
+	{
+		"item": "bikini briefs",
+		"default_color": "white",
+		"gender": "female",
+		"category": "undergarments"
+	},	
+	{
+		"item": "knickers",
+		"default_color": "white",
+		"gender": "female",
+		"category": "undergarments"
+	},
+	{
+		"item": "panties",
+		"default_color": "pink",
+		"gender": "female",
+		"category": "undergarments"
+	},
+	{
+		"item": "thongs",
+		"default_color": "black",
+		"gender": "female",
+		"category": "undergarments"
+	},	
+	{
+		"item": "fishnet stockings",
+		"default_color": "black",
+		"gender": "female",
+		"category": "hosiery"
+	},
+	{
+		"item": "glitter stockings",
+		"default_color": "black",
+		"gender": "female",
+		"category": "hosiery"
+	},	
+	{
+		"item": "opaque stockings, 60 denier",
+		"default_color": "black",
+		"gender": "female",
+		"category": "hosiery"
+	},
+	{
+		"item": "pantyhose",
+		"default_color": "nude",
+		"gender": "female",
+		"category": "hosiery"
+	},
+	{
+		"item": "sheer stockings, 20 denier",
+		"default_color": "nude",
+		"gender": "female",
+		"category": "hosiery"
+	}			
+]

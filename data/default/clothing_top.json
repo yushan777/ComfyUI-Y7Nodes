@@ -8,7 +8,7 @@
     {"item": "boiler suit", "default_color": "olive green", "gender": "unisex"},
     {"item": "bra", "default_color": "white", "gender": "female"},
     {"item": "bralette", "default_color": "pink", "gender": "female"},
-    {"item": "business suit", "default_color": "grey", "gender": "unisex"},
+    {"item": "business suit", "default_color": "black", "gender": "unisex"},    
     {"item": "bustier top", "default_color": "burgundy", "gender": "female"},
     {"item": "button-up dress", "default_color": "blue", "gender": "female"},
     {"item": "cable knit sweater", "default_color": "cream", "gender": "unisex"},

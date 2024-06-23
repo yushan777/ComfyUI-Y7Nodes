@@ -27,7 +27,8 @@ class PhotoPromptGenerator:
     BODY_SHAPE = None
     CLOTHING_PRESETS = None
     CLOTHING_UPPER = None
-    CLOTHING_LOWER = None
+    CLOTHING_UNDERGARMENTS_HOSIERY = None
+    CLOTHING_LOWER = None    
     FOOTWEAR = None
     ACCESSORIES = None
     ACTION = None 
@@ -59,8 +60,9 @@ class PhotoPromptGenerator:
         cls.ROLE = cls.load_json_file("roles.json")
         cls.HAIRSTYLE = cls.load_json_file("hairstyle.json")
         cls.BODY_SHAPE = cls.load_json_file("body_shape.json")
-        cls.CLOTHING_UPPER = cls.load_json_file("clothing_top.json") # (item, default color, gender)
-        cls.CLOTHING_LOWER = cls.load_json_file("clothing_lower.json") # (item, default color, gender)
+        cls.CLOTHING_UPPER = cls.load_json_file("clothing_top.json") # (item, default color, gender, category)        
+        cls.CLOTHING_LOWER = cls.load_json_file("clothing_lower.json") # (item, default color, gender, category)
+        cls.CLOTHING_UNDERGARMENTS_HOSIERY = cls.load_json_file("clothing_undergarments_hosiery.json") # (item, default color, gender, category)
         cls.FOOTWEAR = cls.load_json_file("footwear.json")
         cls.ACCESSORIES = cls.load_json_file("accessories.json")
         cls.ACTION = cls.load_json_file("action.json")
@@ -139,12 +141,17 @@ class PhotoPromptGenerator:
                 "clothing_upper": (
                     ["disabled", "random"] + [clothing_upper["item"] for clothing_upper in cls.CLOTHING_UPPER],
                     {"default": "random"},
-                ),
+                ),                
                 # use a dictionary comprehension to extract only the "item" values for the list: 
                 "clothing_lower": (
                     ["disabled", "random"] + [clothing_lower["item"] for clothing_lower in cls.CLOTHING_LOWER],
                     {"default": "random"},
                 ),
+                # use a dictionary comprehension to extract only the "item" values for the list: 
+                "undergarments_socks_hosiery": (
+                    ["disabled", "random"] + [clothing_underg_hosiery["item"] for clothing_underg_hosiery in cls.CLOTHING_UNDERGARMENTS_HOSIERY],
+                    {"default": "random"},
+                ),                
                 # use a dictionary comprehension to extract only the "item" values for the list: 
                 "footwear": (
                     ["disabled", "random"] + [footwear["item"] for footwear in cls.FOOTWEAR], 
@@ -345,11 +352,11 @@ class PhotoPromptGenerator:
         elif clothing_upper == "random":
             # if set to random, we will lock it to the gender so it's less crazy              
             if self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.MAN:
-                FOOTWEAR_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.MAN, self.CLOTHING_UPPER)
-                clothing_upper = self.select_random_choice(FOOTWEAR_FILTERED)    
+                CLOTHING_UPPER_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.MAN, self.CLOTHING_UPPER)
+                clothing_upper = self.select_random_choice(CLOTHING_UPPER_FILTERED)    
             elif self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.WOMAN:
-                FOOTWEAR_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.WOMAN, self.CLOTHING_UPPER) 
-                clothing_upper = self.select_random_choice(FOOTWEAR_FILTERED)      
+                CLOTHING_UPPER_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.WOMAN, self.CLOTHING_UPPER) 
+                clothing_upper = self.select_random_choice(CLOTHING_UPPER_FILTERED)      
             else: # select random from full list                 
                 clothing_upper = self.select_random_choice(self.CLOTHING_UPPER)          
         else:
@@ -381,11 +388,11 @@ class PhotoPromptGenerator:
         elif clothing_lower == "random":
             # if set to random, we will lock it to the gender so it's less crazy              
             if self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.MAN:
-                FOOTWEAR_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.MAN, self.CLOTHING_LOWER)
-                clothing_lower = self.select_random_choice(FOOTWEAR_FILTERED)    
+                CLOTHING_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.MAN, self.CLOTHING_LOWER)
+                clothing_lower = self.select_random_choice(CLOTHING_FILTERED)    
             elif self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.WOMAN:
-                FOOTWEAR_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.WOMAN, self.CLOTHING_LOWER) 
-                clothing_lower = self.select_random_choice(FOOTWEAR_FILTERED)      
+                CLOTHING_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.WOMAN, self.CLOTHING_LOWER) 
+                clothing_lower = self.select_random_choice(CLOTHING_FILTERED)      
             else: # select random from full list                                 
                 clothing_lower = self.select_random_choice(self.CLOTHING_LOWER)   
         else:
@@ -406,16 +413,67 @@ class PhotoPromptGenerator:
                 color = clothing_lower.get('default_color')  # defaults to 'none' if key does not existpass
 
             article = ""
-            # if no upper clothing 
+            # if no upper clothing chosen, start with wearing and article 'an'/'a'
             if not clothing_upper:
                 article = 'an' if self.begins_with_vowel(color) else 'a'
                 clothing_string = f'wearing {article} {color} {item}' 
             else:
                 clothing_string = f'{color} {item}' 
 
-            components.append(f'{clothing_string},')            
+            components.append(f'{clothing_string},')   
+        # ------------------------------------------------------------     
+        # UNDERGARMENTS & HOSIERY
+        clothing_undergarments_hosiery = kwargs.get("undergarments_socks_hosiery", random)
+        if clothing_undergarments_hosiery == "disabled":
+            clothing_undergarments_hosiery = ""
+        elif clothing_undergarments_hosiery == "random":        
+            # if set to random, we will filter out some items according to what lower clothing item has been selected
+            # IF CLOTHING_LOWER = "" : ALLOW ALL ITEMS
+            # IF CLOTHING_LOWER = PANTS, LEGGINGS, OTHER : ALLOW NONE
+            # IF CLOTHING_LOWER = SKIRTS : ALLOW SOCKS OR HOSIERY ONLY            
+            if clothing_lower == "":
+                # allow all
+                clothing_undergarments_hosiery = self.select_random_choice(self.CLOTHING_UNDERGARMENTS_HOSIERY)   
+            elif clothing_lower['category'] == "skirts":
+                # TODO : need to condition for dresses (socks and hosiery only) and bodysuits/catsuits etc (none)
+                # filter list to socks and hosiery only
+                UNDERGARMENT_FILTERED = self.filter_undergarments_hosiery(self.CLOTHING_UNDERGARMENTS_HOSIERY)
+                clothing_undergarments_hosiery = self.select_random_choice(UNDERGARMENT_FILTERED)   
+            else:
+                clothing_undergarments_hosiery = ""
+        else:
+            # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
+            # we the whole selected location object based on the "item" attribute
+            for underg in self.CLOTHING_UNDERGARMENTS_HOSIERY:
+                if underg["item"] == clothing_undergarments_hosiery:
+                    clothing_undergarments_hosiery = underg
+                    break              
+
+        if clothing_undergarments_hosiery: # if not empty
+
+            item = clothing_undergarments_hosiery.get('item')  # defaults to 'none' if key does not exist
+            color = ""
+            if randomize_clothing_color:
+                color = self.select_random_choice(self.COLORS)        
+            else:
+                # use default color associated with the item of clothing
+                color = randomize_clothing_color.get('default_color')  # defaults to 'none' if key does not existpass
+
+            article = ""
+            # if no upper clothing chosen, start with wearing and article 'an'/'a'
+            if not clothing_upper and not clothing_lower:
+                article = 'an' if self.begins_with_vowel(color) else 'a'
+                clothing_string = f'wearing {article} {color} {item}' 
+            else:
+                clothing_string = f'{color} {item}' 
+
+            print(f'clothing_string = {clothing_string}')
+            components.append(f'{clothing_string},')   
+        # ------------------------------------------------------------              
+
         # ------------------------------------------------------------       
         # FOOTWEAR
+        # ------------------------------------------------------------     
         footwear = kwargs.get("footwear", "random")
         if footwear == "disabled":
             footwear = ""
@@ -446,8 +504,8 @@ class PhotoPromptGenerator:
                 # use default color associated with the item of clothing
                 color = footwear.get('default_color')  # defaults to 'none' if key does not existpass
             article = ""
-            # if no upper clothing AND no lower clothing
-            if not clothing_upper and not clothing_lower:
+            # if no upper clothing AND no lower clothing and no undergarments
+            if not clothing_upper and not clothing_lower and not clothing_undergarments_hosiery:
                 article = 'an' if self.begins_with_vowel(item) else 'a'
                 footwear_string = f'wearing {article} {color} {item}' 
             else:
@@ -707,6 +765,16 @@ class PhotoPromptGenerator:
                     
         return filtered_items
 
+    # ==============================================================================================================  
+    def filter_undergarments_hosiery(self, undergarments_list):
+        filtered_items = []  
+
+        # allow stockings and socks only        
+        for item in undergarments_list:  # Loop through each item in the class variable                
+            if item['category'] == "hosiery" or item['category'] == "socks":
+                filtered_items.append(item)
+
+        return filtered_items
 
 
 NODE_CLASS_MAPPINGS = {

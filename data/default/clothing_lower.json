@@ -1,55 +1,263 @@
 [
-    {"item": "bell bottoms", "default_color": "blue", "gender": "unisex"},
-    {"item": "bikini bottom", "default_color": "black", "gender": "female"},
-    {"item": "bodycon skirt", "default_color": "black", "gender": "female"},
-    {"item": "bootcut pants", "default_color": "denim", "gender": "unisex"},
-    {"item": "bottoms", "default_color": "grey", "gender": "unisex"},
-    {"item": "capri pants", "default_color": "navy", "gender": "female"},
-    {"item": "cargo pants", "default_color": "olive", "gender": "unisex"},
-    {"item": "chinos", "default_color": "khaki", "gender": "unisex"},
-    {"item": "culottes", "default_color": "black", "gender": "female"},
-    {"item": "denim bottoms", "default_color": "denim", "gender": "unisex"},
-    {"item": "denim shorts", "default_color": "denim", "gender": "unisex"},
-    {"item": "fishnet stockings", "default_color": "black", "gender": "female"},
-    {"item": "harem pants", "default_color": "black", "gender": "unisex"},
-    {"item": "high-cut bottoms", "default_color": "black", "gender": "female"},
-    {"item": "high-waisted pants", "default_color": "black", "gender": "female"},
-    {"item": "high-waisted skirt", "default_color": "black", "gender": "female"},
-    {"item": "hotpants", "default_color": "denim", "gender": "female"},
-    {"item": "jeans", "default_color": "denim", "gender": "unisex"},
-    {"item": "jeggings", "default_color": "denim", "gender": "female"},
-    {"item": "business suit with a red and white striped tie", "default_color": "gray", "gender": "unisex"},
-    {"item": "knee-high socks", "default_color": "white", "gender": "female"},
-    {"item": "knickers", "default_color": "white", "gender": "female"},
-    {"item": "latex leggings", "default_color": "black", "gender": "female"},
-    {"item": "leather pants", "default_color": "black", "gender": "unisex"},
-    {"item": "leggings", "default_color": "black", "gender": "female"},
-    {"item": "maxi skirt", "default_color": "black", "gender": "female"},
-    {"item": "mini skirt", "default_color": "red", "gender": "female"},
-    {"item": "opaque stockings, 60 denier", "default_color": "black", "gender": "female"},
-    {"item": "palazzo pants", "default_color": "black", "gender": "female"},
-    {"item": "pants", "default_color": "grey", "gender": "unisex"},
-    {"item": "panties", "default_color": "nude", "gender": "female"},
-    {"item": "pantyhose", "default_color": "nude", "gender": "female"},
-    {"item": "pencil skirt", "default_color": "black", "gender": "female"},
-    {"item": "plaid skirt", "default_color": "red", "gender": "female"},
-    {"item": "pleated skirt", "default_color": "navy", "gender": "female"},
-    {"item": "pvc leggings", "default_color": "black", "gender": "female"},
-    {"item": "ripped jeans", "default_color": "denim", "gender": "unisex"},
-    {"item": "romper", "default_color": "floral", "gender": "female"},
-    {"item": "sarong", "default_color": "sheer white", "gender": "female"},
-    {"item": "sheer stockings, 20 denier", "default_color": "nude", "gender": "female"},
-    {"item": "shorts", "default_color": "khaki", "gender": "unisex"},
-    {"item": "skinny jeans", "default_color": "white", "gender": "unisex"},
-    {"item": "skirt", "default_color": "black", "gender": "female"},
-    {"item": "socks", "default_color": "white", "gender": "unisex"},
-    {"item": "striped pants", "default_color": "navy", "gender": "unisex"},
-    {"item": "sweatpants", "default_color": "grey", "gender": "unisex"},
-    {"item": "tennis skirt", "default_color": "white", "gender": "female"},
-    {"item": "track pants", "default_color": "black", "gender": "unisex"},
-    {"item": "trousers", "default_color": "black", "gender": "unisex"},
-    {"item": "tulle skirt", "default_color": "pink", "gender": "female"},
-    {"item": "tutu", "default_color": "pink", "gender": "female"},
-    {"item": "wrap skirt", "default_color": "black", "gender": "female"},
-    {"item": "yoga pants", "default_color": "black", "gender": "female"}
+	{
+		"item": "bell bottoms",
+		"default_color": "blue",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "bootcut pants",
+		"default_color": "denim",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "bottoms",
+		"default_color": "grey",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "capri pants",
+		"default_color": "navy",
+		"gender": "female",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "cargo pants",
+		"default_color": "olive",
+        
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "chinos",
+		"default_color": "khaki",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "culottes",
+		"default_color": "black",
+		"gender": "female",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "denim bottoms",
+		"default_color": "denim",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "harem pants",
+		"default_color": "black",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "high-cut bottoms",
+		"default_color": "black",
+		"gender": "female",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "high-waisted pants",
+		"default_color": "black",
+		"gender": "female",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "jeans",
+		"default_color": "denim",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "jeggings",
+		"default_color": "denim",
+		"gender": "female",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "leather pants",
+		"default_color": "black",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "palazzo pants",
+		"default_color": "black",
+		"gender": "female",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "pants",
+		"default_color": "grey",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "ripped jeans",
+		"default_color": "denim",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "skinny jeans",
+		"default_color": "white",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "striped pants",
+		"default_color": "navy",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "sweatpants",
+		"default_color": "grey",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "track pants",
+		"default_color": "black",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "trousers",
+		"default_color": "black",
+		"gender": "unisex",
+		"category": "pants_trousers"
+	},
+	{
+		"item": "bikini bottom",
+		"default_color": "black",
+		"gender": "female",
+		"category": "shorts"
+	},
+	{
+		"item": "denim shorts",
+		"default_color": "denim",
+		"gender": "unisex",
+		"category": "shorts"
+	},
+	{
+		"item": "hotpants",
+		"default_color": "denim",
+		"gender": "female",
+		"category": "shorts"
+	},
+	{
+		"item": "shorts",
+		"default_color": "khaki",
+		"gender": "unisex",
+		"category": "shorts"
+	},
+	{
+		"item": "bodycon skirt",
+		"default_color": "black",
+		"gender": "female",
+		"category": "skirts"
+	},
+	{
+		"item": "high-waisted skirt",
+		"default_color": "black",
+		"gender": "female",
+		"category": "skirts"
+	},
+	{
+		"item": "maxi skirt",
+		"default_color": "black",
+		"gender": "female",
+		"category": "skirts"
+	},
+	{
+		"item": "mini skirt",
+		"default_color": "red",
+		"gender": "female",
+		"category": "skirts"
+	},
+	{
+		"item": "pencil skirt",
+		"default_color": "black",
+		"gender": "female",
+		"category": "skirts"
+	},
+	{
+		"item": "plaid skirt",
+		"default_color": "red",
+		"gender": "female",
+		"category": "skirts"
+	},
+	{
+		"item": "pleated skirt",
+		"default_color": "navy",
+		"gender": "female",
+		"category": "skirts"
+	},
+	{
+		"item": "skirt",
+		"default_color": "black",
+		"gender": "female",
+		"category": "skirts"
+	},
+	{
+		"item": "tennis skirt",
+		"default_color": "white",
+		"gender": "female",
+		"category": "skirts"
+	},
+	{
+		"item": "tulle skirt",
+		"default_color": "pink",
+		"gender": "female",
+		"category": "skirts"
+	},
+	{
+		"item": "tutu",
+		"default_color": "pink",
+		"gender": "female",
+		"category": "skirts"
+	},
+	{
+		"item": "wrap skirt",
+		"default_color": "black",
+		"gender": "female",
+		"category": "skirts"
+	},
+	{
+		"item": "latex leggings",
+		"default_color": "black",
+		"gender": "female",
+		"category": "leggings"
+	},
+	{
+		"item": "leggings",
+		"default_color": "black",
+		"gender": "female",
+		"category": "leggings"
+	},
+	{
+		"item": "pvc leggings",
+		"default_color": "black",
+		"gender": "female",
+		"category": "leggings"
+	},
+	{
+		"item": "yoga pants",
+		"default_color": "black",
+		"gender": "female",
+		"category": "leggings"
+	},
+	{
+		"item": "sarong",
+		"default_color": "sheer white",
+		"gender": "female",
+		"category": "other"
+	}
+
+
 ]
