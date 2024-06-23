@@ -31,6 +31,8 @@ If clothing and footwear are set to `random` then they will the selection will c
 
 Default data are stored in data/default. If you wish to add your own custom items to the lists then create them in `data/custom` with the same filename and same format as the original file. This is to ensure if that if changes are made to the defaults then your custom items do not get wiped out. 
 
+When set to `random`, some of the attributes will be dependent on others.  For example, if `clothing_upper` is a dress, then `pants` or `trousers` etc will be ignored, but `socks` etc will be allowed.   Or if an `indoor_scene`  is `active` or `random` then outdoor_scene will be ignored.  If `indoor_scene` is disabled then `outdoor_scene` will be considered. However if set to manual selection, then any combination is allowed to allow for flexibility. 
+
 Changes to the lists can potentially make reproduceability difficult since the random choices can be affected if items in lists are added/deleted or shuffled. For this reason I recommend incuding a show text or show any node to display the full prompt so that when saving, the contents of the show text node will be included in the embedded metadata within the image.  In addition using https://github.com/mpiquero1111/ComfyUI-SaveImgPrompt node to save the workflow in a separate txt file next to every image can be useful in the event that you edit the image causing the metadata to be lost. 
 
 | Attribute                  | Description                                                  |

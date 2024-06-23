@@ -19,6 +19,8 @@ class PhotoPromptGenerator:
     DISABLED = "disabled"
     RANDOM = "random"
 
+    DEFAULT_SETTINGS = None
+
     # Load JSON as class variables
     STYLE_AND_FRAMING = None
     SUBJECT_CLASS = None
@@ -27,15 +29,15 @@ class PhotoPromptGenerator:
     BODY_SHAPE = None
     CLOTHING_PRESETS = None
     CLOTHING_UPPER = None
-    CLOTHING_UNDERGARMENTS_HOSIERY = None
+    UNDERWEAR_SOCKS_HOSIERY = None
     CLOTHING_LOWER = None    
     FOOTWEAR = None
     ACCESSORIES = None
     ACTION = None 
     GAZE = None 
     HANDS = None 
-    LOCATION_INTERIOR = None
-    LOCATION_EXTERIOR = None
+    SCENE_INDOOR = None
+    SCENE_OUTDOOR = None
     TIME_OF_DAY = None 
     LIGHTING = None
     WEATHER = None
@@ -52,39 +54,63 @@ class PhotoPromptGenerator:
     def IS_CHANGED(cls, **kwargs):
         return ""
     
+
     @classmethod
     def initialize_class_variables(cls):
         
-        cls.STYLE_AND_FRAMING = cls.load_json_file("style_and_framing.json")
-        cls.SUBJECT_CLASS = cls.load_json_file("subject_class.json")
-        cls.ROLE = cls.load_json_file("roles.json")
-        cls.HAIRSTYLE = cls.load_json_file("hairstyle.json")
-        cls.BODY_SHAPE = cls.load_json_file("body_shape.json")
-        cls.CLOTHING_UPPER = cls.load_json_file("clothing_top.json") # (item, default color, gender, category)        
-        cls.CLOTHING_LOWER = cls.load_json_file("clothing_lower.json") # (item, default color, gender, category)
-        cls.CLOTHING_UNDERGARMENTS_HOSIERY = cls.load_json_file("clothing_undergarments_hosiery.json") # (item, default color, gender, category)
-        cls.FOOTWEAR = cls.load_json_file("footwear.json")
-        cls.ACCESSORIES = cls.load_json_file("accessories.json")
-        cls.ACTION = cls.load_json_file("action.json")
-        cls.GAZE = cls.load_json_file("gaze.json")
-        cls.HANDS = cls.load_json_file("hands.json")
-        cls.LOCATION_INTERIOR = cls.load_json_file("location_interior.json") # this json, each object has 3 properties (description, detail, preposition)
-        cls.LOCATION_EXTERIOR = cls.load_json_file("location_exterior.json") # this json, each object has 3 properties (description, detail, preposition)
-        cls.LIGHTING = cls.load_json_file("lighting.json")       
-        cls.TIME_OF_DAY = cls.load_json_file("time_of_day.json")
-        cls.WEATHER = cls.load_json_file("weather.json")
-        cls.CAMERA_OR_FILM = cls.load_json_file("camera_or_film.json")
-        cls.PHOTOGRAPHER = cls.load_json_file("photographer.json")
+        cls.STYLE_AND_FRAMING = cls.load_data_files("style_and_framing.json")
+        cls.SUBJECT_CLASS = cls.load_data_files("subject_class.json")
+        cls.ROLE = cls.load_data_files("roles.json")
+        cls.HAIRSTYLE = cls.load_data_files("hairstyle.json")
+        cls.BODY_SHAPE = cls.load_data_files("body_shape.json")
+        cls.CLOTHING_UPPER = cls.load_data_files("clothing_top.json") # (item, default color, gender, category)        
+        cls.CLOTHING_LOWER = cls.load_data_files("clothing_lower.json") # (item, default color, gender, category)
+        cls.UNDERWEAR_SOCKS_HOSIERY = cls.load_data_files("underwear_socks_hosiery.json") # (item, default color, gender, category)
+        cls.FOOTWEAR = cls.load_data_files("footwear.json")
+        cls.ACCESSORIES = cls.load_data_files("accessories.json")
+        cls.ACTION = cls.load_data_files("action.json")
+        cls.GAZE = cls.load_data_files("gaze.json")
+        cls.HANDS = cls.load_data_files("hands.json")
+        cls.SCENE_INDOOR = cls.load_data_files("scene_indoor.json") # this json, each object has 3 properties (description, detail, preposition)
+        cls.SCENE_OUTDOOR = cls.load_data_files("scene_outdoor.json") # this json, each object has 3 properties (description, detail, preposition)
+        cls.LIGHTING = cls.load_data_files("lighting.json")       
+        cls.TIME_OF_DAY = cls.load_data_files("time_of_day.json")
+        cls.WEATHER = cls.load_data_files("weather.json")
+        cls.CAMERA_OR_FILM = cls.load_data_files("camera_or_film.json")
+        cls.PHOTOGRAPHER = cls.load_data_files("photographer.json")
 
         # used for random solection of colors, not selectable by user
-        cls.COLORS = cls.load_json_file("color.json")
+        cls.COLORS = cls.load_data_files("color.json")
 
-        # Sort LOCATION_INTERIOR by "description" values in place
-        cls.LOCATION_INTERIOR.sort(key=lambda x: x['description'])
-        cls.LOCATION_EXTERIOR.sort(key=lambda x: x['description'])
+        # =========================================
+        # SORTING LISTS
+        # =========================================
+        cls.CLOTHING_UPPER.sort(key=lambda x: x['item'])
+        # to sort by category primary key, followed by item as secondary sort use the following
+        # cls.CLOTHING_UPPER.sort(key=lambda x: (x['category'], x['item']))
+
+        cls.CLOTHING_LOWER.sort(key=lambda x: x['item'])
+        # to sort by category primary key, followed by item as secondary sort use the following
+        # cls.CLOTHING_LOWER.sort(key=lambda x: (x['category'], x['item']))
+        
+        cls.SCENE_INDOOR.sort(key=lambda x: x['description'])
+        cls.SCENE_OUTDOOR.sort(key=lambda x: x['description'])
+
     #  ==================================================================================
     @classmethod
-    def load_json_file(cls, file_name):
+    def load_defaults(cls):
+        # Load the default config file
+        base_dir = os.path.dirname(__file__)
+        config_path = os.path.join(base_dir, "config.json")
+        
+        with open(config_path, "r") as config_file:
+            DEFAULT_SETTINGS = json.load(config_file)
+
+        return DEFAULT_SETTINGS
+    
+    #  ==================================================================================
+    @classmethod
+    def load_data_files(cls, file_name):
         # Define the path for default and custom files
         base_dir = os.path.dirname(__file__)
         default_path = os.path.join(base_dir, "data/default", file_name)
@@ -108,106 +134,109 @@ class PhotoPromptGenerator:
     def INPUT_TYPES(cls):
         cls.initialize_class_variables()  # Ensure variables are loaded
 
+        default_settings = cls.load_defaults()
+
         return {
             "required": {
                 "seed": ("INT", {"default": 0, "min": 0, "max": 1125899906842624}),
-                "custom": ("STRING", {}),
+                "custom": ("STRING", {"default": f"{default_settings['custom']}"}),
                 "style_and_framing": (
                     ["disabled", "random"] + cls.STYLE_AND_FRAMING,
-                    {"default": "medium closeup"},            
+                    {"default": f"{default_settings['style_and_framing']}"},            
                 ),
                 "subject_class": (
                     ["disabled", "random"] + cls.SUBJECT_CLASS,
-                    {"default": "a woman"},              
+                    {"default": f"{default_settings['subject_class']}"},              
                 ),
                 "role": (
                     ["disabled", "random"] + cls.ROLE,
-                    {"default": "disabled"},              
+                    {"default": f"{default_settings['role']}"},              
                 ),
                 # use a dictionary comprehension to extract only the "style_name" values for the list: 
                 "hairstyle": (
                     ["disabled", "random"] + [hairstyle["style_name"] for hairstyle in cls.HAIRSTYLE],
-                    {"default": "random"},              
+                    {"default": f"{default_settings['hairstyle']}"},              
                 ),
                 # use a dictionary comprehension to extract only the "description" values for the list: 
                 "body_shape": (
                     ["disabled", "random"] + [body_shape["description"] for body_shape in cls.BODY_SHAPE],
-                    {"default": "random"},              
+                    {"default": f"{default_settings['body_shape']}"},              
                 ),                
-                "randomize_clothing_color": (
-                    "BOOLEAN", {"default": True}
+                "random_clothing_color": (
+                    "BOOLEAN", {"default": f"{default_settings['random_clothing_color']}"}
                 ),                 
                 # use a dictionary comprehension to extract only the "item" values for the list: 
                 "clothing_upper": (
                     ["disabled", "random"] + [clothing_upper["item"] for clothing_upper in cls.CLOTHING_UPPER],
-                    {"default": "random"},
+                    {"default": f"{default_settings['clothing_upper']}"},  
                 ),                
                 # use a dictionary comprehension to extract only the "item" values for the list: 
                 "clothing_lower": (
                     ["disabled", "random"] + [clothing_lower["item"] for clothing_lower in cls.CLOTHING_LOWER],
-                    {"default": "random"},
+                    {"default": f"{default_settings['clothing_lower']}"}, 
                 ),
                 # use a dictionary comprehension to extract only the "item" values for the list: 
-                "undergarments_socks_hosiery": (
-                    ["disabled", "random"] + [clothing_underg_hosiery["item"] for clothing_underg_hosiery in cls.CLOTHING_UNDERGARMENTS_HOSIERY],
-                    {"default": "random"},
+                "underwear_socks_hosiery": (
+                    ["disabled", "random"] + [clothing_underg_hosiery["item"] for clothing_underg_hosiery in cls.UNDERWEAR_SOCKS_HOSIERY],
+                    {"default": f"{default_settings['underwear_socks_hosiery']}"}, 
                 ),                
                 # use a dictionary comprehension to extract only the "item" values for the list: 
                 "footwear": (
                     ["disabled", "random"] + [footwear["item"] for footwear in cls.FOOTWEAR], 
-                    {"default": "random"},
+                    {"default": f"{default_settings['footwear']}"}, 
                 ),
                 "accessories": (
                     ["disabled", "random"] + cls.ACCESSORIES,
-                    {"default": "random"},
+                    {"default": f"{default_settings['accessories']}"}, 
                 ),
                 "action": (
                     ["disabled", "random"] + cls.ACTION,
-                    {"default": "random"},
+                    {"default": f"{default_settings['action']}"}, 
                 ),    
                 "gaze": (
                     ["disabled", "random"] + cls.GAZE,
-                    {"default": "random"},
+                    {"default": f"{default_settings['gaze']}"}, 
                 ),
                 "hands": (
                     ["disabled", "random"] + cls.HANDS,
-                    {"default": "random"},
+                    {"default": f"{default_settings['hands']}"}, 
                 ),   
                 "show_detailed_location": (
-                    "BOOLEAN", {"default": True}
+                    # {"default": f"{default_settings['show_detailed_location']}"}, 
+                    "BOOLEAN", {"default": f"{default_settings['show_detailed_location']}"}, 
                 ),                    
                 # use a dictionary comprehension to extract only the "description" values for the list: 
-                "location_interior": (
-                    ["disabled", "random"] + [location["description"] for location in cls.LOCATION_INTERIOR],
-                    {"default": "random"},
+                "scene_indoor": (
+                    ["disabled", "random"] + [location["description"] for location in cls.SCENE_INDOOR],
+                    {"default": f"{default_settings['scene_indoor']}"}, 
                 ),
                 # use a dictionary comprehension to extract only the "description" values for the list: 
-                "location_exterior": (
-                    ["disabled", "random"] + [location["description"] for location in cls.LOCATION_EXTERIOR],
-                    {"default": "random"},
+                "scene_outdoor": (
+                    ["disabled", "random"] + [location["description"] for location in cls.SCENE_OUTDOOR],
+                    {"default": f"{default_settings['scene_outdoor']}"}, 
                 ),           
                 "lighting": (
                     ["disabled", "random"] + cls.LIGHTING,
-                    {"default": "random"},
+                    {"default": f"{default_settings['lighting']}"}, 
                 ),                  
                 "time_of_day": (
                     ["disabled", "random"] + cls.TIME_OF_DAY,
-                    {"default": "random"},
+                    {"default": f"{default_settings['time_of_day']}"}, 
                 ),  
                 "weather": (
                     ["disabled", "random"] + cls.WEATHER,
-                    {"default": "random"},
+                    {"default": f"{default_settings['weather']}"}, 
                 ),   
                 "camera_or_film": (
                     ["disabled", "random"] + cls.CAMERA_OR_FILM,
-                    {"default": "random"},
+                    {"default": f"{default_settings['camera_or_film']}"}, 
                 ),   
                 "photographer": (
                     ["disabled", "random"] + cls.PHOTOGRAPHER,
-                    {"default": "random"},
+                    {"default": f"{default_settings['photographer']}"}, 
                 ),   
                 "remove_commas_periods": (
-                    "BOOLEAN", {"default": False}
+                    "BOOLEAN", {"default": f"{default_settings['remove_commas_periods']}"}, 
                 ),                   
             },
         }
@@ -341,7 +370,7 @@ class PhotoPromptGenerator:
         # ------------------------------------------------------------
         # GET RANDOM COLOR FLAG
         # ------------------------------------------------------------
-        randomize_clothing_color = kwargs.get("randomize_clothing_color", False)
+        random_clothing_color = kwargs.get("random_clothing_color", False)
 
         # ------------------------------------------------------------
         # CLOTHING UPPER
@@ -371,7 +400,7 @@ class PhotoPromptGenerator:
         if clothing_upper: # if not an empty
             item = clothing_upper.get('item')  # defaults to 'none' if key does not exist
             color = ""
-            if randomize_clothing_color:
+            if random_clothing_color:
                 color = self.select_random_choice(self.COLORS)        
             else:
                 # use default color associated with the item of clothing
@@ -386,16 +415,21 @@ class PhotoPromptGenerator:
         if clothing_lower == "disabled":
             clothing_lower = ""
         elif clothing_lower == "random":
-            # if set to random, we will lock it to the gender so it's less crazy              
-            if self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.MAN:
-                CLOTHING_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.MAN, self.CLOTHING_LOWER)
-                clothing_lower = self.select_random_choice(CLOTHING_FILTERED)    
-            elif self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.WOMAN:
-                CLOTHING_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.WOMAN, self.CLOTHING_LOWER) 
-                clothing_lower = self.select_random_choice(CLOTHING_FILTERED)      
-            else: # select random from full list                                 
-                clothing_lower = self.select_random_choice(self.CLOTHING_LOWER)   
-        else:
+            # first look to see if the clothing_upper is a dress or one-piece - if so we will ignore clothing_lower
+            if clothing_upper['category'] in ('dresses', 'one-piece', 'robes'):
+                clothing_lower = ""
+
+            else:
+                # if set to random, we will lock it to the gender so it's less crazy              
+                if self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.MAN:
+                    CLOTHING_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.MAN, self.CLOTHING_LOWER)
+                    clothing_lower = self.select_random_choice(CLOTHING_FILTERED)    
+                elif self.subject_is_man_or_woman(subject_or_class) == SUBJECT_TYPE.WOMAN:
+                    CLOTHING_FILTERED = self.filter_clothing_by_gender(SUBJECT_TYPE.WOMAN, self.CLOTHING_LOWER) 
+                    clothing_lower = self.select_random_choice(CLOTHING_FILTERED)      
+                else: # select random from full list                                 
+                    clothing_lower = self.select_random_choice(self.CLOTHING_LOWER)   
+        else:            
             # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
             for cloth in self.CLOTHING_LOWER:
@@ -406,7 +440,7 @@ class PhotoPromptGenerator:
         if clothing_lower: # if not an empty      
             item = clothing_lower.get('item')  # defaults to 'none' if key does not exist
             color = ""
-            if randomize_clothing_color:
+            if random_clothing_color:
                 color = self.select_random_choice(self.COLORS)        
             else:
                 # use default color associated with the item of clothing
@@ -423,41 +457,46 @@ class PhotoPromptGenerator:
             components.append(f'{clothing_string},')   
         # ------------------------------------------------------------     
         # UNDERGARMENTS & HOSIERY
-        clothing_undergarments_hosiery = kwargs.get("undergarments_socks_hosiery", random)
-        if clothing_undergarments_hosiery == "disabled":
-            clothing_undergarments_hosiery = ""
-        elif clothing_undergarments_hosiery == "random":        
+        UNDERWEAR_SOCKS_HOSIERY = kwargs.get("underwear_socks_hosiery", random)
+        if UNDERWEAR_SOCKS_HOSIERY == "disabled":
+            UNDERWEAR_SOCKS_HOSIERY = ""
+        elif UNDERWEAR_SOCKS_HOSIERY == "random":        
             # if set to random, we will filter out some items according to what lower clothing item has been selected
             # IF CLOTHING_LOWER = "" : ALLOW ALL ITEMS
             # IF CLOTHING_LOWER = PANTS, LEGGINGS, OTHER : ALLOW NONE
             # IF CLOTHING_LOWER = SKIRTS : ALLOW SOCKS OR HOSIERY ONLY            
             if clothing_lower == "":
-                # allow all
-                clothing_undergarments_hosiery = self.select_random_choice(self.CLOTHING_UNDERGARMENTS_HOSIERY)   
+                # first check if clothing_upper is the reason lower is empty....
+                if clothing_upper['category'] in ('dresses', 'one-piece', 'robes'):
+                    UNDERGARMENT_FILTERED = self.filter_undergarments_hosiery(self.UNDERWEAR_SOCKS_HOSIERY)
+                    UNDERWEAR_SOCKS_HOSIERY = self.select_random_choice(UNDERGARMENT_FILTERED)   
+                else:                    
+                    # allow all
+                    UNDERWEAR_SOCKS_HOSIERY = self.select_random_choice(self.UNDERWEAR_SOCKS_HOSIERY) 
+
             elif clothing_lower['category'] == "skirts":
-                # TODO : need to condition for dresses (socks and hosiery only) and bodysuits/catsuits etc (none)
                 # filter list to socks and hosiery only
-                UNDERGARMENT_FILTERED = self.filter_undergarments_hosiery(self.CLOTHING_UNDERGARMENTS_HOSIERY)
-                clothing_undergarments_hosiery = self.select_random_choice(UNDERGARMENT_FILTERED)   
+                UNDERGARMENT_FILTERED = self.filter_undergarments_hosiery(self.UNDERWEAR_SOCKS_HOSIERY)
+                UNDERWEAR_SOCKS_HOSIERY = self.select_random_choice(UNDERGARMENT_FILTERED)   
             else:
-                clothing_undergarments_hosiery = ""
+                UNDERWEAR_SOCKS_HOSIERY = ""
         else:
             # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
-            for underg in self.CLOTHING_UNDERGARMENTS_HOSIERY:
-                if underg["item"] == clothing_undergarments_hosiery:
-                    clothing_undergarments_hosiery = underg
+            for underg in self.UNDERWEAR_SOCKS_HOSIERY:
+                if underg["item"] == UNDERWEAR_SOCKS_HOSIERY:
+                    UNDERWEAR_SOCKS_HOSIERY = underg
                     break              
 
-        if clothing_undergarments_hosiery: # if not empty
+        if UNDERWEAR_SOCKS_HOSIERY: # if not empty
 
-            item = clothing_undergarments_hosiery.get('item')  # defaults to 'none' if key does not exist
+            item = UNDERWEAR_SOCKS_HOSIERY.get('item')  # defaults to 'none' if key does not exist
             color = ""
-            if randomize_clothing_color:
+            if random_clothing_color:
                 color = self.select_random_choice(self.COLORS)        
             else:
                 # use default color associated with the item of clothing
-                color = randomize_clothing_color.get('default_color')  # defaults to 'none' if key does not existpass
+                color = random_clothing_color.get('default_color')  # defaults to 'none' if key does not existpass
 
             article = ""
             # if no upper clothing chosen, start with wearing and article 'an'/'a'
@@ -498,14 +537,14 @@ class PhotoPromptGenerator:
         if footwear:  # if not an empty   
             item = footwear.get('item')  # defaults to 'none' if key does not exist
             color = ""
-            if randomize_clothing_color:
+            if random_clothing_color:
                 color = self.select_random_choice(self.COLORS)        
             else:
                 # use default color associated with the item of clothing
                 color = footwear.get('default_color')  # defaults to 'none' if key does not existpass
             article = ""
             # if no upper clothing AND no lower clothing and no undergarments
-            if not clothing_upper and not clothing_lower and not clothing_undergarments_hosiery:
+            if not clothing_upper and not clothing_lower and not UNDERWEAR_SOCKS_HOSIERY:
                 article = 'an' if self.begins_with_vowel(item) else 'a'
                 footwear_string = f'wearing {article} {color} {item}' 
             else:
@@ -588,58 +627,58 @@ class PhotoPromptGenerator:
         # ------------------------------------------------------------
         # LOCATION - INTERIOR
         # get initial selection froom drop down
-        location_interior = kwargs.get("location_interior", "random")        
-        if location_interior == self.DISABLED:
-            location_interior = ""
-        elif location_interior == self.RANDOM:
-            location_interior = self.select_random_choice(self.LOCATION_INTERIOR)   
+        scene_indoor = kwargs.get("scene_indoor", "random")        
+        if scene_indoor == self.DISABLED:
+            scene_indoor = ""
+        elif scene_indoor == self.RANDOM:
+            scene_indoor = self.select_random_choice(self.SCENE_INDOOR)   
         else: # else is a selected value                    
             # Find the whole selected location object based on the description
             for loc in self.LOCATION_INTERIOR:
-                if loc["description"] == location_interior:
-                    location_interior = loc # get whol object
+                if loc["description"] == scene_indoor:
+                    scene_indoor = loc # get whol object
                     break
 
         # Only append if truthy (is not an empty) 
-        if location_interior:
+        if scene_indoor:
             if re.search(r'\bman\b', subject_or_class.lower()):
                 components.append("He is")
             elif re.search(r'\bwoman\b', subject_or_class.lower()):
                 components.append("She is")
 
             if show_detailed_location:
-                location_string = f'{location_interior["preposition"]} {location_interior["description"]}, {location_interior["detail"]}'
+                location_string = f'{scene_indoor["preposition"]} {scene_indoor["description"]}, {scene_indoor["detail"]}'
             else:
-                location_string = f'{location_interior["preposition"]} {location_interior["description"]}'
+                location_string = f'{scene_indoor["preposition"]} {scene_indoor["description"]}'
             components.append(f'{location_string},') 
 
         # ELSE IF INT LOCATION IS EMPTY, THEN WE LOOK AT EXTERNAL LOCATION
         else: # LOCATION - EXT
             print('interior is empty - looking at exterior....')
             # get initial selection froom drop down
-            location_exterior = kwargs.get("location_exterior", "random")
-            if location_exterior == self.DISABLED:
-                location_exterior = ""
-            elif location_exterior == self.RANDOM:
-                location_exterior = self.select_random_choice(self.LOCATION_EXTERIOR)   
+            scene_outdoor = kwargs.get("scene_outdoor", "random")
+            if scene_outdoor == self.DISABLED:
+                scene_outdoor = ""
+            elif scene_outdoor == self.RANDOM:
+                scene_outdoor = self.select_random_choice(self.SCENE_OUTDOOR)   
             else:
                 # Find the whole selected location object based on the description
                 for loc in self.LOCATION_EXTERIOR:
-                    if loc["description"] == location_exterior:
-                        location_exterior = loc
+                    if loc["description"] == scene_outdoor:
+                        scene_outdoor = loc
                         break
 
             # Only append if truthy (is not an empty string) 
-            if location_exterior:
+            if scene_outdoor:
                 if re.search(r'\bman\b', subject_or_class.lower()):
                     components.append("He is")
                 elif re.search(r'\bwoman\b', subject_or_class.lower()):
                     components.append("She is")
 
                 if show_detailed_location:
-                    location_string = f'{location_exterior["preposition"]} {location_exterior["description"]}, {location_exterior["detail"]}'
+                    location_string = f'{scene_outdoor["preposition"]} {scene_outdoor["description"]}, {scene_outdoor["detail"]}'
                 else:
-                    location_string = f'{location_exterior["preposition"]} {location_exterior["description"]}'     
+                    location_string = f'{scene_outdoor["preposition"]} {scene_outdoor["description"]}'     
 
                 components.append(f'{location_string},') 
 
@@ -675,7 +714,7 @@ class PhotoPromptGenerator:
 
         # Only append if truthy (is not an empty string) 
         if weather:
-            if location_interior:
+            if scene_indoor:
                 components.append(f'and outside the window the weather is {weather}.')        
             else:
                 components.append(f'and the weather is {weather}.')        
@@ -755,13 +794,14 @@ class PhotoPromptGenerator:
         for item in clothing_list:  # Loop through each item in the class variable
         
             if st == SUBJECT_TYPE.MAN:
-                    # if male or unisex then is good
-                    if item['gender'] == 'male' or item['gender'] == 'unisex':  
-                        filtered_items.append(item)  # Add the item to the filtered list
+                # if male or unisex then is good
+                if item['gender'] in ('male', 'unisex'):
+                    filtered_items.append(item)  # Add the item to the filtered list
             elif st == SUBJECT_TYPE.WOMAN:
-                    # if female or unisex then is good
-                    if item['gender'] == 'female' or item['gender'] == 'unisex':  
-                        filtered_items.append(item)  # Add the item to the filtered list        
+                # if female or unisex then is good
+                if item['gender'] in ('female', 'unisex'):
+                    filtered_items.append(item)  # Add the item to the filtered list
+
                     
         return filtered_items
 
@@ -771,8 +811,9 @@ class PhotoPromptGenerator:
 
         # allow stockings and socks only        
         for item in undergarments_list:  # Loop through each item in the class variable                
-            if item['category'] == "hosiery" or item['category'] == "socks":
+            if item['category'] in ("hosiery", "socks"):
                 filtered_items.append(item)
+
 
         return filtered_items
 
