@@ -1,0 +1,292 @@
+{
+  "last_node_id": 6,
+  "last_link_id": 5,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "ShowText|pysssss",
+      "pos": [
+        605,
+        55
+      ],
+      "size": {
+        "0": 625,
+        "1": 155
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 2,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            4
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "",
+        "agg a medium closeup photo of a young man with a pin curls hairstyle with a slim thin and attractive figure wearing a pink band collar shirt multicolored denim bottoms metallic silver oxfords forest green hat red scarf He is shaking hands looking with a furrowed brow with hands on hips He is at an expansive museum dedicated to ancient civilizations featuring artifacts in glass cases and interactive digital guides anamorphic lens flare it is afternoon and outside the window the weather is sunny with a few clouds Olympus OM-D E-M1 Mark III"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "Count_Tokens_(Y7)",
+      "pos": [
+        759.6425555802198,
+        403.24523598114877
+      ],
+      "size": {
+        "0": 255,
+        "1": 125
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 5
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 4,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            3
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Count_Tokens_(Y7)"
+      },
+      "widgets_values": [
+        true,
+        4,
+        true,
+        ""
+      ]
+    },
+    {
+      "id": 6,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        620,
+        250
+      ],
+      "size": [
+        605,
+        105
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            5
+          ],
+          "shape": 3,
+          "slot_index": 1
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "SDXL/eileen--agg-(woman)-ep1-(0260steps)_[57210bbbe4].safetensors"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "ShowText|pysssss",
+      "pos": [
+        635,
+        580
+      ],
+      "size": [
+        580,
+        585
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 3,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "",
+        "SDXL CLIP MODEL\nTotal Token Count: 110, split across 2 chunks\nChunk[0] = 77 tokens\nChunk[1] = 33 tokens\n\n=========== Chunk[0] : 77 tokens ===========\n49406: <|startoftext|>\n45482: agg           00320: a             08675: medium        35439: closeup       \n01125: photo         00539: of            00320: a             01888: young         \n00786: man           00593: with          00320: a             05164: pin           \n24340: curls         22324: hairstyle     00593: with          00320: a             \n12364: slim          07847: thin          00537: and           12231: attractive    \n05274: figure        03309: wearing       00320: a             03360: pink          \n01963: band          13497: collar        02523: shirt         21683: multic        \n14628: olo           00736: red           13606: denim         31524: bottoms       \n17257: metallic      03467: silver        03282: ox            29351: fords         \n04167: forest        01901: green         03801: hat           00736: red           \n13365: scarf         00797: he            00533: is            19101: shaking       \n03500: hands         01312: looking       00593: with          00320: a             \n02395: fur           22615: rowed         15895: brow          00593: with          \n03500: hands         00525: on            30191: hips          00797: he            \n00533: is            00536: at            00550: an            49261: expansive     \n02786: museum        06770: dedicated     00531: to            05810: ancient       \n06923: civil         02845: iz            00986: ations        03706: featuring     \n30249: artifacts     00530: in            03313: glass         06888: cases         \n00537: and           09456: interactive   02794: digital       \n49407: <|endoftext|>\n\n=========== Chunk[1] : 33 tokens ===========\n49406: <|startoftext|>\n14375: guides      00514: an          19977: amor        03977: phic        \n08666: lens        21185: flare       00585: it          00533: is          \n02716: afternoon   00537: and         02782: outside     00518: the         \n04879: window      00518: the         02237: weather     00533: is          \n05438: sunny       00593: with        00320: a           01939: few         \n06244: clouds      30960: olympus     03932: om          00268: -           \n00323: d           00324: e           00268: -           00332: m           \n00272: 1           02110: mark        06572: iii         \n49407: <|endoftext|>\n\n"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "PhotoPrompter_(Y7)",
+      "pos": [
+        265,
+        70
+      ],
+      "size": {
+        "0": 315,
+        "1": 680
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Full Prompt",
+          "type": "STRING",
+          "links": [
+            2
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PhotoPrompter_(Y7)"
+      },
+      "widgets_values": [
+        330333331109155,
+        "fixed",
+        "agg",
+        "medium closeup",
+        "a young man",
+        "disabled",
+        "pin curls",
+        "slim",
+        "True",
+        "random",
+        "random",
+        "random",
+        "random",
+        "random",
+        "random",
+        "random",
+        "random",
+        "random",
+        "True",
+        "random",
+        "random",
+        "random",
+        "random",
+        "random",
+        "random",
+        "disabled",
+        true
+      ]
+    }
+  ],
+  "links": [
+    [
+      2,
+      3,
+      0,
+      1,
+      0,
+      "STRING"
+    ],
+    [
+      3,
+      4,
+      0,
+      5,
+      0,
+      "STRING"
+    ],
+    [
+      4,
+      1,
+      0,
+      4,
+      1,
+      "STRING"
+    ],
+    [
+      5,
+      6,
+      1,
+      4,
+      0,
+      "CLIP"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "0246.VERSION": [
+      0,
+      0,
+      4
+    ],
+    "ds": {
+      "scale": 1.4641000000000006,
+      "offset": [
+        141.26834442413627,
+        -42.86775971996795
+      ]
+    }
+  },
+  "version": 0.4
+}

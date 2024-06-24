@@ -198,8 +198,8 @@ class PhotoPromptGenerator:
                     ["disabled", "random"] + [body_shape["description"] for body_shape in cls.BODY_SHAPE],
                     {"default": f"{main_settings['body_shape']}"},              
                 ),                
-                "random_clothing_color": (
-                    "BOOLEAN", {"default": f"{main_settings['random_clothing_color']}"}
+                "use_random_clothing_color": (
+                    "BOOLEAN", {"default": f"{main_settings['use_random_clothing_color']}"}
                 ),                 
                 # use a dictionary comprehension to extract only the "item" values for the list: 
                 "clothing_upper": (
@@ -307,7 +307,7 @@ class PhotoPromptGenerator:
         seed = kwargs.get("seed", 0)
         # self.rng set to a new instance of random.Random, init with the seed value
         self.rng = random.Random(seed)
-
+        print(f'seed = {seed}')
         # components hold all the separate prompt parts together
         components = []
 
@@ -410,8 +410,8 @@ class PhotoPromptGenerator:
         # ------------------------------------------------------------
         # GET RANDOM COLOR FLAG
         # ------------------------------------------------------------
-        random_clothing_color = kwargs.get("random_clothing_color", False)
-
+        use_random_clothing_color = kwargs.get("use_random_clothing_color", False)
+        
         # ------------------------------------------------------------
         # CLOTHING UPPER
         # ------------------------------------------------------------
@@ -440,7 +440,7 @@ class PhotoPromptGenerator:
         if clothing_upper: # if not an empty
             item = clothing_upper.get('item')  # defaults to 'none' if key does not exist
             color = ""
-            if random_clothing_color:
+            if use_random_clothing_color:
                 color = self.select_random_choice(self.COLORS)        
             else:
                 # use default color associated with the item of clothing
@@ -480,7 +480,7 @@ class PhotoPromptGenerator:
         if clothing_lower: # if not an empty      
             item = clothing_lower.get('item')  # defaults to 'none' if key does not exist
             color = ""
-            if random_clothing_color:
+            if use_random_clothing_color:
                 color = self.select_random_choice(self.COLORS)        
             else:
                 # use default color associated with the item of clothing
@@ -532,11 +532,11 @@ class PhotoPromptGenerator:
 
             item = clothing_undergarment_selected.get('item')  # defaults to 'none' if key does not exist
             color = ""
-            if random_clothing_color:
+            if use_random_clothing_color:
                 color = self.select_random_choice(self.COLORS)        
             else:
                 # use default color associated with the item of clothing
-                color = random_clothing_color.get('default_color')  # defaults to 'none' if key does not existpass
+                color = use_random_clothing_color.get('default_color')  # defaults to 'none' if key does not existpass
 
             article = ""
             # if no upper clothing chosen, start with wearing and article 'an'/'a'
@@ -577,7 +577,7 @@ class PhotoPromptGenerator:
         if footwear:  # if not an empty   
             item = footwear.get('item')  # defaults to 'none' if key does not exist
             color = ""
-            if random_clothing_color:
+            if use_random_clothing_color:
                 color = self.select_random_choice(self.COLORS)        
             else:
                 # use default color associated with the item of clothing
@@ -608,7 +608,7 @@ class PhotoPromptGenerator:
         if accessories_head: #if not empty
             item = accessories_head.get('item')
             color = ""
-            if random_clothing_color:
+            if use_random_clothing_color:
                 color = self.select_random_choice(self.COLORS)        
             else:
                 # use default color associated with the item of clothing
@@ -640,7 +640,7 @@ class PhotoPromptGenerator:
         if accessories_other: #if not empty
             item = accessories_other.get('item')
             color = ""
-            if random_clothing_color:
+            if use_random_clothing_color:
                 color = self.select_random_choice(self.COLORS)        
             else:
                 # use default color associated with the item of clothing
