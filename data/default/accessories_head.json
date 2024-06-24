@@ -1,0 +1,122 @@
+[
+    {
+        "item": "hair clip",
+        "default_color": "silver",
+        "category": "hair_accessory"
+    },
+    {
+        "item": "headband",
+        "default_color": "black",
+        "category": "hair_accessory"
+    },
+    {
+        "item": "headpiece",
+        "default_color": "silver",
+        "category": "hair_accessory"
+    },
+    {
+        "item": "alice band",
+        "default_color": "black",
+        "category": "headwear"
+    },
+    {
+        "item": "balaclava",
+        "default_color": "black",
+        "category": "headwear"
+    },
+    {
+        "item": "bandana",
+        "default_color": "red",
+        "category": "headwear"
+    },
+    {
+        "item": "baseball cap",
+        "default_color": "navy",
+        "category": "headwear"
+    },
+    {
+        "item": "beret",
+        "default_color": "red",
+        "category": "headwear"
+    },
+    {
+        "item": "bowler hat",
+        "default_color": "black",
+        "category": "headwear"
+    },
+    {
+        "item": "cap",
+        "default_color": "blue",
+        "category": "headwear"
+    },
+    {
+        "item": "cloche",
+        "default_color": "beige",
+        "category": "headwear"
+    },
+    {
+        "item": "crown",
+        "default_color": "gold",
+        "category": "headwear"
+    },
+    {
+        "item": "fascinator",
+        "default_color": "pink",
+        "category": "headwear"
+    },
+    {
+        "item": "fedora hat",
+        "default_color": "grey",
+        "category": "headwear"
+    },
+    {
+        "item": "flat cap",
+        "default_color": "brown",
+        "category": "headwear"
+    },
+    {
+        "item": "straw floppy hat",
+        "default_color": "natural",
+        "category": "headwear"
+    },
+    {
+        "item": "garden hat",
+        "default_color": "straw",
+        "category": "headwear"
+    },
+    {
+        "item": "hat",
+        "default_color": "brown",
+        "category": "headwear"
+    },
+    {
+        "item": "merry widow hat",
+        "default_color": "black",
+        "category": "headwear"
+    },
+    {
+        "item": "newsboy cap",
+        "default_color": "grey",
+        "category": "headwear"
+    },
+    {
+        "item": "panama hat",
+        "default_color": "white",
+        "category": "headwear"
+    },
+    {
+        "item": "stetson",
+        "default_color": "brown",
+        "category": "headwear"
+    },
+    {
+        "item": "straw hat",
+        "default_color": "natural",
+        "category": "headwear"
+    },
+    {
+        "item": "top hat",
+        "default_color": "black",
+        "category": "headwear"
+    }
+]

@@ -1,0 +1,132 @@
+[
+    {
+        "item": "backpack",
+        "default_color": "dark green",
+        "category": "bag"
+    },
+    {
+        "item": "handbag",
+        "default_color": "black",
+        "category": "bag"
+    },
+    {
+        "item": "dark sunglasses",
+        "default_color": "black",
+        "category": "eye_and_face"
+    },
+    {
+        "item": "face mask",
+        "default_color": "black",
+        "category": "eye_and_face"
+    },
+    {
+        "item": "goggles",
+        "default_color": "clear",
+        "category": "eye_and_face"
+    },
+    {
+        "item": "respirator",
+        "default_color": "black",
+        "category": "eye_and_face"
+    },
+    {
+        "item": "rimmed glasses",
+        "default_color": "black",
+        "category": "eye_and_face"
+    },
+    {
+        "item": "gloves",
+        "default_color": "black",
+        "category": "hand accessories"
+    },
+    {
+        "item": "anklet",
+        "default_color": "silver",
+        "category": "jewelry"
+    },
+    {
+        "item": "bracelets",
+        "default_color": "gold",
+        "category": "jewelry"
+    },
+    {
+        "item": "brooch",
+        "default_color": "",
+        "category": "jewelry"
+    },
+    {
+        "item": "chain necklace",
+        "default_color": "silver",
+        "category": "jewelry"
+    },
+    {
+        "item": "cufflinks",
+        "default_color": "silver",
+        "category": "jewelry"
+    },
+    {
+        "item": "earrings",
+        "default_color": "gold",
+        "category": "jewelry"
+    },
+    {
+        "item": "engagement ring",
+        "default_color": "silver",
+        "category": "jewelry"
+    },
+    {
+        "item": "necklace",
+        "default_color": "gold",
+        "category": "jewelry"
+    },
+    {
+        "item": "watch",
+        "default_color": "silver",
+        "category": "jewelry"
+    },
+    {
+        "item": "wedding ring",
+        "default_color": "gold",
+        "category": "jewelry"
+    },
+    {
+        "item": "neck tie",
+        "default_color": "blue",
+        "category": "neckwear"
+    },
+    {
+        "item": "scarf",
+        "default_color": "red",
+        "category": "neckwear"
+    },
+    {
+        "item": "shawl",
+        "default_color": "black",
+        "category": "neckwear"
+    },
+    {
+        "item": "tie",
+        "default_color": "blue",
+        "category": "neckwear"
+    },
+    {
+        "item": "pair of gloves",
+        "default_color": "black",
+        "category": "other"
+    },    
+    {
+        "item": "belt",
+        "default_color": "brown",
+        "category": "other"
+    },
+    {
+        "item": "friendship bracelet",
+        "default_color": "multicolor",
+        "category": "other"
+    },
+    {
+        "item": "towel",
+        "default_color": "white",
+        "category": "other"
+    }
+]
