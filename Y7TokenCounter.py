@@ -37,7 +37,7 @@ import os
 
 import logging
 
-class CountTokens:
+class TokenCounter:
     logging.basicConfig(level=logging.DEBUG)
 
     @classmethod
@@ -54,7 +54,8 @@ class CountTokens:
 
     RETURN_TYPES = ('STRING',)
     FUNCTION = "count_tokens"
-    CATEGORY = "Y7/Tokens"
+    CATEGORY = "Y7"
+    # CATEGORY = "Y7/Tokens"
 
     def count_tokens(self, clip, text, show_token_word_pairs, token_word_pairs_per_line, hide_end_of_word_tag):
         try:
@@ -249,10 +250,10 @@ class CountTokens:
 
 
 NODE_CLASS_MAPPINGS = {
-    "Count_Tokens_(Y7)": CountTokens,
+    "Token_Counter_(Y7)": TokenCounter,
 
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Count_Tokens_(Y7)": "Count Tokens (Y7)",
+    "Token_Counter_(Y7)": "Token Counter (Y7)",
 }

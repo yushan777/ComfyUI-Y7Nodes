@@ -10,19 +10,19 @@ class SUBJECT_TYPE(Enum):
     WOMAN = 2
     OTHER = 3
 
-# ==================================================================
-
-class PhotoPromptGenerator:
+ # ==================================================================
+   
+class ArtStylePromptGenerator:
     logging.basicConfig(level=logging.DEBUG)
-    
+
     DISABLED = "disabled"
     RANDOM = "random"
-    
+
     # load config file
     CONFIG_DATA = None 
-    
-    # Load JSON as class variables
-    STYLE_AND_FRAMING = None
+
+    ARTSTYLE = None
+    ARTIST = None 
     SUBJECT_CLASS = None
     ROLE = None  # if active, it will override hairstyle, bodyshape, clothes, accessories
     HAIRSTYLE = None
@@ -42,11 +42,16 @@ class PhotoPromptGenerator:
     TIME_OF_DAY = None 
     LIGHTING = None
     WEATHER = None
-    CAMERA_OR_FILM = None
-    PHOTOGRAPHER = None
 
     COLORS = None # Not seen by user, invisible list
 
+    def __init__(self, seed=None):
+        self.rng = random.Random(seed)
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return ""    
+    
     # ===========================================================
     def __init__(self, seed=None):
         self.rng = random.Random(seed)
@@ -59,10 +64,11 @@ class PhotoPromptGenerator:
     # ===========================================================
     @classmethod
     def initialize_class_variables(cls):
-        
+
         cls.CONFIG_DATA = cls.load_config()
 
-        cls.STYLE_AND_FRAMING = cls.load_data_files("style_and_framing.json")
+        cls.ARTSTYLE = cls.load_data_files("artstyle.json")
+        cls.ARTIST = cls.load_data_files("artist.json")
         cls.SUBJECT_CLASS = cls.load_data_files("subject_class.json")
         cls.ROLE = cls.load_data_files("roles.json")
         cls.HAIRSTYLE = cls.load_data_files("hairstyle.json")
@@ -81,8 +87,6 @@ class PhotoPromptGenerator:
         cls.LIGHTING = cls.load_data_files("lighting.json")       
         cls.TIME_OF_DAY = cls.load_data_files("time_of_day.json")
         cls.WEATHER = cls.load_data_files("weather.json")
-        cls.CAMERA_OR_FILM = cls.load_data_files("camera_or_film.json")
-        cls.PHOTOGRAPHER = cls.load_data_files("photographer.json")
 
         # used for random solection of colors, not selectable by user
         cls.COLORS = cls.load_data_files("color.json")
@@ -163,8 +167,8 @@ class PhotoPromptGenerator:
             # Assuming the data structure is a list
             data.extend(custom_data)
 
-        return data
-            
+        return data      
+
     #  ==================================================================================
     @classmethod
     def INPUT_TYPES(cls):
@@ -176,10 +180,14 @@ class PhotoPromptGenerator:
             "required": {
                 "seed": ("INT", {"default": 123, "min": 0, "max": 1125899906842624}),
                 "custom": ("STRING", {"default": f"{main_settings['custom']}"}),
-                "style_and_framing": (
-                    ["disabled", "random"] + cls.STYLE_AND_FRAMING,
-                    {"default": f"{main_settings['style_and_framing']}"},            
-                ),
+                "artstyle": (
+                    ["disabled", "random"] + cls.ARTSTYLE,
+                    {"default": f"{main_settings['artstyle']}"},            
+                ),                
+                "artist": (
+                    ["disabled", "random"] + cls.ARTIST,
+                    {"default": f"{main_settings['artist']}"},            
+                ),  
                 "subject_class": (
                     ["disabled", "random"] + cls.SUBJECT_CLASS,
                     {"default": f"{main_settings['subject_class']}"},              
@@ -267,20 +275,13 @@ class PhotoPromptGenerator:
                     ["disabled", "random"] + cls.WEATHER,
                     {"default": f"{main_settings['weather']}"}, 
                 ),   
-                "camera_or_film": (
-                    ["disabled", "random"] + cls.CAMERA_OR_FILM,
-                    {"default": f"{main_settings['camera_or_film']}"}, 
-                ),   
-                "photographer": (
-                    ["disabled", "random"] + cls.PHOTOGRAPHER,
-                    {"default": f"{main_settings['photographer']}"}, 
-                ),   
                 "remove_commas_periods": (
                     "BOOLEAN", {"default": f"{main_settings['remove_commas_periods']}"}, 
-                ),                   
-            },
-        }
+                )                                   
 
+            },
+
+        } 
     RETURN_TYPES = (
         "STRING",
         # "INT",
@@ -301,7 +302,7 @@ class PhotoPromptGenerator:
     DESCRIPTION = """
 ## Description
 """
-    
+
     def generate_prompt(self, **kwargs):
         # get seed. if not provided then default to 0
         seed = kwargs.get("seed", 0)
@@ -319,27 +320,44 @@ class PhotoPromptGenerator:
         # if not empty, append custom string to components list
         if custom != "":
             components.append(f'{custom},')
-                           
+
         # ------------------------------------------------------------
-        # STYLE_AND_FRAMING 
-        # ------------------------------------------------------------        
-        style_and_framing = kwargs.get("style_and_framing", "disabled")
-        if style_and_framing == self.DISABLED:
-            style_and_framing = ""
-        elif style_and_framing == self.RANDOM:
-            style_and_framing = self.select_random_choice(self.STYLE_AND_FRAMING)      
-        
-        if style_and_framing: # if not empty
+        # ARTSTYLE
+        # ------------------------------------------------------------
+        artstyle = kwargs.get("artstyle", "random") 
+        if artstyle == self.DISABLED:
+            artstyle = ""
+        elif artstyle == self.RANDOM:
+            artstyle = self.select_random_choice(self.ARTSTYLE)      
+
+        if artstyle: #if not empty
             # if framing string begins with a vowel
-            if self.begins_with_vowel(style_and_framing) == True:
+            if self.begins_with_vowel(artstyle) == True:
                 # set either "a" or "an"
                 components.append(f'an')  
             else:
                 components.append(f'a')  
 
             # now add framing 
-            components.append(f'{style_and_framing} photo of')  
+            components.append(f'{artstyle}') 
 
+        # ------------------------------------------------------------
+        # ARTIST
+        # ------------------------------------------------------------        
+        artist = kwargs.get("artist", "random") 
+        if artist == self.DISABLED:
+            artist = ""
+        elif artist == self.RANDOM:
+            artist = self.select_random_choice(self.ARTIST)      
+
+        if not artstyle:
+            components.append(f'an image by {artist} of')  
+        else:
+
+            if artist: #if not empty
+
+                # now add framing 
+                components.append(f'by {artist} of')         
         # ------------------------------------------------------------
         # SUBJECT / CLASS
         # ------------------------------------------------------------
@@ -351,7 +369,8 @@ class PhotoPromptGenerator:
 
         
         if subject_or_class:       
-            components.append(f'{subject_or_class}')          
+            components.append(f'{subject_or_class}')    
+                  
         # ------------------------------------------------------------
         # ROLE
         # ------------------------------------------------------------
@@ -810,36 +829,8 @@ class PhotoPromptGenerator:
             else:
                 components.append(f'and the weather is {weather}.')        
         # ------------------------------------------------------------
-        # CAMERA OR FILM
-        camera_or_film = kwargs.get("camera_or_film", "random")
-        if camera_or_film == self.DISABLED:
-            camera_or_film = ""
-        elif camera_or_film == self.RANDOM:
-            camera_or_film = self.select_random_choice(self.CAMERA_OR_FILM)   
-
-        # Only append if truthy (is not an empty string) 
-        if camera_or_film:
-            components.append(f'{camera_or_film}.') 
-        # ------------------------------------------------------------
-        # PHOTOGRAPHER
-        photographer = kwargs.get("photographer", "random")
-        if photographer == self.DISABLED:
-            photographer = ""
-        elif photographer == self.RANDOM:
-            photographer = self.select_random_choice(self.PHOTOGRAPHER)   
-
-        # Only append if truthy (is not an empty string) 
-        if photographer:
-            components.append(f'Shot by {photographer}.')         
-        # ------------------------------------------------------------
         # SHOW DETAILED LOCATION DESCRIPTION (OR NOT)
         remove_commas_periods = kwargs.get("remove_commas_periods", True)
-        # ------------------------------------------------------------
-        # ------------------------------------------------------------
-        # ------------------------------------------------------------
-        # ------------------------------------------------------------
-        # ------------------------------------------------------------
-        # ------------------------------------------------------------
 
         # concatenate a list of strings with each element separated by a space
         prompt = " ".join(components)
@@ -904,12 +895,11 @@ class PhotoPromptGenerator:
 
         return filtered_items
 
-
 NODE_CLASS_MAPPINGS = {
-    "PhotoPrompter_(Y7)": PhotoPromptGenerator
+    "ArtStylePrompter_(Y7)": ArtStylePromptGenerator
 }
 
 # Human readable names for the nodes
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "PhotoPrompter_(Y7)": "Photo Prompter (Y7)"
-}        
+    "ArtStylePrompter_(Y7)": "ArtStyle Prompter (Y7)"
+}                              
