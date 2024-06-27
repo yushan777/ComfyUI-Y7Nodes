@@ -207,7 +207,7 @@ class ArtStylePromptGenerator:
                     {"default": f"{main_settings['body_shape']}"},              
                 ),                
                 "use_random_clothing_color": (
-                    "BOOLEAN", {"default": f"{main_settings['use_random_clothing_color']}"}
+                    "BOOLEAN", {"default": main_settings['use_random_clothing_color']}
                 ),                 
                 # use a dictionary comprehension to extract only the "item" values for the list: 
                 "clothing_upper": (
@@ -251,7 +251,7 @@ class ArtStylePromptGenerator:
                 ),   
                 "show_detailed_location": (
                     # {"default": f"{main_settings['show_detailed_location']}"}, 
-                    "BOOLEAN", {"default": f"{main_settings['show_detailed_location']}"}, 
+                    "BOOLEAN", {"default": main_settings['show_detailed_location']}, 
                 ),                    
                 # use a dictionary comprehension to extract only the "description" values for the list: 
                 "scene_indoor": (
@@ -276,7 +276,7 @@ class ArtStylePromptGenerator:
                     {"default": f"{main_settings['weather']}"}, 
                 ),   
                 "remove_commas_periods": (
-                    "BOOLEAN", {"default": f"{main_settings['remove_commas_periods']}"}, 
+                    "BOOLEAN", {"default": main_settings['remove_commas_periods']}, 
                 )                                   
 
             },
@@ -427,7 +427,7 @@ class ArtStylePromptGenerator:
         # ------------------------------------------------------------
         # GET RANDOM COLOR FLAG
         # ------------------------------------------------------------
-        use_random_clothing_color = kwargs.get("use_random_clothing_color", False)
+        use_random_clothing_color = bool(kwargs.get("use_random_clothing_color", False))
         
         # ------------------------------------------------------------
         # CLOTHING UPPER
@@ -732,7 +732,7 @@ class ArtStylePromptGenerator:
             components.append(f'{hands}.') 
         # ------------------------------------------------------------
         # SHOW DETAILED LOCATION DESCRIPTION (OR NOT)
-        show_detailed_location = kwargs.get("show_detailed_location", True)
+        show_detailed_location = bool(kwargs.get("show_detailed_location", True))
 
         # ------------------------------------------------------------
         # LOCATION - INTERIOR
@@ -829,12 +829,13 @@ class ArtStylePromptGenerator:
             else:
                 components.append(f'and the weather is {weather}.')        
         # ------------------------------------------------------------
-        # SHOW DETAILED LOCATION DESCRIPTION (OR NOT)
-        remove_commas_periods = kwargs.get("remove_commas_periods", True)
+        # REMOVE COMMAS AND PERIODS
+        remove_commas_periods = bool(kwargs.get("remove_commas_periods", False))
 
         # concatenate a list of strings with each element separated by a space
         prompt = " ".join(components)
 
+        # ------------------------------------------------------------
         if remove_commas_periods:
             # Remove commas and periods using regular expressions
             prompt = re.sub(r'[,.]', '', prompt)

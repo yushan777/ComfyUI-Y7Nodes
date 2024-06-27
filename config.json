@@ -1,6 +1,6 @@
 {
     "main_settings": {
-        "_comment": "settings for node attributes",
+        "_comment": "shared and discrete settings for artstyle prompter and photo prompter attributes",
         "custom": "agg",
         "artstyle": "oil painting",
         "artist": "random",
@@ -19,7 +19,7 @@
         "action": "random",
         "gaze": "random",
         "hands": "random",
-        "show_detailed_location": true,
+        "show_detailed_location": false,
         "scene_indoor": "random",
         "scene_outdoor": "random",
         "lighting": "random",
@@ -30,7 +30,7 @@
         "remove_commas_periods": false
     },
     "sort_orders": {
-        "_comment": "sort order for some attributes, 'item' or 'category' for clothing",
+        "_comment": "sort order for some attributes, 'item' or 'category' for clothing. others are default and unchangeable",
         "clothing_upper_sort_order": "category",
         "clothing_lower_sort_order": "category",
         "clothing_undergarment_sort_order": "category",

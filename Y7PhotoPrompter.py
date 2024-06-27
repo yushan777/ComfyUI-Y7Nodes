@@ -199,7 +199,7 @@ class PhotoPromptGenerator:
                     {"default": f"{main_settings['body_shape']}"},              
                 ),                
                 "use_random_clothing_color": (
-                    "BOOLEAN", {"default": f"{main_settings['use_random_clothing_color']}"}
+                    "BOOLEAN", {"default": main_settings['use_random_clothing_color']}
                 ),                 
                 # use a dictionary comprehension to extract only the "item" values for the list: 
                 "clothing_upper": (
@@ -243,7 +243,7 @@ class PhotoPromptGenerator:
                 ),   
                 "show_detailed_location": (
                     # {"default": f"{main_settings['show_detailed_location']}"}, 
-                    "BOOLEAN", {"default": f"{main_settings['show_detailed_location']}"}, 
+                    "BOOLEAN", {"default": main_settings['show_detailed_location']}, 
                 ),                    
                 # use a dictionary comprehension to extract only the "description" values for the list: 
                 "scene_indoor": (
@@ -276,7 +276,7 @@ class PhotoPromptGenerator:
                     {"default": f"{main_settings['photographer']}"}, 
                 ),   
                 "remove_commas_periods": (
-                    "BOOLEAN", {"default": f"{main_settings['remove_commas_periods']}"}, 
+                    "BOOLEAN", {"default": main_settings['remove_commas_periods']}, 
                 ),                   
             },
         }
@@ -408,7 +408,7 @@ class PhotoPromptGenerator:
         # ------------------------------------------------------------
         # GET RANDOM COLOR FLAG
         # ------------------------------------------------------------
-        use_random_clothing_color = kwargs.get("use_random_clothing_color", False)
+        use_random_clothing_color = bool(kwargs.get("use_random_clothing_color", False))
         
         # ------------------------------------------------------------
         # CLOTHING UPPER
@@ -713,7 +713,7 @@ class PhotoPromptGenerator:
             components.append(f'{hands}.') 
         # ------------------------------------------------------------
         # SHOW DETAILED LOCATION DESCRIPTION (OR NOT)
-        show_detailed_location = kwargs.get("show_detailed_location", True)
+        show_detailed_location = bool(kwargs.get("show_detailed_location", True))
 
         # ------------------------------------------------------------
         # LOCATION - INTERIOR
@@ -832,14 +832,8 @@ class PhotoPromptGenerator:
         if photographer:
             components.append(f'Shot by {photographer}.')         
         # ------------------------------------------------------------
-        # SHOW DETAILED LOCATION DESCRIPTION (OR NOT)
-        remove_commas_periods = kwargs.get("remove_commas_periods", True)
-        # ------------------------------------------------------------
-        # ------------------------------------------------------------
-        # ------------------------------------------------------------
-        # ------------------------------------------------------------
-        # ------------------------------------------------------------
-        # ------------------------------------------------------------
+        # REMOVE COMMAS AND PERIODS
+        remove_commas_periods = bool(kwargs.get("remove_commas_periods", False))
 
         # concatenate a list of strings with each element separated by a space
         prompt = " ".join(components)
