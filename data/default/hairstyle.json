@@ -36,6 +36,8 @@
     {"style_name": "french crop", "full_string": "with a french crop hairstyle"},
     {"style_name": "hair set for wedding", "full_string": "with hair set up for wedding"},
     {"style_name": "hime cut", "full_string": "with a hime cut hairstyle"},
+    {"style_name": "Japanese amasogi cut", "full_string": "with an amasogi cut hairstyle"},
+    {"style_name": "Japanese suberakashi cut", "full_string": "with a suberakashi cut hairstyle"},    
     {"style_name": "layered cut", "full_string": "with a layered cut hairstyle"},
     {"style_name": "lob", "full_string": "with a lob hairstyle"},
     {"style_name": "long bob", "full_string": "with a long bob hairstyle"},
