@@ -744,7 +744,7 @@ class ArtStylePromptGenerator:
             scene_indoor = self.select_random_choice(self.SCENE_INDOOR)   
         else: # else is a selected value                    
             # Find the whole selected location object based on the description
-            for loc in self.LOCATION_INTERIOR:
+            for loc in self.SCENE_INDOOR:
                 if loc["description"] == scene_indoor:
                     scene_indoor = loc # get whol object
                     break
@@ -773,7 +773,7 @@ class ArtStylePromptGenerator:
                 scene_outdoor = self.select_random_choice(self.SCENE_OUTDOOR)   
             else:
                 # Find the whole selected location object based on the description
-                for loc in self.LOCATION_EXTERIOR:
+                for loc in self.SCENE_OUTDOOR:
                     if loc["description"] == scene_outdoor:
                         scene_outdoor = loc
                         break
