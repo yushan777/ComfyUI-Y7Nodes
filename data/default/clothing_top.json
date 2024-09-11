@@ -15,6 +15,7 @@
     {"item": "romper", "default_color": "light blue", "gender": "female", "category": "dresses"},
     {"item": "sheath dress", "default_color": "black", "gender": "female", "category": "dresses"},
     {"item": "shift dress", "default_color": "royal blue", "gender": "female", "category": "dresses"},
+    {"item": "summer dress", "default_color": "white", "gender": "female", "category": "dresses"},
     {"item": "wrap dress", "default_color": "emerald green", "gender": "female", "category": "dresses"},
     {"item": "yukata", "default_color": "floral multi-colored", "gender": "female", "category": "dresses"},    
     {"item": "bodysuit", "default_color": "nude", "gender": "female", "category": "one-piece"},
@@ -77,4 +78,5 @@
     {"item": "sports bra", "default_color": "grey", "gender": "female", "category": "undergarments"},
     {"item": "naked, topless", "default_color": "", "gender": "unisex", "category": "none"},
     {"item": "bath robe", "default_color": "white", "gender": "unisex", "category": "robes"}
+
 ]
