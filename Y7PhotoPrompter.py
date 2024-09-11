@@ -222,11 +222,11 @@ class PhotoPromptGenerator:
                     {"default": f"{main_settings['footwear']}"}, 
                 ),
                 "accessories_head": (
-                    ["disabled", "random"] + cls.ACCESSORIES_HEAD,
+                    ["disabled", "random"] + [accessories_head["item"] for accessories_head in cls.ACCESSORIES_HEAD],
                     {"default": f"{main_settings['accessories_head']}"}, 
                 ),
                 "accessories_other": (
-                    ["disabled", "random"] + cls.ACCESSORIES_OTHER,
+                    ["disabled", "random"] + [accessories_other["item"] for accessories_other in cls.ACCESSORIES_OTHER] ,
                     {"default": f"{main_settings['accessories_other']}"}, 
                 ),                
                 "action": (
