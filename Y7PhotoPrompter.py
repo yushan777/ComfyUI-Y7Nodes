@@ -567,8 +567,8 @@ class PhotoPromptGenerator:
         else: 
             # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
-            for ftwear in self.CLOTHING_LOWER:
-                if footwear["item"] == ftwear:
+            for ftwear in self.FOOTWEAR:
+                if ftwear["item"] == footwear:
                     footwear = ftwear
                     break         
         
@@ -599,7 +599,7 @@ class PhotoPromptGenerator:
             # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
             for acc in self.ACCESSORIES_HEAD:
-                if accessories_head["item"] == acc:
+                if acc["item"] == accessories_head:
                     accessories_head = acc
                     break         
 
@@ -631,7 +631,7 @@ class PhotoPromptGenerator:
             # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
             for acc in self.ACCESSORIES_OTHER:
-                if accessories_other["item"] == acc:
+                if acc["item"] == accessories_other:
                     accessories_other = acc
                     break         
                         
