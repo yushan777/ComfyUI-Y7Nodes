@@ -605,10 +605,11 @@ class ArtStylePromptGenerator:
                 article = 'an' if self.begins_with_vowel(item) else 'a'
                 footwear_string = f'wearing {article} {color} {item}' 
             else:
+                # if barefoot, ignore color
                 if item == "barefoot":
-                    footwear_string = f'{color} {item}' 
-                else:    
                     footwear_string = f'{item}' 
+                else:    
+                    footwear_string = f'{color} {item}' 
             components.append(f'{footwear_string},')            
         # ------------------------------------------------------------
         # ACCESSORIES - HEAD

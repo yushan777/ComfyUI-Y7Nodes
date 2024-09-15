@@ -581,15 +581,18 @@ class PhotoPromptGenerator:
                 # use default color associated with the item of clothing
                 color = footwear.get('default_color')  # defaults to 'none' if key does not existpass
             article = ""
+
             # if no upper clothing AND no lower clothing and no undergarments
             if not clothing_upper and not clothing_lower and not clothing_undergarment_selected:
                 article = 'an' if self.begins_with_vowel(item) else 'a'
                 footwear_string = f'wearing {article} {color} {item}' 
+                print(f'--------------> {footwear_string}')
             else:
+                print(f'------>{item}')
                 if item == "barefoot":
-                    footwear_string = f'{color} {item}' 
-                else:    
                     footwear_string = f'{item}' 
+                else:    
+                    footwear_string = f'{color} {item}' 
 
             components.append(f'{footwear_string},')     
 
