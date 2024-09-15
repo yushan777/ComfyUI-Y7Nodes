@@ -587,7 +587,7 @@ class ArtStylePromptGenerator:
             # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
             for ftwear in self.CLOTHING_LOWER:
-                if footwear["item"] == ftwear:
+                if ftwear["item"] == footwear:
                     footwear = ftwear
                     break         
         
@@ -605,7 +605,10 @@ class ArtStylePromptGenerator:
                 article = 'an' if self.begins_with_vowel(item) else 'a'
                 footwear_string = f'wearing {article} {color} {item}' 
             else:
-                footwear_string = f'{color} {item}' 
+                if item == "barefoot":
+                    footwear_string = f'{color} {item}' 
+                else:    
+                    footwear_string = f'{item}' 
             components.append(f'{footwear_string},')            
         # ------------------------------------------------------------
         # ACCESSORIES - HEAD
@@ -618,7 +621,7 @@ class ArtStylePromptGenerator:
             # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
             for acc in self.ACCESSORIES_HEAD:
-                if accessories_head["item"] == acc:
+                if acc["item"] == accessories_head:
                     accessories_head = acc
                     break         
 
@@ -650,7 +653,7 @@ class ArtStylePromptGenerator:
             # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
             # we the whole selected location object based on the "item" attribute
             for acc in self.ACCESSORIES_OTHER:
-                if accessories_other["item"] == acc:
+                if acc["item"] == accessories_head:
                     accessories_other = acc
                     break         
                         

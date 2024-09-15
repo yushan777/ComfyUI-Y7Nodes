@@ -586,8 +586,13 @@ class PhotoPromptGenerator:
                 article = 'an' if self.begins_with_vowel(item) else 'a'
                 footwear_string = f'wearing {article} {color} {item}' 
             else:
-                footwear_string = f'{color} {item}' 
-            components.append(f'{footwear_string},')            
+                if item == "barefoot":
+                    footwear_string = f'{color} {item}' 
+                else:    
+                    footwear_string = f'{item}' 
+
+            components.append(f'{footwear_string},')     
+
         # ------------------------------------------------------------
         # ACCESSORIES - HEAD
         accessories_head = kwargs.get("accessories_head", "random")
