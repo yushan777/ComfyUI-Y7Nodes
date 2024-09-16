@@ -586,9 +586,9 @@ class PhotoPromptGenerator:
             if not clothing_upper and not clothing_lower and not clothing_undergarment_selected:
                 article = 'an' if self.begins_with_vowel(item) else 'a'
                 footwear_string = f'wearing {article} {color} {item}' 
-                print(f'--------------> {footwear_string}')
+                
             else:
-                print(f'------>{item}')
+                # if barefoot, ignore color
                 if item == "barefoot":
                     footwear_string = f'{item}' 
                 else:    
