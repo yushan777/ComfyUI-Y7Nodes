@@ -15,6 +15,7 @@
         "clothing_undergarment": "random",
         "footwear": "random",
         "accessories_head": "random",
+        "accessories_face": "disabled",
         "accessories_other": "random",
         "action": "random",
         "gaze": "random",

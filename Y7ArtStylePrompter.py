@@ -33,6 +33,7 @@ class ArtStylePromptGenerator:
     CLOTHING_LOWER = None    
     FOOTWEAR = None
     ACCESSORIES_HEAD = None
+    ACCESSORIES_FACE = None
     ACCESSORIES_OTHER = None
     ACTION = None 
     GAZE = None 
@@ -78,6 +79,7 @@ class ArtStylePromptGenerator:
         cls.CLOTHING_UNDERGARMENT = cls.load_data_files("clothing_undergarment.json") # (item, default color, gender, category)
         cls.FOOTWEAR = cls.load_data_files("footwear.json")
         cls.ACCESSORIES_HEAD = cls.load_data_files("accessories_head.json")
+        cls.ACCESSORIES_FACE = cls.load_data_files("accessories_face.json")
         cls.ACCESSORIES_OTHER = cls.load_data_files("accessories_other.json")
         cls.ACTION = cls.load_data_files("action.json")
         cls.GAZE = cls.load_data_files("gaze.json")
@@ -233,6 +235,10 @@ class ArtStylePromptGenerator:
                     ["disabled", "random"] + cls.ACCESSORIES_HEAD,
                     {"default": f"{main_settings['accessories_head']}"}, 
                 ),
+                "accessories_face": (
+                    ["disabled", "random"] + cls.ACCESSORIES_FACE,
+                    {"default": f"{main_settings['accessories_face']}"}, 
+                ),                
                 "accessories_other": (
                     ["disabled", "random"] + cls.ACCESSORIES_OTHER,
                     {"default": f"{main_settings['accessories_other']}"}, 
@@ -553,7 +559,7 @@ class ArtStylePromptGenerator:
                 color = self.select_random_choice(self.COLORS)        
             else:
                 # use default color associated with the item of clothing
-                color = use_random_clothing_color.get('default_color')  # defaults to 'none' if key does not existpass
+                color = clothing_undergarment_selected.get('default_color')  # defaults to 'none' if key does not existpass
 
             article = ""
             # if no upper clothing chosen, start with wearing and article 'an'/'a'
@@ -643,6 +649,39 @@ class ArtStylePromptGenerator:
                 accessory_head_string = f'{color} {item}' 
             components.append(f'{accessory_head_string},')     
 
+
+        # ------------------------------------------------------------
+        # ACCESSORIES - FACE
+        accessories_face = kwargs.get("accessories_face", "random")
+        if accessories_face == self.DISABLED:
+            accessories_face = ""
+        elif accessories_face == self.RANDOM:
+            accessories_face = self.select_random_choice(self.ACCESSORIES_FACE)      
+        else: 
+            # if user has made selection, then we only have 'item' property, not the whole obj that also contains the "default_color" attribute, so
+            # we the whole selected location object based on the "item" attribute
+            for acc in self.ACCESSORIES_FACE:
+                if acc["item"] == accessories_face:
+                    accessories_face = acc
+                    break         
+
+        if accessories_face: #if not empty
+            item = accessories_face.get('item')
+            color = ""
+            if use_random_clothing_color:
+                color = self.select_random_choice(self.COLORS)        
+            else:
+                # use default color associated with the item of clothing
+                color = accessories_face.get('default_color')  # defaults to 'none' if key does not existpass
+            article = ""
+            # if no upper clothing AND no lower clothing and no undergarments and no footwear
+            if not clothing_upper and not clothing_lower and not clothing_undergarment_selected and not footwear:
+                article = 'an' if self.begins_with_vowel(item) else 'a'
+                accessory_face_string = f'wearing {article} {color} {item}' 
+            else:
+                accessory_face_string = f'{color} {item}' 
+            components.append(f'{accessory_face_string},')    
+            
         # ------------------------------------------------------------
         # ACCESSORIES - OTHER
         accessories_other = kwargs.get("accessories_other", "random")
