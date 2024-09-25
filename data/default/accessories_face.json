@@ -1,0 +1,27 @@
+[
+    {
+        "item": "dark sunglasses",
+        "default_color": "black",
+        "category": "eye_and_face"
+    },
+    {
+        "item": "face mask",
+        "default_color": "black",
+        "category": "eye_and_face"
+    },
+    {
+        "item": "goggles",
+        "default_color": "clear",
+        "category": "eye_and_face"
+    },
+    {
+        "item": "respirator",
+        "default_color": "black",
+        "category": "eye_and_face"
+    },
+    {
+        "item": "rimmed glasses",
+        "default_color": "black",
+        "category": "eye_and_face"
+    }
+]
