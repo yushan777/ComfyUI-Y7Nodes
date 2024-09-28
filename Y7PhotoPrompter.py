@@ -177,11 +177,12 @@ class PhotoPromptGenerator:
         return {
             "required": {
                 "seed": ("INT", {"default": 123, "min": 0, "max": 1125899906842624}),
-                "custom": ("STRING", {"default": f"{main_settings['custom']}"}),
+                
                 "style_and_framing": (
                     ["disabled", "random"] + cls.STYLE_AND_FRAMING,
                     {"default": f"{main_settings['style_and_framing']}"},            
                 ),
+                "custom": ("STRING", {"default": f"{main_settings['custom']}"}),
                 "subject_class": (
                     ["disabled", "random"] + cls.SUBJECT_CLASS,
                     {"default": f"{main_settings['subject_class']}"},              
@@ -317,15 +318,6 @@ class PhotoPromptGenerator:
         # components hold all the separate prompt parts together
         components = []
 
-        # ------------------------------------------------------------        
-        # CUSTOM
-        # ------------------------------------------------------------
-        # get custom string, if nothing is passed in, default to ""
-        custom = kwargs.get("custom", "")
-        # if not empty, append custom string to components list
-        if custom != "":
-            components.append(f'{custom},')
-                           
         # ------------------------------------------------------------
         # STYLE_AND_FRAMING 
         # ------------------------------------------------------------        
@@ -346,6 +338,15 @@ class PhotoPromptGenerator:
             # now add framing 
             components.append(f'{style_and_framing} photo of')  
 
+        # ------------------------------------------------------------        
+        # CUSTOM TOKEN / TRIGGER WORD
+        # ------------------------------------------------------------
+        # get custom string, if nothing is passed in, default to ""
+        custom = kwargs.get("custom", "")
+        # if not empty, append custom string to components list
+        if custom != "":
+            components.append(f'{custom},')
+                           
         # ------------------------------------------------------------
         # SUBJECT / CLASS
         # ------------------------------------------------------------
