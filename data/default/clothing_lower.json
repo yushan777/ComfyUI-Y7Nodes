@@ -205,6 +205,18 @@
 		"category": "skirts"
 	},
 	{
+		"item": "long skirt",
+		"default_color": "black",
+		"gender": "female",
+		"category": "skirts"
+	},	
+	{
+		"item": "fitted skirt",
+		"default_color": "black",
+		"gender": "female",
+		"category": "skirts"
+	},	
+	{
 		"item": "tennis skirt",
 		"default_color": "white",
 		"gender": "female",
