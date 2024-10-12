@@ -841,7 +841,7 @@ class PhotoPromptGenerator:
 
         # Only append if truthy (is not an empty string) 
         if time_of_day:
-            components.append(f'it is {time_of_day}')
+            components.append(f'it is {time_of_day},')
         # ------------------------------------------------------------
         # WEATHER
         weather = kwargs.get("weather", "random")
@@ -885,6 +885,12 @@ class PhotoPromptGenerator:
         # concatenate a list of strings with each element separated by a space
         prompt = " ".join(components)
 
+        # After generating the full prompt, check if we need to remove color adjectives based on the film type selected
+        camera_or_film = kwargs.get("camera_or_film", "random")
+        if camera_or_film != self.DISABLED and camera_or_film != self.RANDOM:
+            if "black and white" in camera_or_film.lower():
+                prompt = self.remove_color_adjectives(prompt, self.COLORS)
+
         if remove_commas_periods:
             # Remove commas and periods using regular expressions
             prompt = re.sub(r'[,.]', '', prompt)
@@ -892,6 +898,28 @@ class PhotoPromptGenerator:
         
         return prompt, seed
 
+    # ==============================================================================================================
+    def remove_color_adjectives(self, prompt, colors):
+        # Convert the prompt to lowercase for case-insensitive matching
+        lower_prompt = prompt.lower()
+        
+        # Create a regex pattern that matches any color in the list
+        color_pattern = r'\b(?:' + '|'.join(re.escape(color.lower()) for color in colors) + r')\b'
+        
+        # Find all color matches in the prompt
+        matches = list(re.finditer(color_pattern, lower_prompt))
+        
+        # Remove color adjectives, working backwards to avoid index issues
+        for match in reversed(matches):
+            start, end = match.span()
+            # Remove the color and the space before it (if it's not at the start of the prompt)
+            if start > 0 and prompt[start-1] == ' ':
+                prompt = prompt[:start-1] + prompt[end:]
+            else:
+                prompt = prompt[:start] + prompt[end:]
+        
+        return prompt
+    
     # ==============================================================================================================
     def select_random_choice(self, available_choices):
         return self.rng.choices(available_choices, k=1)[0]
