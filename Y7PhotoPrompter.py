@@ -147,6 +147,8 @@ class PhotoPromptGenerator:
         return config
     
     #  ==================================================================================
+
+
     @classmethod
     def load_data_files(cls, file_name):
         # Define the path for default and custom files
@@ -154,18 +156,24 @@ class PhotoPromptGenerator:
         default_path = os.path.join(base_dir, "data/default", file_name)
         custom_path = os.path.join(base_dir, "data/custom", file_name)
 
-        # Load the default file
-        with open(default_path, "r") as file:
-            data = json.load(file)
-        
-        # Check if a custom variant of default file exists and merge it with the default
-        if os.path.exists(custom_path):
-            with open(custom_path, "r") as file:
-                custom_data = json.load(file)
-            # Assuming the data structure is a list
-            data.extend(custom_data)
+        try:
+            # Load the default file with UTF-8 encoding
+            with open(default_path, "r", encoding="utf-8") as file:
+                data = json.load(file)
+            
+            # Check if a custom variant of default file exists and merge it with the default
+            if os.path.exists(custom_path):
+                with open(custom_path, "r", encoding="utf-8") as file:
+                    custom_data = json.load(file)
+                # Assuming the data structure is a list
+                data.extend(custom_data)
+
+        except (FileNotFoundError, json.JSONDecodeError, UnicodeDecodeError) as e:
+            print(f"Error loading JSON file {file_name}: {e}")
+            data = None
 
         return data
+
             
     #  ==================================================================================
     @classmethod
