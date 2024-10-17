@@ -141,14 +141,17 @@ class PhotoPromptGenerator:
         base_dir = os.path.dirname(__file__)
         config_path = os.path.join(base_dir, "config.json")
         
-        with open(config_path, "r") as config_file:
-            config = json.load(config_file)
+        try:
+            # Load the default config file with UTF-8 encoding
+            with open(config_path, "r", encoding="utf-8") as config_file:
+                config = json.load(config_file)
+        except (FileNotFoundError, json.JSONDecodeError, UnicodeDecodeError) as e:
+            logging.error(f"Error loading config file: {e}")
+            config = {}  # Return an empty dictionary or some default value in case of an error
 
         return config
     
     #  ==================================================================================
-
-
     @classmethod
     def load_data_files(cls, file_name):
         # Define the path for default and custom files

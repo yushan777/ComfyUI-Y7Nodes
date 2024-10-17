@@ -145,8 +145,13 @@ class ArtStylePromptGenerator:
         base_dir = os.path.dirname(__file__)
         config_path = os.path.join(base_dir, "config.json")
         
-        with open(config_path, "r") as config_file:
-            config = json.load(config_file)
+        try:
+            # Load the default config file with UTF-8 encoding
+            with open(config_path, "r", encoding="utf-8") as config_file:
+                config = json.load(config_file)
+        except (FileNotFoundError, json.JSONDecodeError, UnicodeDecodeError) as e:
+            logging.error(f"Error loading config file: {e}")
+            config = {}  # Return an empty dictionary or some default value in case of an error
 
         return config
     
@@ -158,18 +163,23 @@ class ArtStylePromptGenerator:
         default_path = os.path.join(base_dir, "data/default", file_name)
         custom_path = os.path.join(base_dir, "data/custom", file_name)
 
-        # Load the default file
-        with open(default_path, "r") as file:
-            data = json.load(file)
-        
-        # Check if a custom variant of default file exists and merge it with the default
-        if os.path.exists(custom_path):
-            with open(custom_path, "r") as file:
-                custom_data = json.load(file)
-            # Assuming the data structure is a list
-            data.extend(custom_data)
+        try:
+            # Load the default file with UTF-8 encoding
+            with open(default_path, "r", encoding="utf-8") as file:
+                data = json.load(file)
+            
+            # Check if a custom variant of default file exists and merge it with the default
+            if os.path.exists(custom_path):
+                with open(custom_path, "r", encoding="utf-8") as file:
+                    custom_data = json.load(file)
+                # Assuming the data structure is a list
+                data.extend(custom_data)
 
-        return data      
+        except (FileNotFoundError, json.JSONDecodeError, UnicodeDecodeError) as e:
+            print(f"Error loading JSON file {file_name}: {e}")
+            data = None
+
+        return data
 
     #  ==================================================================================
     @classmethod
