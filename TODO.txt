@@ -1,3 +1,0 @@
-hide or remove llm_name widget
-
-why slower on windows?
