@@ -1,6 +1,6 @@
 [project]
 name = "comfyui-y7nodes"
-description = "Various utility nodes for ComfyUI. Some will be be modified versions of other existing custom nodes."
+description = "A collection of utility / quality-of-life nodes for ComfyUI. Probably only useful to me."
 version = "1.0.0"
 license = {file = "LICENSE"}
 dependencies = ["torch", "transformers", "protobuf", "sentencepiece", "huggingface_hub"]
