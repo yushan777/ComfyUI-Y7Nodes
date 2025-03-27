@@ -8,24 +8,20 @@ from .nodes.clip_token_count import Y7Nodes_CLIP_TokenCounter
 from .nodes.template_node import Y7_TemplateNode
 
 NODE_CLASS_MAPPINGS = {
-    "Y7Nodes_Brightness": Y7Nodes_Brightness,
-    "Y7Nodes_Grid2Batch": Y7Nodes_Grid2Batch,
-    "Y7Nodes_ShowAnything": Y7Nodes_ShowAnything,
+    "Y7Nodes_ShowAnything": Y7Nodes_ShowAnything,    
+    "Y7Nodes_Grid2Batch": Y7Nodes_Grid2Batch,    
     "Y7Nodes_PromptEnhancerFlux": Y7Nodes_PromptEnhancerFlux,
     "Y7Nodes_T5_TokenCounter": Y7Nodes_T5_TokenCounter,
     "Y7Nodes_CLIP_TokenCounter": Y7Nodes_CLIP_TokenCounter,
-    "Y7_TemplateNode": Y7_TemplateNode
+
 }
 
-
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Y7Nodes_Brightness": "Y7 Brightness Adjustment",
+    "Y7Nodes_ShowAnything": "Y7 Show Anything",    
     "Y7Nodes_Grid2Batch": "Y7 Grid to Batch",
-    "Y7Nodes_ShowAnything": "Y7 Show Anything",
     "Y7Nodes_PromptEnhancerFlux": "Y7 Prompt Enhancer (Flux)",
     "Y7Nodes_T5_TokenCounter": "Y7 T5 Token Counter",
-    "Y7Nodes_CLIP_TokenCounter": "Y7 CLIP Token Counter",
-    "Y7_TemplateNode": "Y7 Template Node"
+    "Y7Nodes_CLIP_TokenCounter": "Y7 CLIP Token Counter",    
 }
 
 # Apply HTML-formatted documentation to node classes

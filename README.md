@@ -38,7 +38,7 @@ Coming soon.
 Based on other nodes that already work just fine.  I just always wanted one with a `copy text` button for easy copying of long generated prompts (for editing or use elsewhere). It will primarily show `string, integer, float and boolean` values directly but will also (try to) display tensor data. 
 
 
-![Show Anything Example 2 ](assets/show_anything2.png)
+![Show Anything Example 2 ](assets/show_anything.jpg)
 
 ---
 
@@ -52,7 +52,7 @@ Takes text (string) as input and, using the CLIP tokenizer, displays:
 - Copy Text button : copies the contets displayed in the text widget
 - Pass-though output for original text
 
-![clip_token_count](assets/clip_token_count.png)
+![clip_token_count](assets/clip_token_count.jpg)
 
 ------
 
@@ -72,19 +72,16 @@ Takes text (string) as input and, using the T5 XXl tokenizer, displays:
 
 - Pass-though output for original text
 
-![clip_token_count](assets/t5_token_count.png)
+![clip_token_count](assets/t5_token_count.jpg)
 
 ------
 ### Y7 Prompt Enhancer (Flux)
 
-![Prompt Enhancer (Flux) ](assets/prompt_enhancer.png)
+![Prompt Enhancer (Flux) ](assets/prompt_enhancer.jpg)
 
 **Prompt Enhancer (Flux)** will take any basic prompt and enhance it and produce T5 and CLIP friendly variants of the enhanced prompt. If you have fine-tuned a model with a token / trigger word then use `[trigger_word]` or if it's combined with a subject `[trigger_word man]`.
 
-Optional LLM models are:
-
-- unsloth/Llama-3.2-3B-Instruct
-- TheBloke/Mistral-7B-Instruct-v0.2-GGUF ()
+LLM model used is: Meta's [Llama-3.2-3B-Instruct (from unsloth's repo)](https://huggingface.co/unsloth/Llama-3.2-3B-Instruct)
 
 #### Background: 
 
@@ -94,6 +91,24 @@ Because the first 77 tokens are shared by both encoders, while the rest are T5-o
 
 For better/different/preferred?? results, consider placing high-impact keywords up front (for CLIP), then letting descriptive language follow (for T5). This hybrid strategy plays to the strengths of both encoders and often leads to more coherent and visually faithful generations.
 
+The node will attempt to download the required model files (approx 6.5GB) if they don't exist.  If you wish to download them manually then you can get the files from https://huggingface.co/unsloth/Llama-3.2-3B-Instruct and place them under `ComfyUI/models/LLM/Llama-3.2-3B-Instruct`. The files you need are:
+
+```
+ComfyUI
+└── models
+    └── LLM
+        └── Llama-3.2-3B-Instruct
+            ├── config.json
+            ├── generation_config.json
+            ├── model.safetensors
+            ├── model.safetensors.index.json
+            ├── special_tokens_map.json
+            ├── tokenizer.json
+            └── tokenizer_config.json
+```
+
+
+
 
 ------
 
@@ -102,7 +117,7 @@ For better/different/preferred?? results, consider placing high-impact keywords 
 
 Takes a grid of images (like those generated in XY-plots) and processes it into a batch of individual images.  Define the number of rows, columns, the size of the individual images in the grid, any offsets (to account for headers). Output is a batch of images that can be processed further in your workflow
 
-![grid2batch](assets/grid2batch.png)
+![grid2batch](assets/grid2batch.jpg)
 
 **Parameters:**
 

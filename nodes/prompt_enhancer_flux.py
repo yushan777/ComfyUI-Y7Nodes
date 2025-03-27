@@ -139,7 +139,7 @@ CLIP Prompt: [Your concise keyword list]
 
 If the user's prompt contains a phrase inside square brackets (e.g., `[agg woman]`), you must treat the content inside the brackets as the **explicit and literal subject** of the image. Do not reinterpret, paraphrase, or alter this phrase. Use it exactly as written, as the primary subject in both the T5 and CLIP prompts.
 
-- preserve the subject phrase exactly, preserving case is very important!
+- preserve the subject phrase exactly, including the case of the phrase!
 
 Examples:
 - `[agg woman] walking through a neon-lit alley` → Subject is "agg woman"
