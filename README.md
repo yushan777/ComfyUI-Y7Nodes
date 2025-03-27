@@ -1,6 +1,6 @@
 # ComfyUI-Y7Nodes
 
-A collection of utility / quality-of-life nodes for ComfyUI.  There's really nothing new here. Some nodes are modifications of of existing custom nodes with additional features and improvements that suit my particular needs.
+A collection of utility / quality-of-life nodes for ComfyUI - Probably only useful to me.  There's really nothing new here. Some nodes are modifications of of existing custom nodes with additional features that suit my particular needs.
 
 ## Installation (Manual)
 
