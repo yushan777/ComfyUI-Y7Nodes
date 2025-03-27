@@ -1,5 +1,5 @@
 [project]
-name = "y7nodes"
+name = "comfyui-y7nodes"
 description = "A collection of utility / quality-of-life nodes for ComfyUI. Probably only useful to me."
 version = "1.0.0"
 license = {file = "LICENSE"}
@@ -10,6 +10,6 @@ Repository = "https://github.com/yushan777/ComfyUI-Y7Nodes"
 #  Used by Comfy Registry https://comfyregistry.org
 
 [tool.comfy]
-PublisherId = "Yushan777"
+PublisherId = "yushan777"
 DisplayName = "ComfyUI-Y7Nodes"
 Icon = ""
