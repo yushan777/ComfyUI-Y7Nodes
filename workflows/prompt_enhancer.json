@@ -1,0 +1,772 @@
+{
+  "id": "17988ba9-49a2-4bce-9116-8c8dbc5b4b93",
+  "revision": 0,
+<<<<<<< HEAD
+<<<<<<< HEAD
+  "last_node_id": 21,
+  "last_link_id": 41,
+=======
+  "last_node_id": 120,
+  "last_link_id": 201,
+>>>>>>> parent of 18b2206 (..)
+=======
+  "last_node_id": 120,
+  "last_link_id": 201,
+>>>>>>> parent of 18b2206 (..)
+  "nodes": [
+    {
+      "id": 120,
+      "type": "ShowText|pysssss",
+      "pos": [
+<<<<<<< HEAD
+<<<<<<< HEAD
+        -678.8003540039062,
+        -814.7765502929688
+      ],
+      "size": [
+        490,
+        340
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 33
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Y7Nodes_ShowAnything"
+      },
+      "widgets_values": [
+        "A rugged, weathered ohwx man stands on the edge of a volcano, his back to the viewer, with his arms outstretched and his fists clenched in a powerful stance. His worn jeans and black leather jacket seem to blend seamlessly into the rugged terrain, as if he's been molded to the landscape. A thick layer of mist swirls around him, obscuring his face, while the sounds of distant rumbling and his own ragged breathing fill the air. The ground beneath his feet is a tangled mess of roots, boulders, and loose scree, and the slope drops away steeply behind him, plunging into a churning sea of molten lava. A warm, golden light filters down from above, casting long shadows across the rough-hewn rock face. The air is heavy with the acrid scent of sulfur and the distant tang of rain. The man's posture conveys a sense of raw emotion, as if he's teetering on the edge of a precipice, with the world crashing down on him. The overall mood is intense, turbulent, and awe-inspiring, capturing the primal power of nature.",
+        true,
+        "11",
+        null
+      ]
+    },
+    {
+      "id": 3,
+      "type": "Y7Nodes_ShowAnything",
+      "pos": [
+        -669.0142211914062,
+        -429.96844482421875
+      ],
+      "size": [
+        480,
+        170
+=======
+        311.6021728515625,
+        306.3055419921875
+      ],
+      "size": [
+        485.92578125,
+        255.37109375
+>>>>>>> parent of 18b2206 (..)
+=======
+        311.6021728515625,
+        306.3055419921875
+      ],
+      "size": [
+        485.92578125,
+        255.37109375
+>>>>>>> parent of 18b2206 (..)
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+<<<<<<< HEAD
+<<<<<<< HEAD
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 35
+=======
+=======
+>>>>>>> parent of 18b2206 (..)
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 201
+<<<<<<< HEAD
+>>>>>>> parent of 18b2206 (..)
+=======
+>>>>>>> parent of 18b2206 (..)
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "bc8922deff73f59311c05cef27b9d4caaf43e87b",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+<<<<<<< HEAD
+<<<<<<< HEAD
+        "ohwx man, rugged terrain, mist, worn jeans, black leather jacket, rugged landscape, distant rumbling, volcanic eruption, golden light, sulfur scent, intense mood, primal power",
+        true,
+        "11",
+        null
+=======
+        "",
+        "woman, office cubicle, modern, natural light, fluorescent lighting, cool color palette, professional attire, productivity, determination"
+>>>>>>> parent of 18b2206 (..)
+=======
+        "",
+        "woman, office cubicle, modern, natural light, fluorescent lighting, cool color palette, professional attire, productivity, determination"
+>>>>>>> parent of 18b2206 (..)
+      ]
+    },
+    {
+      "id": 119,
+      "type": "ShowText|pysssss",
+      "pos": [
+<<<<<<< HEAD
+<<<<<<< HEAD
+        -1765.671630859375,
+        -524.83154296875
+=======
+        339.0474853515625,
+        -113.5968017578125
+>>>>>>> parent of 18b2206 (..)
+=======
+        339.0474853515625,
+        -113.5968017578125
+>>>>>>> parent of 18b2206 (..)
+      ],
+      "size": [
+        463.7109375,
+        342.80078125
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 200
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "bc8922deff73f59311c05cef27b9d4caaf43e87b",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "",
+        "“[ohwx woman] sits confidently in a modern office cubicle, surrounded by sleek, silver, and glass walls that reflect her determined gaze. Her long, dark hair is pulled back into a neat ponytail, accentuating her sharp jawline and prominent cheekbones. Her bright hazel eyes sparkle with focus, as she types away on her computer keyboard with a steady hand. A crisp white blouse and tailored navy blue trousers complete her professional attire, adding a touch of sophistication to the otherwise sterile office environment. Natural light pours in through the window, casting a warm glow on her features. The overall atmosphere is one of productivity and accomplishment, with a hint of subtle tension emanating from the faint hum of the fluorescent lights overhead. The color palette is predominantly cool and calming, with shades of blue and gray dominating the space. The composition places the woman slightly off-center, drawing the viewer's eye to her intense expression and focused gaze. The mood is one of quiet determination, as if she's on the cusp of a major breakthrough.”"
+      ]
+    },
+    {
+      "id": 111,
+      "type": "Y7Nodes_PromptEnhancerFlux",
+      "pos": [
+        -899.9063720703125,
+        -33.342994689941406
+      ],
+      "size": [
+        400,
+        228
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+<<<<<<< HEAD
+<<<<<<< HEAD
+          "name": "SEED",
+          "shape": 3,
+          "type": "INT",
+          "links": [
+            39
+          ]
+        }
+      ],
+      "properties": {},
+      "widgets_values": [
+        683646952406477,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 16,
+      "type": "Note",
+      "pos": [
+        -1799.522705078125,
+        -782.9076538085938
+=======
+          "name": "t5_prompt",
+          "type": "STRING",
+          "links": [
+            199
+          ]
+        },
+        {
+          "name": "clip_prompt",
+          "type": "STRING",
+          "links": [
+            198
+          ]
+        }
+      ],
+      "properties": {
+        "ver": "f04031bc06fd9abdc5306a2b6d72de552c97e103",
+        "Node name for S&R": "Y7Nodes_PromptEnhancerFlux"
+      },
+      "widgets_values": [
+        "[ohwx woman] in an office",
+        "unsloth/Llama-3.2-3B-Instruct",
+        1024,
+        603174868196375,
+        "fixed",
+        false
+      ]
+    },
+    {
+      "id": 117,
+      "type": "Y7Nodes_CLIP_TokenCounter",
+      "pos": [
+        -348.17120361328125,
+        242.82476806640625
+>>>>>>> parent of 18b2206 (..)
+      ],
+      "size": [
+        500,
+        300
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text_in",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "text_in"
+          },
+          "link": 198
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text_out",
+          "type": "STRING",
+          "links": [
+            201
+          ]
+        }
+      ],
+      "properties": {
+        "ver": "f04031bc06fd9abdc5306a2b6d72de552c97e103",
+        "Node name for S&R": "Y7Nodes_CLIP_TokenCounter",
+        "show_tokens_index": 2,
+        "tokens_per_line_index": 3
+      },
+      "widgets_values": [
+        "",
+        "Special Token(s): \n   1: Beginning-of-Sequence (BOS): '<|startoftext|>'\n   2: End-of-Sequence (EOS): '<|endoftext|>'\n\nToken Limit: 77\nToken Count: 26\n\nTokens\n==========================================\n[ 0] <|startoftext|>  [ 1] woman</w>        [ 2] ,</w>            [ 3] office</w>       \n[ 4] cubic            [ 5] le</w>           [ 6] ,</w>            [ 7] modern</w>       \n[ 8] ,</w>            [ 9] natural</w>      [10] light</w>        [11] ,</w>            \n[12] fluorescent</w>  [13] lighting</w>     [14] ,</w>            [15] cool</w>         \n[16] color</w>        [17] palette</w>      [18] ,</w>            [19] professional</w> \n[20] attire</w>       [21] ,</w>            [22] productivity</w> [23] ,</w>            \n[24] determination</w>[25] <|endoftext|>    \n",
+        true,
+        "4",
+        "10",
+        null
+      ]
+    },
+    {
+      "id": 118,
+      "type": "Y7Nodes_T5_TokenCounter",
+      "pos": [
+        -348.65203857421875,
+        -110.09786987304688
+      ],
+      "size": [
+        499.69140625,
+        310.6640625
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+<<<<<<< HEAD
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "a cinematic still of a woman\n\n[ohwx woman] in an office\n\n[ohwx dog] playing in a park\n\n[ohwx man] sitting in a cafee"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 18,
+      "type": "Y7Nodes_T5_TokenCounter",
+      "pos": [
+        -995.1978759765625,
+        -743.6770629882812
+      ],
+      "size": [
+        285.8046875,
+        232
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text_in",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "text_in"
+          },
+          "link": 40
+        }
+      ],
+=======
+      "inputs": [
+        {
+          "name": "text_in",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "text_in"
+          },
+          "link": 199
+        }
+      ],
+>>>>>>> parent of 18b2206 (..)
+      "outputs": [
+        {
+          "name": "text_out",
+          "type": "STRING",
+          "links": [
+<<<<<<< HEAD
+            33
+=======
+            200
+>>>>>>> parent of 18b2206 (..)
+          ]
+        }
+      ],
+      "properties": {
+<<<<<<< HEAD
+=======
+        "ver": "f04031bc06fd9abdc5306a2b6d72de552c97e103",
+>>>>>>> parent of 18b2206 (..)
+        "Node name for S&R": "Y7Nodes_T5_TokenCounter",
+        "token_limit_index": 2,
+        "show_tokens_index": 3,
+        "tokens_per_line_index": 4
+      },
+      "widgets_values": [
+        "",
+<<<<<<< HEAD
+        "Token Count: 289 / 512\n\nTokens\n==========================================\n[  0] ▁A         [  1] ▁rugged    [  2] ,          [  3] ▁weather   \n[  4] e          [  5] d          [  6] ▁          [  7] o          \n[  8] h          [  9] w          [ 10] x          [ 11] ▁man       \n[ 12] ▁stands    [ 13] ▁on        [ 14] ▁the       [ 15] ▁edge      \n[ 16] ▁of        [ 17] ▁          [ 18] a          [ 19] ▁volcano   \n[ 20] ,          [ 21] ▁his       [ 22] ▁back      [ 23] ▁to        \n[ 24] ▁the       [ 25] ▁viewer    [ 26] ,          [ 27] ▁with      \n[ 28] ▁his       [ 29] ▁arms      [ 30] ▁out       [ 31] s          \n[ 32] t          [ 33] r          [ 34] etched     [ 35] ▁and       \n[ 36] ▁his       [ 37] ▁fi        [ 38] s          [ 39] t          \n[ 40] s          [ 41] ▁          [ 42] cle        [ 43] n          \n[ 44] ched       [ 45] ▁in        [ 46] ▁          [ 47] a          \n[ 48] ▁powerful  [ 49] ▁          [ 50] stance     [ 51] .          \n[ 52] ▁His       [ 53] ▁worn      [ 54] ▁jeans     [ 55] ▁and       \n[ 56] ▁black     [ 57] ▁leather   [ 58] ▁jacket    [ 59] ▁seem      \n[ 60] ▁to        [ 61] ▁blend     [ 62] ▁seamlessly[ 63] ▁into      \n[ 64] ▁the       [ 65] ▁rugged    [ 66] ▁terrain   [ 67] ,          \n[ 68] ▁as        [ 69] ▁          [ 70] if         [ 71] ▁          \n[ 72] he         [ 73] '          [ 74] s          [ 75] ▁been      \n[ 76] ▁          [ 77] molded     [ 78] ▁to        [ 79] ▁the       \n[ 80] ▁landscape [ 81] .          [ 82] ▁A         [ 83] ▁thick     \n[ 84] ▁layer     [ 85] ▁of        [ 86] ▁mis       [ 87] t          \n[ 88] ▁swirl     [ 89] s          [ 90] ▁around    [ 91] ▁him       \n[ 92] ,          [ 93] ▁          [ 94] obscur     [ 95] ing        \n[ 96] ▁his       [ 97] ▁face      [ 98] ,          [ 99] ▁while     \n[100] ▁the       [101] ▁sounds    [102] ▁of        [103] ▁distant   \n[104] ▁          [105] r          [106] umbling    [107] ▁and       \n[108] ▁his       [109] ▁own       [110] ▁          [111] ragged     \n[112] ▁breathing [113] ▁fill      [114] ▁the       [115] ▁air       \n[116] .          [117] ▁The       [118] ▁ground    [119] ▁beneath   \n[120] ▁his       [121] ▁feet      [122] ▁is        [123] ▁          \n[124] a          [125] ▁          [126] t          [127] angled     \n[128] ▁mess      [129] ▁of        [130] ▁roots     [131] ,          \n[132] ▁boulder   [133] s          [134] ,          [135] ▁and       \n[136] ▁loose     [137] ▁scr       [138] e          [139] e          \n[140] ,          [141] ▁and       [142] ▁the       [143] ▁slope     \n[144] ▁drops     [145] ▁away      [146] ▁steep     [147] ly         \n[148] ▁behind    [149] ▁him       [150] ,          [151] ▁pl        \n[152] ung        [153] ing        [154] ▁into      [155] ▁          \n[156] a          [157] ▁          [158] ch         [159] ur         \n[160] n          [161] ing        [162] ▁sea       [163] ▁of        \n[164] ▁          [165] mol        [166] ten        [167] ▁          \n[168] lava       [169] .          [170] ▁A         [171] ▁warm      \n[172] ,          [173] ▁golden    [174] ▁light     [175] ▁filters   \n[176] ▁down      [177] ▁from      [178] ▁above     [179] ,          \n[180] ▁casting   [181] ▁long      [182] ▁shadow    [183] s          \n[184] ▁across    [185] ▁the       [186] ▁rough     [187] -          \n[188] he         [189] w          [190] n          [191] ▁rock      \n[192] ▁face      [193] .          [194] ▁The       [195] ▁air       \n[196] ▁is        [197] ▁heavy     [198] ▁with      [199] ▁the       \n[200] ▁          [201] a          [202] cri        [203] d          \n[204] ▁scent     [205] ▁of        [206] ▁sulfur    [207] ▁and       \n[208] ▁the       [209] ▁distant   [210] ▁          [211] tang       \n[212] ▁of        [213] ▁rain      [214] .          [215] ▁The       \n[216] ▁man       [217] '          [218] s          [219] ▁posture   \n[220] ▁convey    [221] s          [222] ▁          [223] a          \n[224] ▁sense     [225] ▁of        [226] ▁raw       [227] ▁emotion   \n[228] ,          [229] ▁as        [230] ▁          [231] if         \n[232] ▁          [233] he         [234] '          [235] s          \n[236] ▁          [237] t          [238] e          [239] e          \n[240] ter        [241] ing        [242] ▁on        [243] ▁the       \n[244] ▁edge      [245] ▁of        [246] ▁          [247] a          \n[248] ▁pre       [249] cip        [250] ice        [251] ,          \n[252] ▁with      [253] ▁the       [254] ▁world     [255] ▁          \n[256] crashing   [257] ▁down      [258] ▁on        [259] ▁him       \n[260] .          [261] ▁The       [262] ▁overall   [263] ▁mood      \n[264] ▁is        [265] ▁intense   [266] ,          [267] ▁turbulent \n[268] ,          [269] ▁and       [270] ▁          [271] a          \n[272] we         [273] -          [274] in         [275] s          \n[276] pir        [277] ing        [278] ,          [279] ▁          \n[280] capturing  [281] ▁the       [282] ▁prima     [283] l          \n[284] ▁power     [285] ▁of        [286] ▁nature    [287] .          \n[288] </s>       \n",
+=======
+        "Special Token: \n   1: End-of-Sequence (EOS): '</s>'\n\nToken Limit: 512\nToken Count: 235\n\nTokens\n==========================================\n[  0] ▁“             [  1] [              [  2] o              [  3] h              \n[  4] w              [  5] x              [  6] ▁woman         [  7] ]              \n[  8] ▁sit           [  9] s              [ 10] ▁confident     [ 11] ly             \n[ 12] ▁in            [ 13] ▁              [ 14] a              [ 15] ▁modern        \n[ 16] ▁office        [ 17] ▁cubic         [ 18] le             [ 19] ,              \n[ 20] ▁              [ 21] surrounded     [ 22] ▁by            [ 23] ▁sleek         \n[ 24] ,              [ 25] ▁silver        [ 26] ,              [ 27] ▁and           \n[ 28] ▁glass         [ 29] ▁walls         [ 30] ▁that          [ 31] ▁reflect       \n[ 32] ▁her           [ 33] ▁determined    [ 34] ▁gaze          [ 35] .              \n[ 36] ▁Her           [ 37] ▁long          [ 38] ,              [ 39] ▁dark          \n[ 40] ▁hair          [ 41] ▁is            [ 42] ▁pulled        [ 43] ▁back          \n[ 44] ▁into          [ 45] ▁              [ 46] a              [ 47] ▁neat          \n[ 48] ▁pony          [ 49] tail           [ 50] ,              [ 51] ▁accent        \n[ 52] u              [ 53] ating          [ 54] ▁her           [ 55] ▁sharp         \n[ 56] ▁jaw           [ 57] line           [ 58] ▁and           [ 59] ▁prominent     \n[ 60] ▁cheek         [ 61] bone           [ 62] s              [ 63] .              \n[ 64] ▁Her           [ 65] ▁bright        [ 66] ▁ha            [ 67] zel            \n[ 68] ▁eyes          [ 69] ▁sparkle       [ 70] ▁with          [ 71] ▁focus         \n[ 72] ,              [ 73] ▁as            [ 74] ▁she           [ 75] ▁types         \n[ 76] ▁away          [ 77] ▁on            [ 78] ▁her           [ 79] ▁computer      \n[ 80] ▁keyboard      [ 81] ▁with          [ 82] ▁              [ 83] a              \n[ 84] ▁steady        [ 85] ▁hand          [ 86] .              [ 87] ▁A             \n[ 88] ▁crisp         [ 89] ▁white         [ 90] ▁blouse        [ 91] ▁and           \n[ 92] ▁tailored      [ 93] ▁navy          [ 94] ▁blue          [ 95] ▁trousers      \n[ 96] ▁complete      [ 97] ▁her           [ 98] ▁professional  [ 99] ▁attire        \n[100] ,              [101] ▁adding        [102] ▁              [103] a              \n[104] ▁touch         [105] ▁of            [106] ▁sophistication[107] ▁to            \n[108] ▁the           [109] ▁otherwise     [110] ▁              [111] ster           \n[112] ile            [113] ▁office        [114] ▁environment   [115] .              \n[116] ▁Natural       [117] ▁light         [118] ▁pour          [119] s              \n[120] ▁in            [121] ▁through       [122] ▁the           [123] ▁window        \n[124] ,              [125] ▁casting       [126] ▁              [127] a              \n[128] ▁warm          [129] ▁glow          [130] ▁on            [131] ▁her           \n[132] ▁features      [133] .              [134] ▁The           [135] ▁overall       \n[136] ▁atmosphere    [137] ▁is            [138] ▁one           [139] ▁of            \n[140] ▁productivity  [141] ▁and           [142] ▁accomplishment[143] ,              \n[144] ▁with          [145] ▁              [146] a              [147] ▁hint          \n[148] ▁of            [149] ▁subtle        [150] ▁tension       [151] ▁emanat        \n[152] ing            [153] ▁from          [154] ▁the           [155] ▁faint         \n[156] ▁              [157] hum            [158] ▁of            [159] ▁the           \n[160] ▁fluorescent   [161] ▁lights        [162] ▁overhead      [163] .              \n[164] ▁The           [165] ▁color         [166] ▁palette       [167] ▁is            \n[168] ▁predominantly [169] ▁cool          [170] ▁and           [171] ▁              \n[172] calming        [173] ,              [174] ▁with          [175] ▁shades        \n[176] ▁of            [177] ▁blue          [178] ▁and           [179] ▁gray          \n[180] ▁domin         [181] ating          [182] ▁the           [183] ▁space         \n[184] .              [185] ▁The           [186] ▁composition   [187] ▁places        \n[188] ▁the           [189] ▁woman         [190] ▁slightly      [191] ▁off           \n[192] -              [193] center         [194] ,              [195] ▁drawing       \n[196] ▁the           [197] ▁viewer        [198] '              [199] s              \n[200] ▁eye           [201] ▁to            [202] ▁her           [203] ▁intense       \n[204] ▁expression    [205] ▁and           [206] ▁focused       [207] ▁gaze          \n[208] .              [209] ▁The           [210] ▁mood          [211] ▁is            \n[212] ▁one           [213] ▁of            [214] ▁quiet         [215] ▁determination \n[216] ,              [217] ▁as            [218] ▁              [219] if             \n[220] ▁she           [221] '              [222] s              [223] ▁on            \n[224] ▁the           [225] ▁cu            [226] s              [227] p              \n[228] ▁of            [229] ▁              [230] a              [231] ▁major         \n[232] ▁breakthrough  [233] .”             [234] </s>           \n",
+>>>>>>> parent of 18b2206 (..)
+        "512",
+        true,
+        "4",
+        "10",
+        null
+      ]
+<<<<<<< HEAD
+    },
+    {
+      "id": 19,
+      "type": "Y7Nodes_CLIP_TokenCounter",
+      "pos": [
+        -1000.122802734375,
+        -457.9464111328125
+      ],
+      "size": [
+        315.36328125,
+        208
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text_in",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "text_in"
+          },
+          "link": 41
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text_out",
+          "type": "STRING",
+          "links": [
+            35
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Y7Nodes_CLIP_TokenCounter",
+        "show_tokens_index": 2,
+        "tokens_per_line_index": 3
+      },
+      "widgets_values": [
+        "",
+        "Token Count: 39 / 77\n\nTokens\n==========================================\n[ 0] <|startoftext|>[ 1] ohwx</w>       [ 2] man</w>        [ 3] ,</w>          \n[ 4] rugged</w>     [ 5] terrain</w>    [ 6] ,</w>          [ 7] mist</w>       \n[ 8] ,</w>          [ 9] worn</w>       [10] jeans</w>      [11] ,</w>          \n[12] black</w>      [13] leather</w>    [14] jacket</w>     [15] ,</w>          \n[16] rugged</w>     [17] landscape</w>  [18] ,</w>          [19] distant</w>    \n[20] ru             [21] mbling</w>     [22] ,</w>          [23] volcanic</w>   \n[24] eruption</w>   [25] ,</w>          [26] golden</w>     [27] light</w>      \n[28] ,</w>          [29] sul            [30] fur</w>        [31] scent</w>      \n[32] ,</w>          [33] intense</w>    [34] mood</w>       [35] ,</w>          \n[36] primal</w>     [37] power</w>      [38] <|endoftext|>  \n",
+        true,
+        "4",
+        "10",
+        null
+      ]
+    },
+    {
+      "id": 21,
+      "type": "Y7Nodes_PromptEnhancerFlux",
+      "pos": [
+        -1333.7593994140625,
+        -612.3634643554688
+      ],
+      "size": [
+        310,
+        252
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": 39
+        }
+      ],
+      "outputs": [
+        {
+          "name": "t5_prompt",
+          "type": "STRING",
+          "links": [
+            40
+=======
+          "name": "t5_prompt",
+          "type": "STRING",
+          "links": [
+            199
+>>>>>>> parent of 18b2206 (..)
+          ]
+        },
+        {
+          "name": "clip_prompt",
+          "type": "STRING",
+          "links": [
+<<<<<<< HEAD
+            41
+=======
+            198
+>>>>>>> parent of 18b2206 (..)
+          ]
+        }
+      ],
+      "properties": {
+        "ver": "f04031bc06fd9abdc5306a2b6d72de552c97e103",
+        "Node name for S&R": "Y7Nodes_PromptEnhancerFlux"
+      },
+      "widgets_values": [
+        "[ohwx man] standing on the edge of a volcano",
+        "unsloth/Llama-3.2-3B-Instruct",
+<<<<<<< HEAD
+        109371187814327,
+        "randomize",
+        0.7000000000000001,
+        0.9,
+        40,
+        false
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+=======
+>>>>>>> parent of 18b2206 (..)
+=======
+        1024,
+        603174868196375,
+        "fixed",
+        false
+      ]
+    },
+    {
+      "id": 117,
+      "type": "Y7Nodes_CLIP_TokenCounter",
+      "pos": [
+        -348.17120361328125,
+        242.82476806640625
+      ],
+      "size": [
+        500,
+        300
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text_in",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "text_in"
+          },
+          "link": 198
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text_out",
+          "type": "STRING",
+          "links": [
+            201
+          ]
+        }
+      ],
+      "properties": {
+        "ver": "f04031bc06fd9abdc5306a2b6d72de552c97e103",
+        "Node name for S&R": "Y7Nodes_CLIP_TokenCounter",
+        "show_tokens_index": 2,
+        "tokens_per_line_index": 3
+      },
+      "widgets_values": [
+        "",
+        "Special Token(s): \n   1: Beginning-of-Sequence (BOS): '<|startoftext|>'\n   2: End-of-Sequence (EOS): '<|endoftext|>'\n\nToken Limit: 77\nToken Count: 26\n\nTokens\n==========================================\n[ 0] <|startoftext|>  [ 1] woman</w>        [ 2] ,</w>            [ 3] office</w>       \n[ 4] cubic            [ 5] le</w>           [ 6] ,</w>            [ 7] modern</w>       \n[ 8] ,</w>            [ 9] natural</w>      [10] light</w>        [11] ,</w>            \n[12] fluorescent</w>  [13] lighting</w>     [14] ,</w>            [15] cool</w>         \n[16] color</w>        [17] palette</w>      [18] ,</w>            [19] professional</w> \n[20] attire</w>       [21] ,</w>            [22] productivity</w> [23] ,</w>            \n[24] determination</w>[25] <|endoftext|>    \n",
+        true,
+        "4",
+        "10",
+        null
+      ]
+    },
+    {
+      "id": 118,
+      "type": "Y7Nodes_T5_TokenCounter",
+      "pos": [
+        -348.65203857421875,
+        -110.09786987304688
+      ],
+      "size": [
+        499.69140625,
+        310.6640625
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text_in",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "text_in"
+          },
+          "link": 199
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text_out",
+          "type": "STRING",
+          "links": [
+            200
+          ]
+        }
+      ],
+      "properties": {
+        "ver": "f04031bc06fd9abdc5306a2b6d72de552c97e103",
+        "Node name for S&R": "Y7Nodes_T5_TokenCounter",
+        "token_limit_index": 2,
+        "show_tokens_index": 3,
+        "tokens_per_line_index": 4
+      },
+      "widgets_values": [
+        "",
+        "Special Token: \n   1: End-of-Sequence (EOS): '</s>'\n\nToken Limit: 512\nToken Count: 235\n\nTokens\n==========================================\n[  0] ▁“             [  1] [              [  2] o              [  3] h              \n[  4] w              [  5] x              [  6] ▁woman         [  7] ]              \n[  8] ▁sit           [  9] s              [ 10] ▁confident     [ 11] ly             \n[ 12] ▁in            [ 13] ▁              [ 14] a              [ 15] ▁modern        \n[ 16] ▁office        [ 17] ▁cubic         [ 18] le             [ 19] ,              \n[ 20] ▁              [ 21] surrounded     [ 22] ▁by            [ 23] ▁sleek         \n[ 24] ,              [ 25] ▁silver        [ 26] ,              [ 27] ▁and           \n[ 28] ▁glass         [ 29] ▁walls         [ 30] ▁that          [ 31] ▁reflect       \n[ 32] ▁her           [ 33] ▁determined    [ 34] ▁gaze          [ 35] .              \n[ 36] ▁Her           [ 37] ▁long          [ 38] ,              [ 39] ▁dark          \n[ 40] ▁hair          [ 41] ▁is            [ 42] ▁pulled        [ 43] ▁back          \n[ 44] ▁into          [ 45] ▁              [ 46] a              [ 47] ▁neat          \n[ 48] ▁pony          [ 49] tail           [ 50] ,              [ 51] ▁accent        \n[ 52] u              [ 53] ating          [ 54] ▁her           [ 55] ▁sharp         \n[ 56] ▁jaw           [ 57] line           [ 58] ▁and           [ 59] ▁prominent     \n[ 60] ▁cheek         [ 61] bone           [ 62] s              [ 63] .              \n[ 64] ▁Her           [ 65] ▁bright        [ 66] ▁ha            [ 67] zel            \n[ 68] ▁eyes          [ 69] ▁sparkle       [ 70] ▁with          [ 71] ▁focus         \n[ 72] ,              [ 73] ▁as            [ 74] ▁she           [ 75] ▁types         \n[ 76] ▁away          [ 77] ▁on            [ 78] ▁her           [ 79] ▁computer      \n[ 80] ▁keyboard      [ 81] ▁with          [ 82] ▁              [ 83] a              \n[ 84] ▁steady        [ 85] ▁hand          [ 86] .              [ 87] ▁A             \n[ 88] ▁crisp         [ 89] ▁white         [ 90] ▁blouse        [ 91] ▁and           \n[ 92] ▁tailored      [ 93] ▁navy          [ 94] ▁blue          [ 95] ▁trousers      \n[ 96] ▁complete      [ 97] ▁her           [ 98] ▁professional  [ 99] ▁attire        \n[100] ,              [101] ▁adding        [102] ▁              [103] a              \n[104] ▁touch         [105] ▁of            [106] ▁sophistication[107] ▁to            \n[108] ▁the           [109] ▁otherwise     [110] ▁              [111] ster           \n[112] ile            [113] ▁office        [114] ▁environment   [115] .              \n[116] ▁Natural       [117] ▁light         [118] ▁pour          [119] s              \n[120] ▁in            [121] ▁through       [122] ▁the           [123] ▁window        \n[124] ,              [125] ▁casting       [126] ▁              [127] a              \n[128] ▁warm          [129] ▁glow          [130] ▁on            [131] ▁her           \n[132] ▁features      [133] .              [134] ▁The           [135] ▁overall       \n[136] ▁atmosphere    [137] ▁is            [138] ▁one           [139] ▁of            \n[140] ▁productivity  [141] ▁and           [142] ▁accomplishment[143] ,              \n[144] ▁with          [145] ▁              [146] a              [147] ▁hint          \n[148] ▁of            [149] ▁subtle        [150] ▁tension       [151] ▁emanat        \n[152] ing            [153] ▁from          [154] ▁the           [155] ▁faint         \n[156] ▁              [157] hum            [158] ▁of            [159] ▁the           \n[160] ▁fluorescent   [161] ▁lights        [162] ▁overhead      [163] .              \n[164] ▁The           [165] ▁color         [166] ▁palette       [167] ▁is            \n[168] ▁predominantly [169] ▁cool          [170] ▁and           [171] ▁              \n[172] calming        [173] ,              [174] ▁with          [175] ▁shades        \n[176] ▁of            [177] ▁blue          [178] ▁and           [179] ▁gray          \n[180] ▁domin         [181] ating          [182] ▁the           [183] ▁space         \n[184] .              [185] ▁The           [186] ▁composition   [187] ▁places        \n[188] ▁the           [189] ▁woman         [190] ▁slightly      [191] ▁off           \n[192] -              [193] center         [194] ,              [195] ▁drawing       \n[196] ▁the           [197] ▁viewer        [198] '              [199] s              \n[200] ▁eye           [201] ▁to            [202] ▁her           [203] ▁intense       \n[204] ▁expression    [205] ▁and           [206] ▁focused       [207] ▁gaze          \n[208] .              [209] ▁The           [210] ▁mood          [211] ▁is            \n[212] ▁one           [213] ▁of            [214] ▁quiet         [215] ▁determination \n[216] ,              [217] ▁as            [218] ▁              [219] if             \n[220] ▁she           [221] '              [222] s              [223] ▁on            \n[224] ▁the           [225] ▁cu            [226] s              [227] p              \n[228] ▁of            [229] ▁              [230] a              [231] ▁major         \n[232] ▁breakthrough  [233] .”             [234] </s>           \n",
+        "512",
+        true,
+        "4",
+        "10",
+        null
+      ]
+>>>>>>> parent of 18b2206 (..)
+    }
+  ],
+  "links": [
+    [
+<<<<<<< HEAD
+<<<<<<< HEAD
+      33,
+      18,
+      0,
+      2,
+      0,
+      "*"
+    ],
+    [
+      35,
+      19,
+      0,
+      3,
+=======
+      198,
+      111,
+      1,
+      117,
+>>>>>>> parent of 18b2206 (..)
+      0,
+      "STRING"
+    ],
+    [
+<<<<<<< HEAD
+      39,
+      11,
+      0,
+      21,
+      0,
+      "INT"
+    ],
+    [
+      40,
+      21,
+      0,
+      18,
+=======
+      199,
+      111,
+      0,
+      118,
+      0,
+=======
+      198,
+      111,
+      1,
+      117,
+      0,
+      "STRING"
+    ],
+    [
+      199,
+      111,
+      0,
+      118,
+      0,
+>>>>>>> parent of 18b2206 (..)
+      "STRING"
+    ],
+    [
+      200,
+      118,
+      0,
+      119,
+<<<<<<< HEAD
+>>>>>>> parent of 18b2206 (..)
+=======
+>>>>>>> parent of 18b2206 (..)
+      0,
+      "STRING"
+    ],
+    [
+<<<<<<< HEAD
+<<<<<<< HEAD
+      41,
+      21,
+      1,
+      19,
+=======
+=======
+>>>>>>> parent of 18b2206 (..)
+      201,
+      117,
+      0,
+      120,
+<<<<<<< HEAD
+>>>>>>> parent of 18b2206 (..)
+=======
+>>>>>>> parent of 18b2206 (..)
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+<<<<<<< HEAD
+<<<<<<< HEAD
+      "scale": 1,
+      "offset": [
+        1853.1432189941406,
+        906.8450393676758
+      ]
+    },
+    "node_versions": {
+      "rgthree-comfy": "1.0.0",
+      "ComfyUI-Y7Nodes": "1f7b26147c6d3eeef3496d92facb1f6c888d09ba"
+    },
+=======
+      "scale": 0.9090909090909092,
+      "offset": [
+        1288.2216781816137,
+        253.08866755861766
+      ]
+    },
+>>>>>>> parent of 18b2206 (..)
+=======
+      "scale": 0.9090909090909092,
+      "offset": [
+        1288.2216781816137,
+        253.08866755861766
+      ]
+    },
+>>>>>>> parent of 18b2206 (..)
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

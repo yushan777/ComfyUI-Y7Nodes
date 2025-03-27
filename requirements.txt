@@ -1,0 +1,5 @@
+torch
+transformers
+protobuf
+sentencepiece
+huggingface_hub
