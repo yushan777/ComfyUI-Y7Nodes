@@ -333,9 +333,10 @@ class Y7Nodes_CLIP_TokenCounter:
             # Use Path to get the absolute path to the tokenizer directory
             # This matches the approach used in __init__.py for web routes
             from pathlib import Path
+
             current_dir = Path(__file__).parent.parent.absolute()
             local_tokenizer_path = (current_dir / "text_encoders" / "clip_tokenizer").as_posix()
-            print(f"Loading tokenizer from local path: {local_tokenizer_path}")
+            # print(f"Loading tokenizer from local path: {local_tokenizer_path}")
             tokenizer = CLIPTokenizer.from_pretrained(local_tokenizer_path)
             return tokenizer
 

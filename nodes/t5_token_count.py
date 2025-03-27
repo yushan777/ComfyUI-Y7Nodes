@@ -132,8 +132,8 @@ class Y7Nodes_T5_TokenCounter:
             # Show tokens if the widget is enabled
             show_tokens = self.get_show_tokens_val(extra_pnginfo, unique_id)        
             if show_tokens:
-                print(f"token_count_original = {token_count_original} ", color.YELLOW)
-                print(f"token_count_truncated = {token_count_truncated} ", color.YELLOW)
+                # print(f"token_count_original = {token_count_original} ", color.YELLOW)
+                # print(f"token_count_truncated = {token_count_truncated} ", color.YELLOW)
                 
                 # Set appropriate title based on truncation
                 title = (f"Tokens (Truncated - Showing first {token_sequence_length})\n==========================================\n" 
@@ -405,7 +405,7 @@ class Y7Nodes_T5_TokenCounter:
             from pathlib import Path
             current_dir = Path(__file__).parent.parent.absolute()
             local_tokenizer_path = (current_dir / "text_encoders" / "t5_tokenizer").as_posix()
-            print(f"Loading tokenizer from local path: {local_tokenizer_path}")
+            # print(f"Loading tokenizer from local path: {local_tokenizer_path}")
             tokenizer = T5Tokenizer.from_pretrained(local_tokenizer_path)
             return tokenizer
 
