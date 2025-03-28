@@ -153,6 +153,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ShowAnything node is based on "Show Any" from yolain's ComfyUI-Easy-Use custom nodes and "Show Any To JSON" from crystian's ComfyUI-Crystools custom nodes, with additional formatting controls and a Copy Text button.
 - Help popup system is based on the implementation from Kosinkadink's ComfyUI-VideoHelperSuite.
 
----
-
-Created by [yushan777](https://github.com/yushan777)
