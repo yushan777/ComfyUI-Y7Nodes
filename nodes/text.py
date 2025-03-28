@@ -21,7 +21,7 @@ class Y7Nodes_Text:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text_out",)    
     FUNCTION = "process"
-    CATEGORY = "Y7Nodes"
+    CATEGORY = "Y7Nodes/Utils"
     
     def process(self, **kwargs):
         

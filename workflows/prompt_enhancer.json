@@ -1,193 +1,9 @@
 {
   "id": "efd192c5-6790-4604-b26b-81560b59cb7e",
   "revision": 0,
-  "last_node_id": 5,
-  "last_link_id": 4,
+  "last_node_id": 6,
+  "last_link_id": 6,
   "nodes": [
-    {
-      "id": 3,
-      "type": "Y7Nodes_CLIP_TokenCounter",
-      "pos": [
-        331.02276611328125,
-        115.69800567626953
-      ],
-      "size": [
-        213.2781219482422,
-        213.5167999267578
-      ],
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text_in",
-          "shape": 7,
-          "type": "STRING",
-          "widget": {
-            "name": "text_in"
-          },
-          "link": 2
-        }
-      ],
-      "outputs": [
-        {
-          "name": "text_out",
-          "type": "STRING",
-          "links": [
-            4
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-y7nodes",
-        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda",
-        "Node name for S&R": "Y7Nodes_CLIP_TokenCounter",
-        "show_tokens_index": 2,
-        "tokens_per_line_index": 3
-      },
-      "widgets_values": [
-        "",
-        "Token Count: 34 / 77\n\nTokens\n==========================================\n[ 0] <|startoftext|> [ 1] man</w>         [ 2] ,</w>           [ 3] cafe</w>        \n[ 4] ,</w>           [ 5] warm</w>        [ 6] lighting</w>    [ 7] ,</w>           \n[ 8] leather</w>     [ 9] -</w>           [10] bound</w>       [11] book</w>        \n[12] ,</w>           [13] coffee</w>      [14] ,</w>           [15] soft</w>        \n[16] focus</w>       [17] ,</w>           [18] cozy</w>        [19] atmosphere</w>  \n[20] ,</w>           [21] earthy</w>      [22] tones</w>       [23] ,</w>           \n[24] dark</w>        [25] wood</w>        [26] accents</w>     [27] ,</w>           \n[28] relaxed</w>     [29] mood</w>        [30] ,</w>           [31] intellectual</w>\n[32] curiosity</w>   [33] <|endoftext|>   \n",
-        true,
-        "4",
-        "10",
-        null
-      ]
-    },
-    {
-      "id": 2,
-      "type": "Y7Nodes_T5_TokenCounter",
-      "pos": [
-        334.95355224609375,
-        -176.6583251953125
-      ],
-      "size": [
-        210,
-        237.1281280517578
-      ],
-      "flags": {},
-      "order": 1,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text_in",
-          "shape": 7,
-          "type": "STRING",
-          "widget": {
-            "name": "text_in"
-          },
-          "link": 1
-        }
-      ],
-      "outputs": [
-        {
-          "name": "text_out",
-          "type": "STRING",
-          "links": [
-            3
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-y7nodes",
-        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda",
-        "Node name for S&R": "Y7Nodes_T5_TokenCounter",
-        "token_limit_index": 2,
-        "show_tokens_index": 3,
-        "tokens_per_line_index": 4
-      },
-      "widgets_values": [
-        "",
-        "Token Count: 236 / 512\n\nTokens\n==========================================\n[  0] ▁Oh          [  1] w            [  2] x            [  3] ▁man         \n[  4] ▁sit         [  5] s            [  6] ▁in          [  7] ▁            \n[  8] a            [  9] ▁cozy        [ 10] ,            [ 11] ▁well        \n[ 12] -            [ 13] lit          [ 14] ▁cafe        [ 15] ,            \n[ 16] ▁            [ 17] surrounded   [ 18] ▁by          [ 19] ▁the         \n[ 20] ▁aroma       [ 21] ▁of          [ 22] ▁freshly     [ 23] ▁            \n[ 24] brewed       [ 25] ▁coffee      [ 26] ▁and         [ 27] ▁the         \n[ 28] ▁soft        [ 29] ▁            [ 30] hum          [ 31] ▁of          \n[ 32] ▁gentle      [ 33] ▁chat        [ 34] ter          [ 35] .            \n[ 36] ▁His         [ 37] ▁            [ 38] s            [ 39] l            \n[ 40] ender        [ 41] ,            [ 42] ▁            [ 43] ang          \n[ 44] ular         [ 45] ▁features    [ 46] ▁are         [ 47] ▁illuminate  \n[ 48] d            [ 49] ▁by          [ 50] ▁the         [ 51] ▁warm        \n[ 52] ▁glow        [ 53] ▁of          [ 54] ▁the         [ 55] ▁table       \n[ 56] ▁lamp        [ 57] ,            [ 58] ▁casting     [ 59] ▁            \n[ 60] a            [ 61] ▁soft        [ 62] ,            [ 63] ▁golden      \n[ 64] ▁light       [ 65] ▁on          [ 66] ▁his         [ 67] ▁face        \n[ 68] .            [ 69] ▁His         [ 70] ▁dark        [ 71] ▁hair        \n[ 72] ▁is          [ 73] ▁muss        [ 74] e            [ 75] d            \n[ 76] ,            [ 77] ▁as          [ 78] ▁            [ 79] if           \n[ 80] ▁            [ 81] he           [ 82] '            [ 83] s            \n[ 84] ▁been        [ 85] ▁running     [ 86] ▁his         [ 87] ▁hands       \n[ 88] ▁through     [ 89] ▁it          [ 90] ,            [ 91] ▁and         \n[ 92] ▁his         [ 93] ▁eyes        [ 94] ,            [ 95] ▁            \n[ 96] a            [ 97] ▁deep        [ 98] ,            [ 99] ▁            \n[100] pier         [101] c            [102] ing          [103] ▁blue        \n[104] ,            [105] ▁are         [106] ▁fixed       [107] ▁intent      \n[108] ly           [109] ▁on          [110] ▁the         [111] ▁pages       \n[112] ▁of          [113] ▁            [114] a            [115] ▁worn        \n[116] ,            [117] ▁leather     [118] -            [119] bound        \n[120] ▁book        [121] .            [122] ▁He          [123] ▁wear        \n[124] s            [125] ▁            [126] a            [127] ▁fitted      \n[128] ,            [129] ▁cream       [130] -            [131] colored      \n[132] ▁sweater     [133] ▁and         [134] ▁dark        [135] ▁jeans       \n[136] ,            [137] ▁his         [138] ▁feet        [139] ▁            \n[140] t            [141] ucked        [142] ▁into        [143] ▁            \n[144] s            [145] c            [146] uffed        [147] ▁up          \n[148] ,            [149] ▁brown       [150] ▁loaf        [151] ers          \n[152] .            [153] ▁The         [154] ▁background  [155] ▁of          \n[156] ▁the         [157] ▁cafe        [158] ▁is          [159] ▁            \n[160] a            [161] ▁warm        [162] ,            [163] ▁earth       \n[164] y            [165] ▁tone        [166] ,            [167] ▁with        \n[168] ▁rich        [169] ,            [170] ▁dark        [171] ▁wood        \n[172] ▁accent      [173] s            [174] ▁and         [175] ▁comfortable \n[176] ,            [177] ▁plus        [178] h            [179] ▁arm         \n[180] chair        [181] s            [182] .            [183] ▁The         \n[184] ▁atmosphere  [185] ▁is          [186] ▁relaxed     [187] ▁and         \n[188] ▁intimate    [189] ,            [190] ▁with        [191] ▁soft        \n[192] ,            [193] ▁mu          [194] ted          [195] ▁music       \n[196] ▁playing     [197] ▁in          [198] ▁the         [199] ▁background  \n[200] .            [201] ▁The         [202] ▁overall     [203] ▁mood        \n[204] ▁is          [205] ▁one         [206] ▁of          [207] ▁quiet       \n[208] ▁contemplat  [209] i            [210] on           [211] ▁and         \n[212] ▁intellectual[213] ▁curiosity   [214] ,            [215] ▁as          \n[216] ▁            [217] if           [218] ▁the         [219] ▁man         \n[220] ▁is          [221] ▁lost        [222] ▁in          [223] ▁thought     \n[224] ,            [225] ▁completely  [226] ▁            [227] absorbed     \n[228] ▁in          [229] ▁the         [230] ▁world       [231] ▁of          \n[232] ▁his         [233] ▁book        [234] .            [235] </s>         \n\n",
-        "512",
-        true,
-        "4",
-        "10",
-        null
-      ]
-    },
-    {
-      "id": 5,
-      "type": "Y7Nodes_ShowAnything",
-      "pos": [
-        579.6618041992188,
-        117.5152587890625
-      ],
-      "size": [
-        474.93670654296875,
-        217.95196533203125
-      ],
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "shape": 7,
-          "type": "*",
-          "link": 4
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-y7nodes",
-        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda",
-        "Node name for S&R": "Y7Nodes_ShowAnything"
-      },
-      "widgets_values": [
-        "man, cafe, warm lighting, leather-bound book, coffee, soft focus, cozy atmosphere, earthy tones, dark wood accents, relaxed mood, intellectual curiosity",
-        true,
-        "11",
-        null
-      ]
-    },
-    {
-      "id": 4,
-      "type": "Y7Nodes_ShowAnything",
-      "pos": [
-        585.3320922851562,
-        -280.92724609375
-      ],
-      "size": [
-        467.0734558105469,
-        338.52227783203125
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "shape": 7,
-          "type": "*",
-          "link": 3
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-y7nodes",
-        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda",
-        "Node name for S&R": "Y7Nodes_ShowAnything"
-      },
-      "widgets_values": [
-        "Ohwx man sits in a cozy, well-lit cafe, surrounded by the aroma of freshly brewed coffee and the soft hum of gentle chatter. His slender, angular features are illuminated by the warm glow of the table lamp, casting a soft, golden light on his face. His dark hair is mussed, as if he's been running his hands through it, and his eyes, a deep, piercing blue, are fixed intently on the pages of a worn, leather-bound book. He wears a fitted, cream-colored sweater and dark jeans, his feet tucked into scuffed up, brown loafers. The background of the cafe is a warm, earthy tone, with rich, dark wood accents and comfortable, plush armchairs. The atmosphere is relaxed and intimate, with soft, muted music playing in the background. The overall mood is one of quiet contemplation and intellectual curiosity, as if the man is lost in thought, completely absorbed in the world of his book.",
-        true,
-        "11",
-        null
-      ]
-    },
     {
       "id": 1,
       "type": "Y7Nodes_PromptEnhancerFlux",
@@ -220,18 +36,259 @@
         }
       ],
       "properties": {
+        "Node name for S&R": "Y7Nodes_PromptEnhancerFlux",
         "cnr_id": "comfyui-y7nodes",
-        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda",
-        "Node name for S&R": "Y7Nodes_PromptEnhancerFlux"
+        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda"
       },
       "widgets_values": [
         "[ohwx man] sitting in a cafe",
         0.7,
         0.9,
         40,
-        472933357544200,
+        324320009849135,
         "randomize",
         false
+      ]
+    },
+    {
+      "id": 2,
+      "type": "Y7Nodes_T5_TokenCounter",
+      "pos": [
+        324.1650085449219,
+        118.5262680053711
+      ],
+      "size": [
+        210.2095184326172,
+        234.1913299560547
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text_in",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "text_in"
+          },
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text_out",
+          "type": "STRING",
+          "links": [
+            3
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Y7Nodes_T5_TokenCounter",
+        "token_limit_index": 2,
+        "show_tokens_index": 3,
+        "tokens_per_line_index": 4,
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda"
+      },
+      "widgets_values": [
+        "",
+        "Token Count: 273 / 512\n\nTokens\n==========================================\n[  0] ▁Oh         [  1] w           [  2] x           [  3] ▁man        \n[  4] ▁sit        [  5] s           [  6] ▁in         [  7] ▁           \n[  8] a           [  9] ▁cozy       [ 10] ,           [ 11] ▁modern     \n[ 12] ▁cafe       [ 13] ,           [ 14] ▁his        [ 15] ▁eyes       \n[ 16] ▁fixed      [ 17] ▁on         [ 18] ▁           [ 19] a           \n[ 20] ▁laptop     [ 21] ▁screen     [ 22] ▁with       [ 23] ▁           \n[ 24] a           [ 25] ▁thoughtful [ 26] ▁expression [ 27] .           \n[ 28] ▁His        [ 29] ▁dark       [ 30] ▁hair       [ 31] ▁is         \n[ 32] ▁muss       [ 33] e           [ 34] d           [ 35] ,           \n[ 36] ▁and        [ 37] ▁           [ 38] a           [ 39] ▁few        \n[ 40] ▁           [ 41] strand      [ 42] s           [ 43] ▁frame      \n[ 44] ▁his        [ 45] ▁face       [ 46] ,           [ 47] ▁adding     \n[ 48] ▁           [ 49] a           [ 50] ▁touch      [ 51] ▁of         \n[ 52] ▁rugged     [ 53] ▁charm      [ 54] .           [ 55] ▁A          \n[ 56] ▁warm       [ 57] ,           [ 58] ▁golden     [ 59] ▁light      \n[ 60] ▁spill      [ 61] s           [ 62] ▁in         [ 63] ▁from       \n[ 64] ▁the        [ 65] ▁large      [ 66] ▁windows    [ 67] ,           \n[ 68] ▁casting    [ 69] ▁           [ 70] a           [ 71] ▁soft       \n[ 72] ▁glow       [ 73] ▁on         [ 74] ▁his        [ 75] ▁features   \n[ 76] .           [ 77] ▁The        [ 78] ▁cafe       [ 79] ▁is         \n[ 80] ▁bustl      [ 81] ing         [ 82] ▁with       [ 83] ▁people     \n[ 84] ▁typing     [ 85] ▁away       [ 86] ▁on         [ 87] ▁their      \n[ 88] ▁own        [ 89] ▁laptop     [ 90] s           [ 91] ▁or         \n[ 92] ▁si         [ 93] pping       [ 94] ▁coffee     [ 95] ,           \n[ 96] ▁creating   [ 97] ▁           [ 98] a           [ 99] ▁sense      \n[100] ▁of         [101] ▁warmth     [102] ▁and        [103] ▁community  \n[104] .           [105] ▁The        [106] ▁walls      [107] ▁are        \n[108] ▁           [109] adorned     [110] ▁with       [111] ▁vintage    \n[112] ▁posters    [113] ,           [114] ▁adding     [115] ▁           \n[116] a           [117] ▁pop        [118] ▁of         [119] ▁color      \n[120] ▁and        [121] ▁eclectic   [122] ▁charm      [123] .           \n[124] ▁The        [125] ▁atmosphere [126] ▁is         [127] ▁lively     \n[128] ,           [129] ▁yet        [130] ▁intimate   [131] ,           \n[132] ▁with       [133] ▁the        [134] ▁aroma      [135] ▁of         \n[136] ▁freshly    [137] ▁           [138] brewed      [139] ▁coffee     \n[140] ▁wa         [141] f           [142] ting        [143] ▁through    \n[144] ▁the        [145] ▁air        [146] .           [147] ▁The        \n[148] ▁man        [149] '           [150] s           [151] ▁posture    \n[152] ▁is         [153] ▁relaxed    [154] ,           [155] ▁with       \n[156] ▁one        [157] ▁leg        [158] ▁crossed    [159] ▁over       \n[160] ▁the        [161] ▁other      [162] ,           [163] ▁ex         \n[164] u           [165] d           [166] ing         [167] ▁           \n[168] a           [169] ▁sense      [170] ▁of         [171] ▁comfort    \n[172] ▁and        [173] ▁ease       [174] .           [175] ▁His        \n[176] ▁fingers    [177] ▁dance      [178] ▁across     [179] ▁the        \n[180] ▁keyboard   [181] ,           [182] ▁his        [183] ▁eyes       \n[184] ▁never      [185] ▁leaving    [186] ▁the        [187] ▁screen     \n[188] .           [189] ▁The        [190] ▁overall    [191] ▁mood       \n[192] ▁is         [193] ▁one        [194] ▁of         [195] ▁focused    \n[196] ▁contemplat [197] i           [198] on          [199] ,           \n[200] ▁as         [201] ▁           [202] if          [203] ▁lost       \n[204] ▁in         [205] ▁thought    [206] .           [207] ▁The        \n[208] ▁color      [209] ▁palette    [210] ▁is         [211] ▁           \n[212] a           [213] ▁warm       [214] ▁and        [215] ▁inviting   \n[216] ▁mix        [217] ▁of         [218] ▁earth      [219] y           \n[220] ▁to         [221] nes         [222] ,           [223] ▁rich       \n[224] ▁brown      [225] s           [226] ,           [227] ▁and        \n[228] ▁deep       [229] ▁blue       [230] s           [231] ,           \n[232] ▁           [233] e           [234] vo          [235] king        \n[236] ▁           [237] a           [238] ▁sense      [239] ▁of         \n[240] ▁comfort    [241] ▁and        [242] ▁ser        [243] en          \n[244] ity         [245] .           [246] ▁The        [247] ▁composition\n[248] ▁places     [249] ▁the        [250] ▁man        [251] ▁slightly   \n[252] ▁off        [253] -           [254] center      [255] ,           \n[256] ▁with       [257] ▁the        [258] ▁cafe       [259] '           \n[260] s           [261] ▁vibrant    [262] ▁energy     [263] ▁drawing    \n[264] ▁the        [265] ▁viewer     [266] '           [267] s           \n[268] ▁attention  [269] ▁to         [270] ▁him        [271] .           \n[272] </s>        \n",
+        "512",
+        true,
+        "4",
+        "10",
+        null
+      ]
+    },
+    {
+      "id": 3,
+      "type": "Y7Nodes_CLIP_TokenCounter",
+      "pos": [
+        322.4858703613281,
+        -135.21458435058594
+      ],
+      "size": [
+        213.5622100830078,
+        208
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text_in",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "text_in"
+          },
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text_out",
+          "type": "STRING",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Y7Nodes_CLIP_TokenCounter",
+        "show_tokens_index": 2,
+        "tokens_per_line_index": 3,
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda"
+      },
+      "widgets_values": [
+        "",
+        "Token Count: 52 / 77\n\nTokens\n==========================================\n[ 0] <|startoftext|>[ 1] ohwx</w>       [ 2] man</w>        [ 3] ,</w>          \n[ 4] modern</w>     [ 5] cafe</w>       [ 6] ,</w>          [ 7] laptop</w>     \n[ 8] ,</w>          [ 9] thought</w>    [10] -</w>          [11] provoking</w>  \n[12] expression</w> [13] ,</w>          [14] dark</w>       [15] hair</w>       \n[16] ,</w>          [17] warm</w>       [18] golden</w>     [19] light</w>      \n[20] ,</w>          [21] vintage</w>    [22] posters</w>    [23] ,</w>          \n[24] bust           [25] ling</w>       [26] atmosphere</w> [27] ,</w>          \n[28] cozy</w>       [29] ,</w>          [30] intimate</w>   [31] ,</w>          \n[32] freshly</w>    [33] brewed</w>     [34] coffee</w>     [35] ,</w>          \n[36] earthy</w>     [37] tones</w>      [38] ,</w>          [39] rich</w>       \n[40] browns</w>     [41] ,</w>          [42] deep</w>       [43] blues</w>      \n[44] ,</w>          [45] relaxed</w>    [46] posture</w>    [47] ,</w>          \n[48] focused</w>    [49] contempl       [50] ation</w>      [51] <|endoftext|>  \n\n",
+        true,
+        "4",
+        "10",
+        null
+      ]
+    },
+    {
+      "id": 4,
+      "type": "Y7Nodes_ShowAnything",
+      "pos": [
+        560.1188354492188,
+        93.80990600585938
+      ],
+      "size": [
+        462.2865295410156,
+        369.8752746582031
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 3
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            5
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Y7Nodes_ShowAnything",
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda"
+      },
+      "widgets_values": [
+        "Ohwx man sits in a cozy, modern cafe, his eyes fixed on a laptop screen with a thoughtful expression. His dark hair is mussed, and a few strands frame his face, adding a touch of rugged charm. A warm, golden light spills in from the large windows, casting a soft glow on his features. The cafe is bustling with people typing away on their own laptops or sipping coffee, creating a sense of warmth and community. The walls are adorned with vintage posters, adding a pop of color and eclectic charm. The atmosphere is lively, yet intimate, with the aroma of freshly brewed coffee wafting through the air. The man's posture is relaxed, with one leg crossed over the other, exuding a sense of comfort and ease. His fingers dance across the keyboard, his eyes never leaving the screen. The overall mood is one of focused contemplation, as if lost in thought. The color palette is a warm and inviting mix of earthy tones, rich browns, and deep blues, evoking a sense of comfort and serenity. The composition places the man slightly off-center, with the cafe's vibrant energy drawing the viewer's attention to him.",
+        true,
+        "11",
+        null
+      ]
+    },
+    {
+      "id": 5,
+      "type": "Y7Nodes_ShowAnything",
+      "pos": [
+        560.0659790039062,
+        -136.93052673339844
+      ],
+      "size": [
+        458.32806396484375,
+        185.52655029296875
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            6
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Y7Nodes_ShowAnything",
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda"
+      },
+      "widgets_values": [
+        "ohwx man, modern cafe, laptop, thought-provoking expression, dark hair, warm golden light, vintage posters, bustling atmosphere, cozy, intimate, freshly brewed coffee, earthy tones, rich browns, deep blues, relaxed posture, focused contemplation",
+        true,
+        "11",
+        null
+      ]
+    },
+    {
+      "id": 6,
+      "type": "CLIPTextEncodeFlux",
+      "pos": [
+        1061.1536865234375,
+        7.45004940032959
+      ],
+      "size": [
+        226.50567626953125,
+        115.7528305053711
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": null
+        },
+        {
+          "name": "t5xxl",
+          "type": "STRING",
+          "widget": {
+            "name": "t5xxl"
+          },
+          "link": 5
+        },
+        {
+          "name": "clip_l",
+          "type": "STRING",
+          "widget": {
+            "name": "clip_l"
+          },
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncodeFlux"
+      },
+      "widgets_values": [
+        "",
+        "",
+        3.5
       ]
     }
   ],
@@ -267,22 +324,42 @@
       5,
       0,
       "*"
+    ],
+    [
+      5,
+      4,
+      0,
+      6,
+      1,
+      "STRING"
+    ],
+    [
+      6,
+      5,
+      0,
+      6,
+      2,
+      "STRING"
     ]
   ],
   "groups": [],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.9090909090909091,
+      "scale": 1.1,
       "offset": [
-        283.23361648736073,
-        485.00591654627743
+        310.0063866635915,
+        403.74317525095
       ]
     },
     "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "VHS_MetadataImage": true,
-    "VHS_KeepIntermediate": true
+    "VHS_KeepIntermediate": true,
+    "node_versions": {
+      "comfyui-y7nodes": "27e97410474260ce2a8bc43f32263348a5de7abe",
+      "comfy-core": "0.3.27"
+    }
   },
   "version": 0.4
 }

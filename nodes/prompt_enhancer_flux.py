@@ -13,6 +13,8 @@ import torch
 from transformers import AutoModelForCausalLM, AutoProcessor, AutoTokenizer
 from huggingface_hub import snapshot_download
 
+
+
 # Function Call Sequence
 # Y7Nodes_PromptEnhancerFlux.enhance()
 #   ├── model_path_download_if_needed() - Checks if model exists, downloads if needed
@@ -38,7 +40,7 @@ from huggingface_hub import snapshot_download
 # ==================================================================================
 # MODEL PERSISTENCE
 # ==================================================================================
-# This class provides a persistent storage mechanism for loaded models and tokenizers.
+# ModelCache class provides a persistent storage mechanism for loaded models and tokenizers.
 # Unlike other (similar) custom nodes which use separate nodes for model loading and 
 # inference, we use a class-level cache to maintain refs to loaded models between 
 # calls. This prevents Python's garbage collector from freeing models when 
@@ -198,7 +200,7 @@ class Y7Nodes_PromptEnhancerFlux:
         }
 
     RETURN_TYPES = ("STRING", "STRING",)
-    RETURN_NAMES = ("t5_prompt", "clip_prompt",)
+    RETURN_NAMES = ("clip_l_prompt", "t5xxl_prompt",)
     FUNCTION = "enhance"
     CATEGORY = "Y7Nodes/Prompt"
     OUTPUT_NODE = False
@@ -245,9 +247,9 @@ class Y7Nodes_PromptEnhancerFlux:
         # Default prompt if empty
         if not prompt.strip():
             prompt = DEFAULT_PROMPT
-            t5_prompt = 'Please provide a prompt, no matter how basic.  If you wish to use a token or trigger words enclose them in square brackets.\nExamples:\n\n"A man sitting in a cafe".\n"[ohwx woman] standing in the middle of a busy street"'
-            clip_prompt = ""
-            return (t5_prompt, clip_prompt,)
+            t5xxl_prompt = 'Please provide a prompt, no matter how basic.  If you wish to use a token or trigger words enclose them in square brackets.\nExamples:\n\n"A man sitting in a cafe".\n"[ohwx woman] standing in the middle of a busy street"'
+            clip_l_prompt = ""
+            return (t5xxl_prompt, clip_l_prompt,)
         try:
             load_device = comfy.model_management.get_torch_device()
             offload_device = comfy.model_management.unet_offload_device()
@@ -277,7 +279,7 @@ class Y7Nodes_PromptEnhancerFlux:
             )
             
             # Get the first pair of prompts (t5, clip)
-            t5_prompt, clip_prompt = t5_clip_prompts[0]
+            t5xxl_prompt, clip_l_prompt = t5_clip_prompts[0]
             
             # ==================================================================================
             # MODEL PERSISTENCE - MEMORY MANAGEMENT
@@ -319,7 +321,7 @@ class Y7Nodes_PromptEnhancerFlux:
                 ModelCache.loaded_models[llm_repo_name] = llm_model
                 ModelCache.loaded_tokenizers[llm_repo_name] = llm_tokenizer
             
-            return (t5_prompt, clip_prompt,)
+            return (clip_l_prompt, t5xxl_prompt,)
             
         except Exception as e:
             # Return a generic error message
