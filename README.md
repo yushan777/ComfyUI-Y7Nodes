@@ -92,11 +92,13 @@ LLM model used is: Meta's [Llama-3.2-3B-Instruct (from unsloth's repo)](https://
 
 #### Background: 
 
-Flux.1 uses two encoders simultaneously: CLIP and T5 XXL. CLIP prefers concise, keyword-style prompts and processes only the first 77 tokens (including <bos>/<eos>), ignoring anything beyond. T5 handles up to 512 tokens (or 256 in the “schnell” version) and thrives on natural, descriptive language. Most users throw the same prompt into both encoders, as it's the most convenient approach.
+Flux.1 uses two encoders: CLIP and T5 XXL. CLIP processes only the first 77 tokens (including <bos>/<eos>), and anything beyond that depends on the implementation. In ComfyUI, long prompts are split into 77-token chunks for CLIP, which are then batched and concatenated. On the other hand, T5, supports up to 512 tokens (or 256 in the “schnell” version) and works well with natural, descriptive language.
 
-Because the first 77 tokens are shared by both encoders, while the rest are T5-only, stacking long prose too early can limit CLIP’s effectiveness. Likewise, front-loading keywords may weaken T5’s ability to build nuance across a longer prompt.
+Most users simply feed the same (T5) prompt into both encoders, as it’s the most straightforward approach. However, because the first 77 tokens are shared by both encoders—and the rest are exclusive to T5—how you structure your prompt can make a big difference.
 
-For better/different/preferred?? results, consider placing high-impact keywords up front (for CLIP), then letting descriptive language follow (for T5). This hybrid strategy plays to the strengths of both encoders and often leads to more coherent and visually faithful generations.
+Front-loading long prose too early can reduce CLIP’s effectiveness, while cramming too many keywords up front may limit T5’s ability to build nuance throughout the rest of the prompt.
+
+For better results (possibly), a hybrid approach of starting with high-impact keywords to guide CLIP, then follow with flowing, descriptive language tailored for T5. This approach plays to the strengths of both encoders (maybe).
 
 The node will attempt to download the required model files (approx 6.5GB) if they don't exist.  If you wish to download them manually then you can get the files from https://huggingface.co/unsloth/Llama-3.2-3B-Instruct and place them under `ComfyUI/models/LLM/Llama-3.2-3B-Instruct`. The files you need are:
 
