@@ -128,7 +128,7 @@ app.registerExtension({
                     navigator.clipboard.writeText(textToCopy)
                         .then(() => {
                             // Temporarily change button text to show success
-                            const button = this.widgets[3];  // The button is the 4th widget in array
+                            const button = this.widgets[COPYBUTTON_WIDGET];  // The button is the 4th widget in array
                             const originalText = button.name;
                             button.name = "✅ Text copied.";
                             
@@ -145,7 +145,7 @@ app.registerExtension({
                         .catch(err => {
                             console.error('Failed to copy text:', err);
                             // Show error state
-                            const button = this.widgets[3];
+                            const button = this.widgets[COPYBUTTON_WIDGET];
                             const originalText = button.name;
                             button.name = "❌ Failed to copy text.";
                             

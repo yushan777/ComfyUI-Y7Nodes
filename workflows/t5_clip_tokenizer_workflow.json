@@ -1,29 +1,32 @@
 {
   "id": "17988ba9-49a2-4bce-9116-8c8dbc5b4b93",
   "revision": 0,
-  "last_node_id": 109,
-  "last_link_id": 177,
+  "last_node_id": 117,
+  "last_link_id": 186,
   "nodes": [
     {
-      "id": 107,
-      "type": "Y7Nodes_T5_TokenCounter",
+      "id": 116,
+      "type": "Y7Nodes_CLIP_TokenCounter",
       "pos": [
-        211.95057678222656,
-        10.810222625732422
+        251.2105712890625,
+        490.74639892578125
       ],
       "size": [
-        660.0765991210938,
-        469.94256591796875
+        650,
+        380
       ],
       "flags": {},
-      "order": 3,
+      "order": 1,
       "mode": 0,
       "inputs": [
         {
           "name": "text_in",
           "shape": 7,
-          "type": "MY_STRING",
-          "link": 175
+          "type": "STRING",
+          "widget": {
+            "name": "text_in"
+          },
+          "link": 185
         }
       ],
       "outputs": [
@@ -34,31 +37,31 @@
         }
       ],
       "properties": {
-        "ver": "2a10eb16cf0e94bc0e8d159edc776c567975b99d",
-        "Node name for S&R": "Y7Nodes_T5_TokenCounter",
-        "show_tokens_index": 1,
-        "tokens_per_line_index": 2,
-        "show_special_tokens_index": 3
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda",
+        "Node name for S&R": "Y7Nodes_CLIP_TokenCounter",
+        "show_tokens_index": 2,
+        "tokens_per_line_index": 3
       },
       "widgets_values": [
-        "Special Token(s): \n   1: End-of-Sequence (EOS): '</s>'\nToken Count: 528 (excluding special token)\nToken Limit: 511 (512 minus special token)\n\n511th Token (idx 510): \"▁and\" \nContext: \"...between monolithic stones and\"\n\nTokens (up to 511)\n========================\n[  0] ▁In          [  1] ▁the         [  2] ▁distance    [  3] ,            \n[  4] ▁the         [  5] ▁silhouette  [  6] ▁of          [  7] ▁crumbl      \n[  8] ing          [  9] ▁            [ 10] ruins        [ 11] ▁            \n[ 12] loom         [ 13] s            [ 14] ▁against     [ 15] ▁the         \n[ 16] ▁            [ 17] t            [ 18] w            [ 19] i            \n[ 20] light        [ 21] ▁            [ 22] horizon      [ 23] ,            \n[ 24] ▁their       [ 25] ▁ja          [ 26] gged         [ 27] ▁edges       \n[ 28] ▁soft        [ 29] ened         [ 30] ▁by          [ 31] ▁the         \n[ 32] ▁            [ 33] haz          [ 34] e            [ 35] ▁of          \n[ 36] ▁dust        [ 37] ▁and         [ 38] ▁            [ 39] fading       \n[ 40] ▁light       [ 41] .            [ 42] ▁The         [ 43] ▁last        \n[ 44] ▁            [ 45] ray          [ 46] s            [ 47] ▁of          \n[ 48] ▁the         [ 49] ▁sun         [ 50] ▁catch       [ 51] ▁the         \n[ 52] ▁edges       [ 53] ▁of          [ 54] ▁broken      [ 55] ▁columns     \n[ 56] ▁and         [ 57] ▁fracture    [ 58] d            [ 59] ▁stone       \n[ 60] ,            [ 61] ▁casting     [ 62] ▁long        [ 63] ,            \n[ 64] ▁            [ 65] ang          [ 66] ular         [ 67] ▁shadow      \n[ 68] s            [ 69] ▁that        [ 70] ▁stretch     [ 71] ▁across      \n[ 72] ▁the         [ 73] ▁barre       [ 74] n            [ 75] ▁ground      \n[ 76] ▁like        [ 77] ▁the         [ 78] ▁fingers     [ 79] ▁of          \n[ 80] ▁forgotten   [ 81] ▁god         [ 82] s            [ 83] .            \n[ 84] ▁A           [ 85] ▁warm        [ 86] ,            [ 87] ▁am          \n[ 88] ber          [ 89] ▁glow        [ 90] ▁            [ 91] linger       \n[ 92] s            [ 93] ▁in          [ 94] ▁the         [ 95] ▁sky         \n[ 96] ,            [ 97] ▁dis         [ 98] solv         [ 99] ing          \n[100] ▁slowly      [101] ▁into        [102] ▁the         [103] ▁in          \n[104] dig          [105] o            [106] ▁vei         [107] l            \n[108] ▁of          [109] ▁approaching [110] ▁night       [111] .            \n[112] ▁A           [113] ▁gentle      [114] ▁breeze      [115] ▁stir        \n[116] s            [117] ▁the         [118] ▁dry         [119] ▁air         \n[120] ,            [121] ▁lifting     [122] ▁            [123] strand       \n[124] s            [125] ▁of          [126] ▁her         [127] ▁hair        \n[128] ▁and         [129] ▁            [130] rust         [131] ling         \n[132] ▁the         [133] ▁edges       [134] ▁of          [135] ▁her         \n[136] ▁clothing    [137] ▁with        [138] ▁            [139] a            \n[140] ▁whisper     [141] -            [142] soft         [143] ▁            \n[144] s            [145] igh          [146] .            [147] ▁It          \n[148] ▁            [149] carries      [150] ▁with        [151] ▁it          \n[152] ▁the         [153] ▁faint       [154] ▁scent       [155] ▁of          \n[156] ▁ancient     [157] ▁earth       [158] ▁and         [159] ▁something   \n[160] ▁metallic    [161] ▁            [162] —            [163] ▁the         \n[164] ▁trace       [165] ▁of          [166] ▁old         [167] ▁machines    \n[168] ▁            [169] buried       [170] ▁beneath     [171] ▁centuries   \n[172] ▁of          [173] ▁silence     [174] .            [175] ▁Her         \n[176] ▁eyes        [177] ▁narrow      [178] ▁slightly    [179] ,            \n[180] ▁scanning    [181] ▁the         [182] ▁terrain     [183] ▁ahead       \n[184] ▁with        [185] ▁practice    [186] d            [187] ▁calm        \n[188] ,            [189] ▁taking      [190] ▁in          [191] ▁every       \n[192] ▁subtle      [193] ▁movement    [194] ▁and         [195] ▁texture     \n[196] .            [197] ▁She         [198] ▁remains     [199] ▁still       \n[200] ,            [201] ▁save        [202] ▁for         [203] ▁the         \n[204] ▁soft        [205] ▁rise        [206] ▁and         [207] ▁fall        \n[208] ▁of          [209] ▁her         [210] ▁breath      [211] ,            \n[212] ▁as          [213] ▁though      [214] ▁listening   [215] ▁for         \n[216] ▁something   [217] ▁that        [218] ▁the         [219] ▁world       \n[220] ▁itself      [221] ▁has         [222] ▁nearly      [223] ▁forgotten   \n[224] .            [225] ▁S           [226] lung         [227] ▁across      \n[228] ▁her         [229] ▁shoulder    [230] ▁is          [231] ▁            \n[232] a            [233] ▁weather     [234] e            [235] d            \n[236] ▁leather     [237] ▁            [238] s            [239] at           \n[240] chel         [241] ,            [242] ▁its         [243] ▁surface     \n[244] ▁            [245] s            [246] c            [247] uffed        \n[248] ▁and         [249] ▁scar        [250] red          [251] ▁by          \n[252] ▁time        [253] ▁and         [254] ▁travel      [255] .            \n[256] ▁The         [257] ▁flap        [258] ▁is          [259] ▁secured     \n[260] ▁with        [261] ▁            [262] a            [263] ▁            \n[264] rus          [265] ted          [266] ▁brass       [267] ▁buckle      \n[268] ,            [269] ▁barely      [270] ▁holding     [271] ▁together    \n[272] ▁under       [273] ▁the         [274] ▁strain      [275] ▁of          \n[276] ▁worn        [277] ▁maps        [278] ,            [279] ▁fade        \n[280] d            [281] ▁photographs [282] ,            [283] ▁and         \n[284] ▁the         [285] ▁delicate    [286] ▁remains     [287] ▁of          \n[288] ▁art         [289] i            [290] fact         [291] s            \n[292] ▁wrapped     [293] ▁in          [294] ▁cloth       [295] .            \n[296] ▁One         [297] ▁hand        [298] ▁rest        [299] s            \n[300] ▁lightly     [301] ▁on          [302] ▁the         [303] ▁strap       \n[304] ,            [305] ▁fingers     [306] ▁cur         [307] led          \n[308] ▁as          [309] ▁though      [310] ▁in          [311] ▁habit       \n[312] ,            [313] ▁ready       [314] ▁to          [315] ▁move        \n[316] ,            [317] ▁ready       [318] ▁to          [319] ▁reach       \n[320] .            [321] ▁A           [322] ▁small       [323] ▁pendant     \n[324] ▁            [325] gli          [326] n            [327] t            \n[328] s            [329] ▁at          [330] ▁her         [331] ▁neck        \n[332] ▁            [333] —            [334] ▁            [335] a            \n[336] ▁simple      [337] ▁piece       [338] ▁of          [339] ▁stone       \n[340] ▁            [341] en           [342] case         [343] d            \n[344] ▁in          [345] ▁wire        [346] ▁            [347] —            \n[348] ▁its         [349] ▁surface     [350] ▁            [351] etched       \n[352] ▁with        [353] ▁symbols     [354] ▁long        [355] ▁erase       \n[356] d            [357] ▁from        [358] ▁memory      [359] ,            \n[360] ▁passed      [361] ▁down        [362] ▁to          [363] ▁her         \n[364] ▁through     [365] ▁half        [366] -            [367] re           \n[368] member       [369] e            [370] d            [371] ▁stories     \n[372] ▁and         [373] ▁dreams      [374] .            [375] ▁Behind      \n[376] ▁her         [377] ,            [378] ▁the         [379] ▁remains     \n[380] ▁of          [381] ▁            [382] a            [383] ▁forgotten   \n[384] ▁world       [385] ▁stretch     [386] ▁out         [387] ward         \n[388] :            [389] ▁            [390] rus          [391] ted          \n[392] ▁vehicles    [393] ▁over        [394] take         [395] n            \n[396] ▁by          [397] ▁            [398] mos          [399] s            \n[400] ,            [401] ▁buildings   [402] ▁collapse    [403] d            \n[404] ▁in          [405] ward         [406] ▁upon        [407] ▁themselves  \n[408] ,            [409] ▁and         [410] ▁remnant     [411] s            \n[412] ▁of          [413] ▁civilization[414] ▁            [415] buried       \n[416] ▁beneath     [417] ▁dust        [418] ▁and         [419] ▁            \n[420] i            [421] v            [422] y            [423] .            \n[424] ▁F           [425] lick         [426] er           [427] ing          \n[428] ▁lights      [429] ▁pulse       [430] ▁in          [431] ▁the         \n[432] ▁distance    [433] ▁            [434] —            [435] ▁not         \n[436] ▁quite       [437] ▁fire        [438] ,            [439] ▁not         \n[440] ▁quite       [441] ▁electricity [442] ▁            [443] —            \n[444] ▁casting     [445] ▁intermittent[446] ▁glow        [447] s            \n[448] ▁through     [449] ▁the         [450] ▁fog         [451] .            \n[452] ▁Some        [453] where        [454] ▁nearby      [455] ,            \n[456] ▁the         [457] ▁distant     [458] ▁            [459] r            \n[460] umble        [461] ▁of          [462] ▁shifting    [463] ▁earth       \n[464] ▁            [465] echoe        [466] s            [467] ▁faint       \n[468] ly           [469] ,            [470] ▁like        [471] ▁the         \n[472] ▁grow        [473] l            [474] ▁of          [475] ▁something   \n[476] ▁stirring    [477] ▁beneath     [478] ▁the         [479] ▁surface     \n[480] .            [481] ▁The         [482] ▁woman       [483] ▁does        \n[484] ▁not         [485] ▁            [486] f            [487] l            \n[488] inch         [489] .            [490] ▁Her         [491] ▁gaze        \n[492] ▁remains     [493] ▁fixed       [494] ▁on          [495] ▁the         \n[496] ▁            [497] horizon      [498] ,            [499] ▁where       \n[500] ▁            [501] a            [502] ▁narrow      [503] ▁path        \n[504] ▁winds       [505] ▁between     [506] ▁mono        [507] lith         \n[508] ic           [509] ▁stones      [510] ▁and         \n\nTokens (over 511)\n========================\n[511] ▁van         [512] ish          [513] e            [514] s            \n[515] ▁into        [516] ▁            [517] a            [518] ▁            \n[519] gna          [520] r            [521] led          [522] ▁forest      \n[523] ▁of          [524] ▁            [525] skeletal     [526] ▁trees       \n[527] .            [528] </s>         \n",
+        "",
+        "Token Count: 179 / 77: >>102 over limit<<\n\nLast Token: \"filtering</w> | \"...foliage, and patches of sunbeams filtering\"\n\nTokens (Truncated - Showing first 77)\n==========================================\n[ 0] <|startoftext|>[ 1] in</w>         [ 2] a</w>          [ 3] serene</w>     \n[ 4] forest</w>     [ 5] setting</w>    [ 6] ,</w>          [ 7] a</w>          \n[ 8] giant</w>      [ 9] mouse</w>      [10] with</w>       [11] large</w>      \n[12] ,</w>          [13] pink</w>       [14] eyes</w>       [15] and</w>        \n[16] enormous</w>   [17] ,</w>          [18] oversized</w>  [19] ears</w>       \n[20] sits</w>       [21] grace          [22] fully</w>      [23] on</w>         \n[24] a</w>          [25] moss</w>       [26] -</w>          [27] covered</w>    \n[28] log</w>        [29] .</w>          [30] he</w>         [31] wears</w>      \n[32] a</w>          [33] little</w>     [34] red</w>        [35] cape</w>       \n[36] with</w>       [37] gold</w>       [38] embroidery</w> [39] ,</w>          \n[40] a</w>          [41] tiny</w>       [42] top</w>        [43] hat</w>        \n[44] adorned</w>    [45] with</w>       [46] pearls</w>     [47] ,</w>          \n[48] and</w>        [49] a</w>          [50] gold</w>       [51] watch</w>      \n[52] chain</w>      [53] around</w>     [54] his</w>        [55] tiny</w>       \n[56] waist</w>      [57] .</w>          [58] the</w>        [59] forest</w>     \n[60] is</w>         [61] filled</w>     [62] with</w>       [63] towering</w>   \n[64] trees</w>      [65] ,</w>          [66] lush</w>       [67] green</w>      \n[68] foliage</w>    [69] ,</w>          [70] and</w>        [71] patches</w>    \n[72] of</w>         [73] sun            [74] beams</w>      [75] filtering</w>  \n[76] <|endoftext|>  \n\nOverflow Tokens\n=========================\nNote: The final token in the truncated output above is the EOS token.\nHowever, in the overflow output, the token at the same index position [76]\nis an actual text token — and would've appeared in the main sequence\nif truncation (and EOS insertion) hadn't occurred.\n\n[ 76] through</w>    [ 77] ,</w>          [ 78] casting</w>    [ 79] gentle</w>     \n[ 80] shadows</w>    [ 81] .</w>          [ 82] the</w>        [ 83] lighting</w>   \n[ 84] is</w>         [ 85] soft</w>       [ 86] and</w>        [ 87] warm</w>       \n[ 88] ,</w>          [ 89] with</w>       [ 90] occasional</w> [ 91] bursts</w>     \n[ 92] of</w>         [ 93] sunlight</w>   [ 94] creating</w>   [ 95] a</w>          \n[ 96] magical</w>    [ 97] ,</w>          [ 98] whimsical</w>  [ 99] atmosphere</w> \n[100] .</w>          [101] the</w>        [102] color</w>      [103] palette</w>    \n[104] consists</w>   [105] of</w>         [106] rich</w>       [107] autumnal</w>   \n[108] colors</w>     [109] -</w>          [110] reds</w>       [111] ,</w>          \n[112] oranges</w>    [113] ,</w>          [114] and</w>        [115] yel            \n[116] lows</w>       [117] -</w>          [118] as</w>         [119] well</w>       \n[120] as</w>         [121] the</w>        [122] contrasting</w>[123] cool</w>       \n[124] and</w>        [125] yel            [126] lows</w>       [127] greens</w>     \n[128] of</w>         [129] the</w>        [130] forest</w>     [131] .</w>          \n[132] the</w>        [133] composition</w>[134] includes</w>   [135] the</w>        \n[136] mouse</w>      [137] as</w>         [138] the</w>        [139] focal</w>      \n[140] point</w>      [141] in</w>         [142] the</w>        [143] foreground</w> \n[144] ,</w>          [145] the</w>        [146] lush</w>       [147] forest</w>     \n[148] scene</w>      [149] in</w>         [150] the</w>        [151] middle</w>     \n[152] ground</w>     [153] ,</w>          [154] and</w>        [155] a</w>          \n[156] far</w>        [157] -</w>          [158] off</w>        [159] village</w>    \n[160] in</w>         [161] the</w>        [162] background</w> [163] ,</w>          \n[164] hin            [165] ting</w>       [166] at</w>         [167] a</w>          \n[168] larger</w>     [169] world</w>      [170] .</w>          [171] the</w>        \n[172] mood</w>       [173] is</w>         [174] enchanting</w> [175] and</w>        \n[176] playful</w>    [177] .</w>          [178] <|endoftext|>  ",
         true,
         "4",
-        true,
-        "10",
+        "12",
         null
       ]
     },
     {
-      "id": 41,
-      "type": "CR Text",
+      "id": 114,
+      "type": "Y7Nodes_Text",
       "pos": [
-        -394.8932189941406,
-        4.593849182128906
+        -243.21478271484375,
+        339.613525390625
       ],
       "size": [
-        417.54583740234375,
-        457.1636047363281
+        441.0343322753906,
+        242.98590087890625
       ],
       "flags": {},
       "order": 0,
@@ -66,38 +69,34 @@
       "inputs": [],
       "outputs": [
         {
-          "name": "text",
-          "type": "*",
-          "slot_index": 0,
-          "links": [
-            177
-          ]
-        },
-        {
-          "name": "show_help",
+          "name": "text_out",
           "type": "STRING",
-          "links": null
+          "links": [
+            185,
+            186
+          ]
         }
       ],
       "properties": {
-        "cnr_id": "ComfyUI_Comfyroll_CustomNodes",
-        "ver": "d78b780ae43fcf8c6b7c6505e6ffb4584281ceca",
-        "Node name for S&R": "CR Text"
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda",
+        "Node name for S&R": "Y7Nodes_Text"
       },
       "widgets_values": [
-        "In the distance, the silhouette of crumbling ruins looms against the twilight horizon, their jagged edges softened by the haze of dust and fading light. The last rays of the sun catch the edges of broken columns and fractured stone, casting long, angular shadows that stretch across the barren ground like the fingers of forgotten gods. A warm, amber glow lingers in the door"
+        "In a serene forest setting, a giant mouse with large, pink eyes and enormous, oversized ears sits gracefully on a moss-covered log. He wears a little red cape with gold embroidery, a tiny top hat adorned with pearls, and a gold watch chain around his tiny waist. The forest is filled with towering trees, lush green foliage, and patches of sunbeams filtering through, casting gentle shadows. The lighting is soft and warm, with occasional bursts of sunlight creating a magical, whimsical atmosphere. The color palette consists of rich autumnal colors - reds, oranges, and yellows - as well as the contrasting cool and yellows greens of the forest. The composition includes the mouse as the focal point in the foreground, the lush forest scene in the middle ground, and a far-off village in the background, hinting at a\nlarger world. The mood is enchanting and playful.",
+        null
       ]
     },
     {
-      "id": 109,
-      "type": "Y7Nodes_CLIP_TokenCounter",
+      "id": 115,
+      "type": "Y7Nodes_T5_TokenCounter",
       "pos": [
-        197.01171875,
-        568.4930419921875
+        251.9218292236328,
+        26.572805404663086
       ],
       "size": [
-        1005.1218872070312,
-        649.6509399414062
+        650,
+        420
       ],
       "flags": {},
       "order": 2,
@@ -106,8 +105,11 @@
         {
           "name": "text_in",
           "shape": 7,
-          "type": "MY_STRING",
-          "link": 177
+          "type": "STRING",
+          "widget": {
+            "name": "text_in"
+          },
+          "link": 186
         }
       ],
       "outputs": [
@@ -118,77 +120,40 @@
         }
       ],
       "properties": {
-        "ver": "2a10eb16cf0e94bc0e8d159edc776c567975b99d",
-        "Node name for S&R": "Y7Nodes_CLIP_TokenCounter",
-        "show_tokens_index": 1,
-        "tokens_per_line_index": 2,
-        "show_special_tokens_index": 3
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda",
+        "Node name for S&R": "Y7Nodes_T5_TokenCounter",
+        "token_limit_index": 2,
+        "show_tokens_index": 3,
+        "tokens_per_line_index": 4
       },
       "widgets_values": [
-        "Special Token(s): \n   1: Beginning-of-Sequence (BOS): '<|startoftext|>'\n   2: End-of-Sequence (EOS): '<|endoftext|>'\nToken Count: 75 (excluding special tokens)\nToken Limit: 75 (77 minus special tokens)\n\n75th Token (idx 74): \"door</w>\" \nContext: \"..., amber glow lingers in the\"\n\nTokens (up to 75)\n========================\n[  0] <|startoftext|>[  1] in</w>         [  2] the</w>        [  3] distance</w>   [  4] ,</w>          [  5] the</w>        \n[  6] silhouette</w> [  7] of</w>         [  8] cru            [  9] mbling</w>     [ 10] ruins</w>      [ 11] looms</w>      \n[ 12] against</w>    [ 13] the</w>        [ 14] twilight</w>   [ 15] horizon</w>    [ 16] ,</w>          [ 17] their</w>      \n[ 18] jag            [ 19] ged</w>        [ 20] edges</w>      [ 21] sof            [ 22] tened</w>      [ 23] by</w>         \n[ 24] the</w>        [ 25] haze</w>       [ 26] of</w>         [ 27] dust</w>       [ 28] and</w>        [ 29] fading</w>     \n[ 30] light</w>      [ 31] .</w>          [ 32] the</w>        [ 33] last</w>       [ 34] rays</w>       [ 35] of</w>         \n[ 36] the</w>        [ 37] sun</w>        [ 38] catch</w>      [ 39] the</w>        [ 40] edges</w>      [ 41] of</w>         \n[ 42] broken</w>     [ 43] columns</w>    [ 44] and</w>        [ 45] fractured</w>  [ 46] stone</w>      [ 47] ,</w>          \n[ 48] casting</w>    [ 49] long</w>       [ 50] ,</w>          [ 51] angular</w>    [ 52] shadows</w>    [ 53] that</w>       \n[ 54] stretch</w>    [ 55] across</w>     [ 56] the</w>        [ 57] barren</w>     [ 58] ground</w>     [ 59] like</w>       \n[ 60] the</w>        [ 61] fingers</w>    [ 62] of</w>         [ 63] forgotten</w>  [ 64] gods</w>       [ 65] .</w>          \n[ 66] a</w>          [ 67] warm</w>       [ 68] ,</w>          [ 69] amber</w>      [ 70] glow</w>       [ 71] ling           \n[ 72] ers</w>        [ 73] in</w>         [ 74] the</w>        \n\nTokens (over 75)\n========================\n[ 75] door</w>       [ 76] <|endoftext|>  \n",
+        "",
+        "Token Count: 215 / 512\n\nTokens\n==========================================\n[  0] ▁In         [  1] ▁           [  2] a           [  3] ▁serene     \n[  4] ▁forest     [  5] ▁setting    [  6] ,           [  7] ▁           \n[  8] a           [  9] ▁giant      [ 10] ▁mouse      [ 11] ▁with       \n[ 12] ▁large      [ 13] ,           [ 14] ▁pink       [ 15] ▁eyes       \n[ 16] ▁and        [ 17] ▁enormous   [ 18] ,           [ 19] ▁           \n[ 20] oversized   [ 21] ▁ears       [ 22] ▁sit        [ 23] s           \n[ 24] ▁graceful   [ 25] ly          [ 26] ▁on         [ 27] ▁           \n[ 28] a           [ 29] ▁           [ 30] mos         [ 31] s           \n[ 32] -           [ 33] covered     [ 34] ▁log        [ 35] .           \n[ 36] ▁He         [ 37] ▁wear       [ 38] s           [ 39] ▁           \n[ 40] a           [ 41] ▁little     [ 42] ▁red        [ 43] ▁cap        \n[ 44] e           [ 45] ▁with       [ 46] ▁gold       [ 47] ▁embroidery \n[ 48] ,           [ 49] ▁           [ 50] a           [ 51] ▁tiny       \n[ 52] ▁top        [ 53] ▁           [ 54] hat         [ 55] ▁           \n[ 56] adorned     [ 57] ▁with       [ 58] ▁pearl      [ 59] s           \n[ 60] ,           [ 61] ▁and        [ 62] ▁           [ 63] a           \n[ 64] ▁gold       [ 65] ▁watch      [ 66] ▁chain      [ 67] ▁around     \n[ 68] ▁his        [ 69] ▁tiny       [ 70] ▁waist      [ 71] .           \n[ 72] ▁The        [ 73] ▁forest     [ 74] ▁is         [ 75] ▁filled     \n[ 76] ▁with       [ 77] ▁tower      [ 78] ing         [ 79] ▁trees      \n[ 80] ,           [ 81] ▁lush       [ 82] ▁green      [ 83] ▁foliage    \n[ 84] ,           [ 85] ▁and        [ 86] ▁patches    [ 87] ▁of         \n[ 88] ▁sun        [ 89] be          [ 90] am          [ 91] s           \n[ 92] ▁filter     [ 93] ing         [ 94] ▁through    [ 95] ,           \n[ 96] ▁casting    [ 97] ▁gentle     [ 98] ▁shadow     [ 99] s           \n[100] .           [101] ▁The        [102] ▁lighting   [103] ▁is         \n[104] ▁soft       [105] ▁and        [106] ▁warm       [107] ,           \n[108] ▁with       [109] ▁occasional [110] ▁bur        [111] s           \n[112] t           [113] s           [114] ▁of         [115] ▁sunlight   \n[116] ▁creating   [117] ▁           [118] a           [119] ▁magical    \n[120] ,           [121] ▁whimsical  [122] ▁atmosphere [123] .           \n[124] ▁The        [125] ▁color      [126] ▁palette    [127] ▁           \n[128] consists    [129] ▁of         [130] ▁rich       [131] ▁autumn     \n[132] al          [133] ▁colors     [134] ▁           [135] -           \n[136] ▁red        [137] s           [138] ,           [139] ▁orange     \n[140] s           [141] ,           [142] ▁and        [143] ▁yellow     \n[144] s           [145] ▁           [146] -           [147] ▁as         \n[148] ▁well       [149] ▁as         [150] ▁the        [151] ▁           \n[152] contrasting [153] ▁cool       [154] ▁and        [155] ▁yellow     \n[156] s           [157] ▁green      [158] s           [159] ▁of         \n[160] ▁the        [161] ▁forest     [162] .           [163] ▁The        \n[164] ▁composition[165] ▁includes   [166] ▁the        [167] ▁mouse      \n[168] ▁as         [169] ▁the        [170] ▁focal      [171] ▁point      \n[172] ▁in         [173] ▁the        [174] ▁for        [175] e           \n[176] ground      [177] ,           [178] ▁the        [179] ▁lush       \n[180] ▁forest     [181] ▁scene      [182] ▁in         [183] ▁the        \n[184] ▁middle     [185] ▁ground     [186] ,           [187] ▁and        \n[188] ▁           [189] a           [190] ▁far        [191] -           \n[192] off         [193] ▁village    [194] ▁in         [195] ▁the        \n[196] ▁background [197] ,           [198] ▁hint       [199] ing         \n[200] ▁at         [201] ▁           [202] a           [203] ▁larger     \n[204] ▁world      [205] .           [206] ▁The        [207] ▁mood       \n[208] ▁is         [209] ▁           [210] enchanting  [211] ▁and        \n[212] ▁playful    [213] .           [214] </s>        \n",
+        "512",
         true,
-        "6",
-        true,
-        "10",
+        "4",
+        "12",
         null
-      ]
-    },
-    {
-      "id": 58,
-      "type": "CR Text",
-      "pos": [
-        -345.7569274902344,
-        588.5875854492188
-      ],
-      "size": [
-        439.3633117675781,
-        559.28857421875
-      ],
-      "flags": {},
-      "order": 1,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "text",
-          "type": "*",
-          "slot_index": 0,
-          "links": [
-            175
-          ]
-        },
-        {
-          "name": "show_help",
-          "type": "STRING",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "ComfyUI_Comfyroll_CustomNodes",
-        "ver": "d78b780ae43fcf8c6b7c6505e6ffb4584281ceca",
-        "Node name for S&R": "CR Text"
-      },
-      "widgets_values": [
-        "In the distance, the silhouette of crumbling ruins looms against the twilight horizon, their jagged edges softened by the haze of dust and fading light. The last rays of the sun catch the edges of broken columns and fractured stone, casting long, angular shadows that stretch across the barren ground like the fingers of forgotten gods. A warm, amber glow lingers in the sky, dissolving slowly into the indigo veil of approaching night. A gentle breeze stirs the dry air, lifting strands of her hair and rustling the edges of her clothing with a whisper-soft sigh. It carries with it the faint scent of ancient earth and something metallic — the trace of old machines buried beneath centuries of silence. Her eyes narrow slightly, scanning the terrain ahead with practiced calm, taking in every subtle movement and texture. She remains still, save for the soft rise and fall of her breath, as though listening for something that the world itself has nearly forgotten. Slung across her shoulder is a weathered leather satchel, its surface scuffed and scarred by time and travel. The flap is secured with a rusted brass buckle, barely holding together under the strain of worn maps, faded photographs, and the delicate remains of artifacts wrapped in cloth. One hand rests lightly on the strap, fingers curled as though in habit, ready to move, ready to reach. A small pendant glints at her neck — a simple piece of stone encased in wire — its surface etched with symbols long erased from memory, passed down to her through half-remembered stories and dreams. Behind her, the remains of a forgotten world stretch outward: rusted vehicles overtaken by moss, buildings collapsed inward upon themselves, and remnants of civilization buried beneath dust and ivy. Flickering lights pulse in the distance — not quite fire, not quite electricity — casting intermittent glows through the fog. Somewhere nearby, the distant rumble of shifting earth echoes faintly, like the growl of something stirring beneath the surface. The woman does not flinch. Her gaze remains fixed on the horizon, where a narrow path winds between monolithic stones and vanishes into a gnarled forest of skeletal trees. "
       ]
     }
   ],
   "links": [
     [
-      175,
-      58,
+      185,
+      114,
       0,
-      107,
+      116,
       0,
-      "MY_STRING"
+      "STRING"
     ],
     [
-      177,
-      41,
+      186,
+      114,
       0,
-      109,
+      115,
       0,
-      "MY_STRING"
+      "STRING"
     ]
   ],
   "groups": [],
@@ -197,8 +162,8 @@
     "ds": {
       "scale": 1,
       "offset": [
-        479.31232270780265,
-        73.56616460328513
+        483.3516828936107,
+        40.26938099940293
       ]
     },
     "VHS_latentpreview": false,

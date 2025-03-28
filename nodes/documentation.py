@@ -23,14 +23,19 @@ def normal(text, indent_level=0, font_size="12px"):
     return f'<div style="margin-bottom: 8px; margin-left: {indent_px}px; font-size: {font_size};">{processed_text}</div>'
 
 descriptions = {
-    "Y7Nodes_Brightness": [
-        "Image Brightness Adjustment (demo node)",
-        short_desc("Adjusts the brightness of an image by multiplying pixel values"),
-        normal("Control the brightness level with the `strength` parameter:"),
-        normal("- Values > 1.0 increase brightness", 1),
-        normal("- Values < 1.0 decrease brightness", 1),
-        normal("- Value of 1.0 leaves the image unchanged", 1),
-        normal("Optionally provide a `filename_prefix` to use when saving the processed image.")
+    # "Y7Nodes_Brightness": [
+    #     "Image Brightness Adjustment (demo node)",
+    #     short_desc("Adjusts the brightness of an image by multiplying pixel values"),
+    #     normal("Control the brightness level with the `strength` parameter:"),
+    #     normal("- Values > 1.0 increase brightness", 1),
+    #     normal("- Values < 1.0 decrease brightness", 1),
+    #     normal("- Value of 1.0 leaves the image unchanged", 1),
+    #     normal("Optionally provide a `filename_prefix` to use when saving the processed image.")
+    # ],
+
+    "Y7Nodes_Text":[
+        "Basic Text Input With Copy Button", 
+        short_desc("Basic Text Input With Copy Button"),
     ],
 
     "Y7Nodes_Grid2Batch": [

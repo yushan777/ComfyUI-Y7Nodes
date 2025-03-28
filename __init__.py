@@ -1,13 +1,16 @@
-from .nodes.brightness import Y7Nodes_Brightness
+# from .nodes.brightness import Y7Nodes_Brightness
+# from .nodes.template_node import Y7_TemplateNode
+from .nodes.documentation import format_descriptions
+from .nodes.text import Y7Nodes_Text
 from .nodes.grid2batch import Y7Nodes_Grid2Batch
 from .nodes.show_anything import Y7Nodes_ShowAnything
-from .nodes.documentation import format_descriptions
 from .nodes.prompt_enhancer_flux import Y7Nodes_PromptEnhancerFlux
 from .nodes.t5_token_count import Y7Nodes_T5_TokenCounter
 from .nodes.clip_token_count import Y7Nodes_CLIP_TokenCounter
-from .nodes.template_node import Y7_TemplateNode
+
 
 NODE_CLASS_MAPPINGS = {
+    "Y7Nodes_Text": Y7Nodes_Text,
     "Y7Nodes_ShowAnything": Y7Nodes_ShowAnything,    
     "Y7Nodes_Grid2Batch": Y7Nodes_Grid2Batch,    
     "Y7Nodes_PromptEnhancerFlux": Y7Nodes_PromptEnhancerFlux,
@@ -17,6 +20,7 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
+    "Y7Nodes_Text": "Y7 Text",
     "Y7Nodes_ShowAnything": "Y7 Show Anything",    
     "Y7Nodes_Grid2Batch": "Y7 Grid to Batch",
     "Y7Nodes_PromptEnhancerFlux": "Y7 Prompt Enhancer (Flux)",
