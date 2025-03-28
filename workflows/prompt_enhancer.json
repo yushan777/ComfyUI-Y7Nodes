@@ -1,55 +1,9 @@
 {
   "id": "efd192c5-6790-4604-b26b-81560b59cb7e",
   "revision": 0,
-  "last_node_id": 6,
-  "last_link_id": 6,
+  "last_node_id": 7,
+  "last_link_id": 10,
   "nodes": [
-    {
-      "id": 1,
-      "type": "Y7Nodes_PromptEnhancerFlux",
-      "pos": [
-        -39.73756790161133,
-        -72.45809173583984
-      ],
-      "size": [
-        323.78277587890625,
-        258.7774353027344
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "t5_prompt",
-          "type": "STRING",
-          "links": [
-            1
-          ]
-        },
-        {
-          "name": "clip_prompt",
-          "type": "STRING",
-          "links": [
-            2
-          ]
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "Y7Nodes_PromptEnhancerFlux",
-        "cnr_id": "comfyui-y7nodes",
-        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda"
-      },
-      "widgets_values": [
-        "[ohwx man] sitting in a cafe",
-        0.7,
-        0.9,
-        40,
-        324320009849135,
-        "randomize",
-        false
-      ]
-    },
     {
       "id": 2,
       "type": "Y7Nodes_T5_TokenCounter",
@@ -62,7 +16,7 @@
         234.1913299560547
       ],
       "flags": {},
-      "order": 1,
+      "order": 2,
       "mode": 0,
       "inputs": [
         {
@@ -72,7 +26,7 @@
           "widget": {
             "name": "text_in"
           },
-          "link": 1
+          "link": 10
         }
       ],
       "outputs": [
@@ -94,7 +48,7 @@
       },
       "widgets_values": [
         "",
-        "Token Count: 273 / 512\n\nTokens\n==========================================\n[  0] ▁Oh         [  1] w           [  2] x           [  3] ▁man        \n[  4] ▁sit        [  5] s           [  6] ▁in         [  7] ▁           \n[  8] a           [  9] ▁cozy       [ 10] ,           [ 11] ▁modern     \n[ 12] ▁cafe       [ 13] ,           [ 14] ▁his        [ 15] ▁eyes       \n[ 16] ▁fixed      [ 17] ▁on         [ 18] ▁           [ 19] a           \n[ 20] ▁laptop     [ 21] ▁screen     [ 22] ▁with       [ 23] ▁           \n[ 24] a           [ 25] ▁thoughtful [ 26] ▁expression [ 27] .           \n[ 28] ▁His        [ 29] ▁dark       [ 30] ▁hair       [ 31] ▁is         \n[ 32] ▁muss       [ 33] e           [ 34] d           [ 35] ,           \n[ 36] ▁and        [ 37] ▁           [ 38] a           [ 39] ▁few        \n[ 40] ▁           [ 41] strand      [ 42] s           [ 43] ▁frame      \n[ 44] ▁his        [ 45] ▁face       [ 46] ,           [ 47] ▁adding     \n[ 48] ▁           [ 49] a           [ 50] ▁touch      [ 51] ▁of         \n[ 52] ▁rugged     [ 53] ▁charm      [ 54] .           [ 55] ▁A          \n[ 56] ▁warm       [ 57] ,           [ 58] ▁golden     [ 59] ▁light      \n[ 60] ▁spill      [ 61] s           [ 62] ▁in         [ 63] ▁from       \n[ 64] ▁the        [ 65] ▁large      [ 66] ▁windows    [ 67] ,           \n[ 68] ▁casting    [ 69] ▁           [ 70] a           [ 71] ▁soft       \n[ 72] ▁glow       [ 73] ▁on         [ 74] ▁his        [ 75] ▁features   \n[ 76] .           [ 77] ▁The        [ 78] ▁cafe       [ 79] ▁is         \n[ 80] ▁bustl      [ 81] ing         [ 82] ▁with       [ 83] ▁people     \n[ 84] ▁typing     [ 85] ▁away       [ 86] ▁on         [ 87] ▁their      \n[ 88] ▁own        [ 89] ▁laptop     [ 90] s           [ 91] ▁or         \n[ 92] ▁si         [ 93] pping       [ 94] ▁coffee     [ 95] ,           \n[ 96] ▁creating   [ 97] ▁           [ 98] a           [ 99] ▁sense      \n[100] ▁of         [101] ▁warmth     [102] ▁and        [103] ▁community  \n[104] .           [105] ▁The        [106] ▁walls      [107] ▁are        \n[108] ▁           [109] adorned     [110] ▁with       [111] ▁vintage    \n[112] ▁posters    [113] ,           [114] ▁adding     [115] ▁           \n[116] a           [117] ▁pop        [118] ▁of         [119] ▁color      \n[120] ▁and        [121] ▁eclectic   [122] ▁charm      [123] .           \n[124] ▁The        [125] ▁atmosphere [126] ▁is         [127] ▁lively     \n[128] ,           [129] ▁yet        [130] ▁intimate   [131] ,           \n[132] ▁with       [133] ▁the        [134] ▁aroma      [135] ▁of         \n[136] ▁freshly    [137] ▁           [138] brewed      [139] ▁coffee     \n[140] ▁wa         [141] f           [142] ting        [143] ▁through    \n[144] ▁the        [145] ▁air        [146] .           [147] ▁The        \n[148] ▁man        [149] '           [150] s           [151] ▁posture    \n[152] ▁is         [153] ▁relaxed    [154] ,           [155] ▁with       \n[156] ▁one        [157] ▁leg        [158] ▁crossed    [159] ▁over       \n[160] ▁the        [161] ▁other      [162] ,           [163] ▁ex         \n[164] u           [165] d           [166] ing         [167] ▁           \n[168] a           [169] ▁sense      [170] ▁of         [171] ▁comfort    \n[172] ▁and        [173] ▁ease       [174] .           [175] ▁His        \n[176] ▁fingers    [177] ▁dance      [178] ▁across     [179] ▁the        \n[180] ▁keyboard   [181] ,           [182] ▁his        [183] ▁eyes       \n[184] ▁never      [185] ▁leaving    [186] ▁the        [187] ▁screen     \n[188] .           [189] ▁The        [190] ▁overall    [191] ▁mood       \n[192] ▁is         [193] ▁one        [194] ▁of         [195] ▁focused    \n[196] ▁contemplat [197] i           [198] on          [199] ,           \n[200] ▁as         [201] ▁           [202] if          [203] ▁lost       \n[204] ▁in         [205] ▁thought    [206] .           [207] ▁The        \n[208] ▁color      [209] ▁palette    [210] ▁is         [211] ▁           \n[212] a           [213] ▁warm       [214] ▁and        [215] ▁inviting   \n[216] ▁mix        [217] ▁of         [218] ▁earth      [219] y           \n[220] ▁to         [221] nes         [222] ,           [223] ▁rich       \n[224] ▁brown      [225] s           [226] ,           [227] ▁and        \n[228] ▁deep       [229] ▁blue       [230] s           [231] ,           \n[232] ▁           [233] e           [234] vo          [235] king        \n[236] ▁           [237] a           [238] ▁sense      [239] ▁of         \n[240] ▁comfort    [241] ▁and        [242] ▁ser        [243] en          \n[244] ity         [245] .           [246] ▁The        [247] ▁composition\n[248] ▁places     [249] ▁the        [250] ▁man        [251] ▁slightly   \n[252] ▁off        [253] -           [254] center      [255] ,           \n[256] ▁with       [257] ▁the        [258] ▁cafe       [259] '           \n[260] s           [261] ▁vibrant    [262] ▁energy     [263] ▁drawing    \n[264] ▁the        [265] ▁viewer     [266] '           [267] s           \n[268] ▁attention  [269] ▁to         [270] ▁him        [271] .           \n[272] </s>        \n",
+        "Token Count: 286 / 512\n\nTokens\n==========================================\n[  0] ▁            [  1] o            [  2] h            [  3] w            \n[  4] x            [  5] ▁woman       [  6] ▁sit         [  7] s            \n[  8] ▁in          [  9] ▁            [ 10] a            [ 11] ▁            \n[ 12] quaint       [ 13] ,            [ 14] ▁sun         [ 15] -            \n[ 16] d            [ 17] ren          [ 18] ched         [ 19] ▁cafe        \n[ 20] ,            [ 21] ▁            [ 22] surrounded   [ 23] ▁by          \n[ 24] ▁the         [ 25] ▁gentle      [ 26] ▁            [ 27] hum          \n[ 28] ▁of          [ 29] ▁conversation[ 30] ▁and         [ 31] ▁the         \n[ 32] ▁aroma       [ 33] ▁of          [ 34] ▁freshly     [ 35] ▁            \n[ 36] brewed       [ 37] ▁coffee      [ 38] .            [ 39] ▁Her         \n[ 40] ▁            [ 41] s            [ 42] l            [ 43] ender        \n[ 44] ▁fingers     [ 45] ▁grasp       [ 46] ▁            [ 47] a            \n[ 48] ▁delicate    [ 49] ▁ceramic     [ 50] ▁cup         [ 51] ,            \n[ 52] ▁            [ 53] cra          [ 54] d            [ 55] ling         \n[ 56] ▁the         [ 57] ▁warmth      [ 58] ▁as          [ 59] ▁she         \n[ 60] ▁gaze        [ 61] s            [ 62] ▁out         [ 63] ▁the         \n[ 64] ▁large       [ 65] ▁window      [ 66] ,            [ 67] ▁her         \n[ 68] ▁expression  [ 69] ▁            [ 70] a            [ 71] ▁thoughtful  \n[ 72] ▁blend       [ 73] ▁of          [ 74] ▁curiosity   [ 75] ▁and         \n[ 76] ▁relaxation  [ 77] .            [ 78] ▁Soft        [ 79] ,            \n[ 80] ▁golden      [ 81] ▁light       [ 82] ▁pour        [ 83] s            \n[ 84] ▁in          [ 85] ▁through     [ 86] ▁the         [ 87] ▁pan         \n[ 88] e            [ 89] s            [ 90] ,            [ 91] ▁casting     \n[ 92] ▁            [ 93] a            [ 94] ▁warm        [ 95] ▁glow        \n[ 96] ▁on          [ 97] ▁her         [ 98] ▁features    [ 99] ,            \n[100] ▁accent      [101] u            [102] ating        [103] ▁the         \n[104] ▁gentle      [105] ▁curve       [106] s            [107] ▁of          \n[108] ▁her         [109] ▁face        [110] ▁and         [111] ▁the         \n[112] ▁subtle      [113] ▁she         [114] en           [115] ▁in          \n[116] ▁her         [117] ▁dark        [118] ▁hair        [119] .            \n[120] ▁The         [121] ▁cafe        [122] '            [123] s            \n[124] ▁interior    [125] ▁is          [126] ▁            [127] a            \n[128] ▁charming    [129] ,            [130] ▁eclectic    [131] ▁mix         \n[132] ▁of          [133] ▁vintage     [134] ▁furniture   [135] ▁and         \n[136] ▁modern      [137] ▁decor       [138] ,            [139] ▁with        \n[140] ▁rich        [141] ▁wood        [142] ▁to          [143] nes          \n[144] ,            [145] ▁plus        [146] h            [147] ▁arm         \n[148] chair        [149] s            [150] ,            [151] ▁and         \n[152] ▁            [153] a            [154] ▁lively      [155] ▁array       \n[156] ▁of          [157] ▁colorful    [158] ▁artwork     [159] ▁            \n[160] ador         [161] n            [162] ing          [163] ▁the         \n[164] ▁walls       [165] .            [166] ▁The         [167] ▁atmosphere  \n[168] ▁is          [169] ▁lively      [170] ▁yet         [171] ▁intimate    \n[172] ,            [173] ▁with        [174] ▁the         [175] ▁sounds      \n[176] ▁of          [177] ▁laughter    [178] ▁and         [179] ▁gentle      \n[180] ▁chat        [181] ter          [182] ▁fill        [183] ing          \n[184] ▁the         [185] ▁air         [186] ,            [187] ▁creating    \n[188] ▁            [189] a            [190] ▁sense       [191] ▁of          \n[192] ▁warmth      [193] ▁and         [194] ▁community   [195] .            \n[196] ▁A           [197] ▁soft        [198] ,            [199] ▁creamy      \n[200] ▁color       [201] ▁palette     [202] ▁dominate    [203] s            \n[204] ▁the         [205] ▁space       [206] ,            [207] ▁with        \n[208] ▁warm        [209] ▁be          [210] ige          [211] ,            \n[212] ▁rich        [213] ▁wood        [214] ,            [215] ▁and         \n[216] ▁deep        [217] ▁blue        [218] s            [219] ▁providing   \n[220] ▁            [221] a            [222] ▁soothing    [223] ▁backdrop    \n[224] ▁for         [225] ▁the         [226] ▁vibrant     [227] ▁hue         \n[228] s            [229] ▁of          [230] ▁the         [231] ▁cafe        \n[232] '            [233] s            [234] ▁decor       [235] .            \n[236] ▁The         [237] ▁composition [238] ▁places      [239] ▁the         \n[240] ▁woman       [241] ▁at          [242] ▁the         [243] ▁center      \n[244] ,            [245] ▁with        [246] ▁the         [247] ▁window      \n[248] ▁and         [249] ▁surrounding [250] ▁furniture   [251] ▁drawing     \n[252] ▁the         [253] ▁viewer      [254] '            [255] s            \n[256] ▁eye         [257] ▁toward      [258] ▁her         [259] .            \n[260] ▁The         [261] ▁overall     [262] ▁mood        [263] ▁is          \n[264] ▁tranquil    [265] ▁and         [266] ▁inviting    [267] ,            \n[268] ▁            [269] e            [270] vo           [271] king         \n[272] ▁            [273] a            [274] ▁sense       [275] ▁of          \n[276] ▁            [277] a            [278] ▁peaceful    [279] ▁retreat     \n[280] ▁from        [281] ▁the         [282] ▁world       [283] ▁outside     \n[284] .            [285] </s>         \n",
         "512",
         true,
         "4",
@@ -106,15 +60,15 @@
       "id": 3,
       "type": "Y7Nodes_CLIP_TokenCounter",
       "pos": [
-        322.4858703613281,
-        -135.21458435058594
+        322.68914794921875,
+        -125.87825775146484
       ],
       "size": [
         213.5622100830078,
         208
       ],
       "flags": {},
-      "order": 2,
+      "order": 1,
       "mode": 0,
       "inputs": [
         {
@@ -124,7 +78,7 @@
           "widget": {
             "name": "text_in"
           },
-          "link": 2
+          "link": 9
         }
       ],
       "outputs": [
@@ -145,7 +99,7 @@
       },
       "widgets_values": [
         "",
-        "Token Count: 52 / 77\n\nTokens\n==========================================\n[ 0] <|startoftext|>[ 1] ohwx</w>       [ 2] man</w>        [ 3] ,</w>          \n[ 4] modern</w>     [ 5] cafe</w>       [ 6] ,</w>          [ 7] laptop</w>     \n[ 8] ,</w>          [ 9] thought</w>    [10] -</w>          [11] provoking</w>  \n[12] expression</w> [13] ,</w>          [14] dark</w>       [15] hair</w>       \n[16] ,</w>          [17] warm</w>       [18] golden</w>     [19] light</w>      \n[20] ,</w>          [21] vintage</w>    [22] posters</w>    [23] ,</w>          \n[24] bust           [25] ling</w>       [26] atmosphere</w> [27] ,</w>          \n[28] cozy</w>       [29] ,</w>          [30] intimate</w>   [31] ,</w>          \n[32] freshly</w>    [33] brewed</w>     [34] coffee</w>     [35] ,</w>          \n[36] earthy</w>     [37] tones</w>      [38] ,</w>          [39] rich</w>       \n[40] browns</w>     [41] ,</w>          [42] deep</w>       [43] blues</w>      \n[44] ,</w>          [45] relaxed</w>    [46] posture</w>    [47] ,</w>          \n[48] focused</w>    [49] contempl       [50] ation</w>      [51] <|endoftext|>  \n\n",
+        "Token Count: 58 / 77\n\nTokens\n==========================================\n[ 0] <|startoftext|>[ 1] ohwx</w>       [ 2] woman</w>      [ 3] ,</w>          \n[ 4] sun</w>        [ 5] -</w>          [ 6] drenched</w>   [ 7] cafe</w>       \n[ 8] ,</w>          [ 9] quaint</w>     [10] ,</w>          [11] sun            \n[12] lit</w>        [13] ,</w>          [14] ceramic</w>    [15] cup</w>        \n[16] ,</w>          [17] golden</w>     [18] light</w>      [19] ,</w>          \n[20] soft</w>       [21] focus</w>      [22] ,</w>          [23] warm</w>       \n[24] glow</w>       [25] ,</w>          [26] vintage</w>    [27] decor</w>      \n[28] ,</w>          [29] eclectic</w>   [30] mix</w>        [31] ,</w>          \n[32] rich</w>       [33] wood</w>       [34] ,</w>          [35] plush</w>      \n[36] arm            [37] chairs</w>     [38] ,</w>          [39] colorful</w>   \n[40] artwork</w>    [41] ,</w>          [42] lively</w>     [43] atmosphere</w> \n[44] ,</w>          [45] creamy</w>     [46] color</w>      [47] palette</w>    \n[48] ,</w>          [49] warm</w>       [50] beige</w>      [51] ,</w>          \n[52] deep</w>       [53] blues</w>      [54] ,</w>          [55] intimate</w>   \n[56] setting</w>    [57] <|endoftext|>  \n",
         true,
         "4",
         "10",
@@ -156,15 +110,15 @@
       "id": 4,
       "type": "Y7Nodes_ShowAnything",
       "pos": [
-        560.1188354492188,
-        93.80990600585938
+        544.1256103515625,
+        96.19235229492188
       ],
       "size": [
-        462.2865295410156,
-        369.8752746582031
+        469.3177795410156,
+        427.8524169921875
       ],
       "flags": {},
-      "order": 3,
+      "order": 4,
       "mode": 0,
       "inputs": [
         {
@@ -189,7 +143,7 @@
         "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda"
       },
       "widgets_values": [
-        "Ohwx man sits in a cozy, modern cafe, his eyes fixed on a laptop screen with a thoughtful expression. His dark hair is mussed, and a few strands frame his face, adding a touch of rugged charm. A warm, golden light spills in from the large windows, casting a soft glow on his features. The cafe is bustling with people typing away on their own laptops or sipping coffee, creating a sense of warmth and community. The walls are adorned with vintage posters, adding a pop of color and eclectic charm. The atmosphere is lively, yet intimate, with the aroma of freshly brewed coffee wafting through the air. The man's posture is relaxed, with one leg crossed over the other, exuding a sense of comfort and ease. His fingers dance across the keyboard, his eyes never leaving the screen. The overall mood is one of focused contemplation, as if lost in thought. The color palette is a warm and inviting mix of earthy tones, rich browns, and deep blues, evoking a sense of comfort and serenity. The composition places the man slightly off-center, with the cafe's vibrant energy drawing the viewer's attention to him.",
+        "ohwx woman sits in a quaint, sun-drenched cafe, surrounded by the gentle hum of conversation and the aroma of freshly brewed coffee. \nHer slender fingers grasp a delicate ceramic cup, cradling the warmth as she gazes out the large window, her expression a thoughtful blend of curiosity and relaxation. \nSoft, golden light pours in through the panes, casting a warm glow on her features, accentuating the gentle curves of her face and the subtle sheen in her dark hair. \nThe cafe's interior is a charming, eclectic mix of vintage furniture and modern decor, with rich wood tones, plush armchairs, and a lively array of colorful artwork adorning the walls. \nThe atmosphere is lively yet intimate, with the sounds of laughter and gentle chatter filling the air, creating a sense of warmth and community. \nA soft, creamy color palette dominates the space, with warm beige, rich wood, and deep blues providing a soothing backdrop for the vibrant hues of the cafe's decor. \nThe composition places the woman at the center, with the window and surrounding furniture drawing the viewer's eye toward her. \nThe overall mood is tranquil and inviting, evoking a sense of a peaceful retreat from the world outside.",
         true,
         "11",
         null
@@ -199,15 +153,15 @@
       "id": 5,
       "type": "Y7Nodes_ShowAnything",
       "pos": [
-        560.0659790039062,
-        -136.93052673339844
+        546.9550170898438,
+        -133.837646484375
       ],
       "size": [
-        458.32806396484375,
-        185.52655029296875
+        457.9632568359375,
+        193.20669555664062
       ],
       "flags": {},
-      "order": 4,
+      "order": 3,
       "mode": 0,
       "inputs": [
         {
@@ -232,7 +186,7 @@
         "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda"
       },
       "widgets_values": [
-        "ohwx man, modern cafe, laptop, thought-provoking expression, dark hair, warm golden light, vintage posters, bustling atmosphere, cozy, intimate, freshly brewed coffee, earthy tones, rich browns, deep blues, relaxed posture, focused contemplation",
+        "ohwx woman, sun-drenched cafe, quaint, sunlit, ceramic cup, golden light, soft focus, warm glow, vintage decor, eclectic mix, rich wood, plush armchairs, colorful artwork, lively atmosphere, creamy color palette, warm beige, deep blues, intimate setting",
         true,
         "11",
         null
@@ -242,8 +196,8 @@
       "id": 6,
       "type": "CLIPTextEncodeFlux",
       "pos": [
-        1061.1536865234375,
-        7.45004940032959
+        1033.2933349609375,
+        24.43416404724121
       ],
       "size": [
         226.50567626953125,
@@ -290,26 +244,54 @@
         "",
         3.5
       ]
+    },
+    {
+      "id": 7,
+      "type": "Y7Nodes_PromptEnhancerFlux",
+      "pos": [
+        -2.3150529861450195,
+        -74.537109375
+      ],
+      "size": [
+        300,
+        252
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "clip_l_prompt",
+          "type": "STRING",
+          "links": [
+            9
+          ]
+        },
+        {
+          "name": "t5xxl_prompt",
+          "type": "STRING",
+          "links": [
+            10
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Y7Nodes_PromptEnhancerFlux"
+      },
+      "widgets_values": [
+        "[ohwx woman] sitting in a cafe",
+        0.7,
+        0.9,
+        40,
+        211422668342407,
+        "randomize",
+        false
+      ]
     }
   ],
   "links": [
     [
-      1,
-      1,
-      0,
-      2,
-      0,
-      "STRING"
-    ],
-    [
-      2,
-      1,
-      1,
-      3,
-      0,
-      "STRING"
-    ],
-    [
       3,
       2,
       0,
@@ -339,6 +321,22 @@
       0,
       6,
       2,
+      "STRING"
+    ],
+    [
+      9,
+      7,
+      0,
+      3,
+      0,
+      "STRING"
+    ],
+    [
+      10,
+      7,
+      1,
+      2,
+      0,
       "STRING"
     ]
   ],
@@ -346,10 +344,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1.1,
+      "scale": 1.2100000000000002,
       "offset": [
-        310.0063866635915,
-        403.74317525095
+        355.31824100243443,
+        338.9549521104543
       ]
     },
     "VHS_latentpreview": false,
