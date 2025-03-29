@@ -60,6 +60,7 @@ class ModelCache:
 LLM_MODELS = [
     ("Llama-3.2-3B-Instruct", "unsloth/Llama-3.2-3B-Instruct"),
     ("OpenHermes-2.5-Mistral-7B", "teknium/OpenHermes-2.5-Mistral-7B"),
+    ("Hermes-Trismegistus-Mistral-7B", "teknium/Hermes-Trismegistus-Mistral-7B"),
     # Add more models here as needed
 ]
 
@@ -68,10 +69,7 @@ LLM_DISPLAY_NAMES = [model[0] for model in LLM_MODELS]
 
 # Helper function to get repository information from display name
 def get_repo_info(display_name):
-    """Get the repository information from a display name.
-    Returns:
-        tuple: (repo_path, quant_version)
-    """
+    # Returns the repository information from a given model's display name.    
     for model_info in LLM_MODELS:
         if model_info[0] == display_name:
             return model_info[1]
@@ -103,6 +101,19 @@ openhermes_2_5_mistral_7b_req_files = [
                                 "tokenizer_config.json",
                                 "transformers_inference.py"]
 
+# required files for teknium/Hermes-Trismegistus-Mistral-7B
+# only sharded bin version available
+hermes_trismegistus_mistral_7b_req_files = [
+                    "added_tokens.json",
+                    "config.json",
+                    "generation_config.json",
+                    "pytorch_model-00001-of-00002.bin",
+                    "pytorch_model-00002-of-00002.bin",
+                    "pytorch_model.bin.index.json",
+                    "special_tokens_map.json",
+                    "tokenizer.model",
+                    "tokenizer_config.json"]
+
 # _MAX_NEW_TOKENS=1024
 _MAX_NEW_TOKENS=2048
 
@@ -110,68 +121,21 @@ _MAX_NEW_TOKENS=2048
 MODELS_PATH_KEY = "LLM"
 DEFAULT_PROMPT = ""
 
-PROMPT_INSTRUCTION = """
+# Base introduction and purpose
+PROMPT_BASE = """
 You are an AI assistant specialized in generating comprehensive text-to-image prompts for 
 the Flux image generation model. Each output must include two complementary prompt types that work together:
 
 ---
+"""
 
-1. **T5 Prompt** (Detailed natural language description, simulate approximately up to 512 T5 tokens (roughly up to 400 words)):
-
-Structure your description in this order:
-
-- **Subject comes first**: Clearly state the main subject(s) at the beginning 
-- **Subject Details**: Describe the subject(s) in vivid detail, including physical appearance, pose, action, expression, attire, and interactions.
-- **Scene Description**: Describe the overall setting including environment, background, location type (e.g., interior, exterior), and visual style.
-- **Time & Place**: Indicate time of day, season, architecture, and relevant objects or decor.
-- **Lighting**: Describe lighting sources, intensity, direction, color temperature, shadows, and effects.
-- **Color Palette**: Specify dominant and supporting colors, including visual harmony or contrasts.
-- **Composition**: Detail the layout — foreground, middle ground, background, and focal points.
-- **Mood & Atmosphere**: Convey emotional tone using evocative, poetic, or cinematic language.
-- **Use only positive descriptions** — focus solely on what should appear in the image.
-- **Avoid repetition and filler words. Use diverse, sensory-rich vocabulary.**
-
-**Example T5 Prompt (But it does not need to be this long)**:
-A woman with shoulder-length black hair and luminous brown eyes stands alone in a dimly lit interior hallway. She wears a sleek, 
-emerald green satin dress that catches the light with a subtle shimmer. Her posture is still, almost statuesque, as she gazes 
-slightly off-camera with a pensive expression. One hand rests gently on a weathered wooden railing, while the other clutches a 
-small vintage clutch.
-The hallway is narrow and elegant, lined with tall windows draped in sheer curtains that allow soft shafts of moonlight to filter 
-in. Dust particles drift through the air, caught in the light. Ornate wall sconces cast warm amber glows along the wallpapered walls, 
-creating deep shadows that frame the woman in dramatic contrast.
-Muted jewel tones dominate the color palette: deep greens, soft golds, and shadowy blues. In the background, a blurred chandelier 
-hangs overhead, adding a subtle sparkle. The composition places the woman slightly off-center, with the lines of the corridor drawing 
-focus toward her. The overall mood is contemplative and cinematic, evoking the quiet tension of a moment suspended in time.
-
----
-
-2. **CLIP Prompt** (Concise keyword list; simulate approximately up to 75 CLIP tokens (roughly up to 30-40 words)):
-
-- Provide a prioritized, comma-separated list of essential keywords.
-- Include: subject(s), art style (if any), setting, major visual features, mood, lighting, and color scheme.
-- Include specific artistic or stylistic terms if relevant (e.g., "soft focus," "cinematic lighting," "Baroque detail").
-- Ensure full alignment with the T5 prompt.
-- Use only **positive keywords** — no negative terms or exclusions.
-- Avoid overgeneralizations or generic terms like "high quality" or "detailed" unless critical to the style.
-
-**Example CLIP Prompt**:  
-woman, shoulder-length black hair, luminous brown eyes, emerald satin dress, vintage clutch, dim hallway, cinematic lighting, pensive, 
-statuesque, wooden railing, moonlight, sheer curtains, amber wall sconces, dust in air, dramatic shadows, chandelier, soft focus, 
-contemplative mood, baroque detail
-
-
----
-
-**Output Format**:
-
-T5 Prompt: [Your detailed natural language description]  
-CLIP Prompt: [Your concise keyword list]
-
----
+# Special override rules
+PROMPT_SPECIAL_OVERRIDES = """
 **Special Subject Override Rule**:
 
-If the user's prompt contains a phrase inside square brackets (e.g., "[agg woman]"), you must treat the content inside the brackets as the **explicit and literal subject** of the image. Do not reinterpret, paraphrase, or alter this phrase. Use it exactly as written, as the primary subject in both the T5 and CLIP prompts.
-
+If the user's prompt contains a phrase inside square brackets (e.g., "[agg woman]"), then the content inside the brackets as 
+the **explicit and literal subject** of the image. Do not reinterpret, paraphrase, or alter this phrase. 
+Use it exactly as written, as the primary subject in both the T5 and CLIP prompts.
 - preserve the subject phrase exactly inside the square brackets, including the case of the phrase!
 
 Examples:
@@ -181,8 +145,93 @@ Examples:
 - "[ohwx, an old man] standing next to an old car" = "ohwx, an old man standing next to an old car"
 - "[sks knight] standing in ruins" = "sks knight standing in ruins"
 - "[sks dog] playing in a park" = "sks dog playing in a park"
-
 """
+
+# T5 Prompt instructions section
+PROMPT_T5_INSTRUCTIONS = """
+1. **T5 Prompt** (Detailed natural language description, simulate approximately up to 512 T5 tokens (roughly up to 400 words)):
+
+Structure your description in this order:
+
+- **Subject comes first**: Clearly state the main subject(s) at the beginning - obey the special subject override rule explained previously (even it it grammar rules).
+- **Subject Details**: Describe the subject(s) in vivid detail, including physical appearance, pose, action, expression, attire, and interactions.
+- **Scene Description**: Describe the overall setting including environment, background, location type (e.g., interior, exterior), and visual style.
+- **Time & Place**: Indicate time of day, season, architecture, and relevant objects or decor.
+- **Lighting**: Describe lighting sources, intensity, direction, color temperature, shadows, and effects.
+- **Color Palette**: Specify dominant and supporting colors, including visual harmony or contrasts.
+- **Composition**: Detail the layout — foreground, middle ground, background, and focal points.
+- **Mood & Atmosphere**: Convey emotional tone using evocative, poetic, or cinematic language.
+- **Use only positive descriptions** — focus solely on what should appear in the image.
+- **Avoid repetition and filler words. Use diverse, sensory-rich vocabulary.**
+"""
+
+# T5 example section
+PROMPT_T5_EXAMPLE = """
+**Example T5 Prompt**:
+A woman with shoulder-length black hair and luminous brown eyes stands alone in a dimly lit interior hallway. She wears a sleek, 
+emerald green satin dress that catches the light with a subtle shimmer. Her posture is still, almost statuesque, as she gazes 
+slightly off-camera with a pensive expression. One hand rests gently on a weathered wooden railing, while the other clutches a 
+small vintage clutch. The hallway is narrow and elegant, lined with tall windows draped in sheer curtains that allow soft shafts of moonlight to filter 
+in. Dust particles drift through the air, caught in the light. Ornate wall sconces cast warm amber glows along the wallpapered walls, 
+creating deep shadows that frame the woman in dramatic contrast. Muted jewel tones dominate the color palette: deep greens, soft golds, and shadowy blues. 
+In the background, a blurred chandelier hangs overhead, adding a subtle sparkle. The composition places the woman slightly off-center, with the lines of the corridor drawing 
+focus toward her. The overall mood is contemplative and cinematic, evoking the quiet tension of a moment suspended in time.
+
+**Example T5 Prompt (with subject override rule)**:
+agg woman with shoulder-length black hair and luminous brown eyes stands alone in a dimly lit interior hallway. She wears a sleek, 
+emerald green satin dress that catches the light with a subtle shimmer. Her posture is still, almost statuesque, as she gazes 
+slightly off-camera with a pensive expression. One hand rests gently on a weathered wooden railing, while the other clutches a 
+small vintage clutch. The hallway is narrow and elegant, lined with tall windows draped in sheer curtains that allow soft shafts of moonlight to filter 
+in. Dust particles drift through the air, caught in the light. Ornate wall sconces cast warm amber glows along the wallpapered walls, 
+creating deep shadows that frame the woman in dramatic contrast. Muted jewel tones dominate the color palette: deep greens, soft golds, and shadowy blues. 
+In the background, a blurred chandelier hangs overhead, adding a subtle sparkle. The composition places the woman slightly off-center, with the lines of the corridor drawing 
+focus toward her. The overall mood is contemplative and cinematic, evoking the quiet tension of a moment suspended in time.
+---
+"""
+
+# CLIP prompt instructions section
+PROMPT_CLIP_INSTRUCTIONS = """
+2. **CLIP Prompt** (Concise keyword list; simulate approximately up to 75 CLIP tokens (roughly up to 30-40 words)):
+
+- Provide a prioritized, comma-separated list of essential keywords.
+- Include: subject(s), art style (if any), setting, major visual features, mood, lighting, and color scheme.
+- Include specific artistic or stylistic terms if relevant (e.g., "soft focus," "cinematic lighting," "Baroque detail").
+- Ensure full alignment with the T5 prompt.
+- Use only **positive keywords** — no negative terms or exclusions.
+- Avoid overgeneralizations or generic terms like "high quality" or "detailed" unless critical to the style.
+"""
+
+# CLIP example section
+PROMPT_CLIP_EXAMPLE = """
+**Example CLIP Prompt**:  
+woman, shoulder-length black hair, luminous brown eyes, emerald satin dress, vintage clutch, dim hallway, cinematic lighting, pensive, 
+statuesque, wooden railing, moonlight, sheer curtains, amber wall sconces, dust in air, dramatic shadows, chandelier, soft focus, 
+contemplative mood, baroque detail
+
+**Example CLIP Prompt (with subject override rule)**:  
+agg woman, shoulder-length black hair, luminous brown eyes, emerald satin dress, vintage clutch, dim hallway, cinematic lighting, pensive, 
+statuesque, wooden railing, moonlight, sheer curtains, amber wall sconces, dust in air, dramatic shadows, chandelier, soft focus, 
+contemplative mood, baroque detail
+---
+"""
+
+
+
+# Combine all sections when needed in the code
+def get_prompt_instruction():
+    return (
+        PROMPT_BASE + 
+        PROMPT_T5_INSTRUCTIONS + 
+        PROMPT_T5_EXAMPLE + 
+        PROMPT_CLIP_INSTRUCTIONS + 
+        PROMPT_CLIP_EXAMPLE + 
+        PROMPT_SPECIAL_OVERRIDES
+    )
+
+# **Output Format**:
+
+# T5 Prompt: [Your detailed natural language description]  
+# CLIP Prompt: [Your concise keyword list]
 # ==================================================================================
 class Y7Nodes_PromptEnhancerFlux:
     @classmethod
@@ -249,24 +298,20 @@ class Y7Nodes_PromptEnhancerFlux:
                 
         # Extract parameters that affect the output
         prompt = kwargs.get("prompt", "")
-        llm_display_name = kwargs.get("llm_name", "")
-        
-        # Get the repo path for hashing
-        repo_path, _ = get_repo_info(llm_display_name)
-        
+        llm_display_name = kwargs.get("llm_name", "")                
         seed = kwargs.get("seed", 0)
         temperature = kwargs.get("temperature", 0.7)
         top_p = kwargs.get("top_p", 0.9)
         top_k = kwargs.get("top_k", 40)
         
         # Create a string with all parameters
-        input_string = f"{prompt}_{repo_path}_{seed}_{temperature}_{top_p}_{top_k}"
+        input_string = f"{prompt}_{llm_display_name}_{seed}_{temperature}_{top_p}_{top_k}"
         
         # Generate a hash of the input string (cos prompts can be long)
         hash_object = hashlib.md5(input_string.encode())
         hash_hex = hash_object.hexdigest()
         
-        # print(f"IS_CHANGED hash = {hash_hex}", color.ORANGE)
+        print(f"IS_CHANGED hash = {hash_hex}", color.ORANGE)
         return hash_hex
         
    # ==================================================================================
@@ -412,6 +457,9 @@ class Y7Nodes_PromptEnhancerFlux:
                     print(f"ℹ️ Downloading {repo_path} (≈14.5GB)", color.BRIGHT_BLUE)
                     allow_patterns = openhermes_2_5_mistral_7b_req_files
 
+                elif "Hermes-Trismegistus-Mistral-7B" in repo_path:
+                    print(f"ℹ️ Downloading {repo_path} (≈14.5GB)", color.BRIGHT_BLUE)
+                    allow_patterns = openhermes_2_5_mistral_7b_req_files
 
                 snapshot_download(
                     repo_id=repo_path,
@@ -427,61 +475,41 @@ class Y7Nodes_PromptEnhancerFlux:
         else:
             # directory does exist, check if all necessary files exist (per model)
 
-            if model_display_name == "Llama-3.2-3B-Instruct":
-                
-                # check if ALL of the following files exist in the directory.  if not, download that file             
+            # track missing files 
+            missing_files = []
+            required_files = []
+
+            if model_display_name == "Llama-3.2-3B-Instruct":                                       
                 required_files = llama_3_2_3b_instruct_req_files
-                missing_files = []
-                
-                for file in required_files:
-                    if not os.path.exists(os.path.join(full_model_path, file)):
-                        missing_files.append(file)
-                
-                if missing_files:
-                    print(f"ℹ️ Found {repo_path} directory but missing files: {', '.join(missing_files)}", color.YELLOW)
-                    print(f"⬇️ Downloading missing files for {repo_path}", color.YELLOW)
-                    try:
-                        snapshot_download(
-                            repo_id=repo_path,
-                            local_dir=full_model_path,
-                            allow_patterns=missing_files
-                        )
-                        print(f"✅ Missing files for {repo_path} downloaded successfully!", color.BRIGHT_GREEN)
-                    except Exception as e:
-                        print(f"❌ Error downloading missing files for {repo_path}: {str(e)}", color.BRIGHT_RED)
-                        raise
-                else:
-                    print(f"✅ All required files for {repo_path} found.", color.BRIGHT_GREEN)
-
+                                
             elif model_display_name == "OpenHermes-2.5-Mistral-7B":
-
-                # Check for OpenHermes-2.5-Mistral-7B model files
                 required_files = openhermes_2_5_mistral_7b_req_files
-                missing_files = []
                 
-                for file in required_files:
-                    if not os.path.exists(os.path.join(full_model_path, file)):
-                        missing_files.append(file)
-                
-                if missing_files:
-                    print(f"ℹ️ Found {repo_path} directory but missing files: {', '.join(missing_files)}", color.YELLOW)
-                    print(f"⬇️ Downloading missing files for {repo_path}", color.YELLOW)
-                    try:
-                        snapshot_download(
-                            repo_id=repo_path,
-                            local_dir=full_model_path,
-                            allow_patterns=missing_files
-                        )
-                        print(f"✅ Missing files for {repo_path} downloaded successfully!", color.BRIGHT_GREEN)
-                    except Exception as e:
-                        print(f"❌ Error downloading missing files for {repo_path}: {str(e)}", color.BRIGHT_RED)
-                        raise
-                else:
-                    print(f"✅ All required files for {repo_path} found.", color.BRIGHT_GREEN)
+            elif model_display_name == "Hermes-Trismegistus-Mistral-7B":
+                required_files = hermes_trismegistus_mistral_7b_req_files
 
+            # find any missing files
+            for file in required_files:
+                if not os.path.exists(os.path.join(full_model_path, file)):
+                    missing_files.append(file)
+            
+            # if found.. attempt to download. 
+            if missing_files:
+                print(f"ℹ️ Found {repo_path} directory but missing files: {', '.join(missing_files)}", color.YELLOW)
+                print(f"⬇️ Downloading missing files for {repo_path}", color.YELLOW)
+                try:
+                    snapshot_download(
+                        repo_id=repo_path,
+                        local_dir=full_model_path,
+                        allow_patterns=missing_files
+                    )
+                    print(f"✅ Missing files for {repo_path} downloaded successfully!", color.BRIGHT_GREEN)
+                except Exception as e:
+                    print(f"❌ Error downloading missing files for {repo_path}: {str(e)}", color.BRIGHT_RED)
+                    raise
             else:
-                # For other models, just inform user that the directory exists
-                print(f"ℹ️ Model directory for {repo_path} already exists", color.BRIGHT_BLUE)
+                print(f"✅ All required files for {repo_path} found.", color.BRIGHT_GREEN)
+
 
         return full_model_path
 
@@ -556,7 +584,7 @@ def get_model_size(model):
     """Calculate the memory size of a model based on parameters and buffers.
     
     Args:
-        model: PyTorch model or LlamaCppModel
+        model: PyTorch model
         
     Returns:
         Total memory size in bytes
@@ -568,6 +596,38 @@ def get_model_size(model):
     return total_size
 
 # ==================================================================================
+# Custom function to format chat messages without relying on apply_chat_template
+def format_chat_messages(messages, add_generation_prompt=True):
+    """
+    Format chat messages into a single string without using apply_chat_template.
+    
+    Args:
+        messages: List of message dictionaries with 'role' and 'content' keys
+        add_generation_prompt: Whether to add a generation prompt at the end
+        
+    Returns:
+        Formatted string with all messages
+    """
+    formatted_text = ""
+    
+    for message in messages:
+        role = message.get("role", "").lower()
+        content = message.get("content", "")
+        
+        if role == "system":
+            formatted_text += f"System: {content}\n\n"
+        elif role == "user":
+            formatted_text += f"User: {content}\n\n"
+        elif role == "assistant":
+            formatted_text += f"Assistant: {content}\n\n"
+        else:
+            formatted_text += f"{content}\n\n"
+    
+    if add_generation_prompt:
+        formatted_text += "Assistant: "
+    
+    return formatted_text
+
 def generate_flux_t5_clip_prompts(
                     prompt_enhancer_model, 
                     prompt_enhancer_tokenizer, 
@@ -607,18 +667,31 @@ def generate_flux_t5_clip_prompts(
 
     messages = [
         [
-            {"role": "system", "content": PROMPT_INSTRUCTION},
+            {"role": "system", "content": get_prompt_instruction()},
             {"role": "user", "content": f"{p}"},
         ]
         for p in prompts
     ]
 
-    texts = [
-        prompt_enhancer_tokenizer.apply_chat_template(
-            m, tokenize=False, add_generation_prompt=True
-        )
-        for m in messages
-    ]
+    # Check if the tokenizer has a chat template
+    has_chat_template = hasattr(prompt_enhancer_tokenizer, 'chat_template') and prompt_enhancer_tokenizer.chat_template is not None
+    
+    try:
+        if has_chat_template:
+            print("Using tokenizer's built-in chat template", color.BRIGHT_GREEN)
+            texts = [
+                prompt_enhancer_tokenizer.apply_chat_template(
+                    m, tokenize=False, add_generation_prompt=True
+                )
+                for m in messages
+            ]
+        else:
+            print("Tokenizer has no chat template, using custom formatting", color.YELLOW)
+            texts = [format_chat_messages(m, add_generation_prompt=True) for m in messages]
+    except Exception as e:
+        print(f"Error applying chat template: {str(e)}", color.RED)
+        print("Falling back to custom message formatting", color.YELLOW)
+        texts = [format_chat_messages(m, add_generation_prompt=True) for m in messages]
     
     # Handle device placement for PyTorch models
     model_inputs = prompt_enhancer_tokenizer(texts, return_tensors="pt")
@@ -688,7 +761,7 @@ def _generate_and_decode_flux_prompts(
         t5_prompt = ""
         clip_prompt = ""
 
-        print(f"Processing response:\n{response}\n\n", color.ORANGE)
+        print(f"RAW response = \n{response}\n\n", color.ORANGE)
         
         # Enhanced parsing logic with better error handling
         try:
@@ -723,7 +796,7 @@ def _generate_and_decode_flux_prompts(
                 )
             else:
                 # Llama-3.2-3B-Instruct is quite censored and will return strings that start with:
-                if response.startswith(("I can't create", "I can't generate")):
+                if response.startswith("I can't"):
                     print("Refusal detected.")
                     t5_prompt = response
                     clip_prompt = response  
@@ -740,9 +813,6 @@ def _generate_and_decode_flux_prompts(
         
         if not clip_prompt.strip():
             clip_prompt = "Error: Unable to extract CLIP prompt from model response"
-
-        print(f"Extracted T5 prompt: {t5_prompt[:50]}...", color.GREEN)
-        print(f"Extracted CLIP prompt: {clip_prompt[:50]}...", color.GREEN)
         
         result_pairs.append((t5_prompt, clip_prompt))
     
