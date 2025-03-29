@@ -102,8 +102,16 @@ First, I need you to create a T5 Prompt:
 
 This should be a detailed natural language description (up to 512 T5 tokens - maybe max 350 words) with:
 
-- Subject comes first: Start with the main subject(s)
-- Subject Details: Describe physical appearance, pose, action, expression, attire
+- Do not start with, "in this image..." or similar assume that we know it is an image, go straight to the point!
+Bad:
+"In this image, a woman stands in..."
+"The image shows a woman who is..."
+
+Good:
+"A woman stands in..."
+
+- Subject always comes first: Start with the main subject(s): determined by the input prompt. this can be a person, object or scene or something else. 
+- Subject Details: When applicable, describe physical appearance, pose, action, expression, attire
 - Scene Description: Overall setting, environment, background, visual style
 - Time & Place: Time of day, season, architecture, objects
 - Lighting: Sources, intensity, direction, color temperature, shadows
@@ -112,7 +120,7 @@ This should be a detailed natural language description (up to 512 T5 tokens - ma
 - Mood & Atmosphere: Emotional tone using evocative language
 
 Use only positive descriptions — focus on what should appear in the image.
-Avoid repetition and use diverse, sensory-rich vocabulary.
+Avoid repetition and use diverse, sensory-rich vocabulary, but try to avoid very esoteric vocabulary.
 """
 
 # T5 example
@@ -130,7 +138,7 @@ creating deep shadows that frame the woman in dramatic contrast.
 PROMPT_CLIP_INSTRUCTIONS = """
 Next, I need you to create a CLIP Prompt:
 
-This should be a concise keyword list (up to 60 CLIP TOKENS) with:
+This should be a concise keyword list (up to 50 CLIP TOKENS) with:
 
 - Prioritized, comma-separated list of essential keywords
 - Include: subject(s), art style, setting, major visual features, mood, lighting, color scheme
@@ -263,6 +271,32 @@ def generate_t5_prompt(
     
     # Final cleanup - remove brackets from final output
     final_t5 = processed_t5.replace("[", "").replace("]", "")
+    
+    # Remove various "image description" prefixes
+    image_prefix_patterns = [
+        r'^in this image,?\s+',
+        r'^the image shows,?\s+',
+        r'^this image depicts,?\s+',
+        r'^in the image,?\s+',
+        r'^the image features,?\s+',
+        r'^this picture shows,?\s+',
+        r'^the picture depicts,?\s+',
+        r'^visible in this image,?\s+',
+        r'^this photograph shows,?\s+',
+        r'^as seen in the image,?\s+',
+        r'^the scene shows,?\s+',
+        r'^the scene depicts,?\s+',
+        r'^the photograph displays,?\s+',
+        r'^shown in this image,?\s+',
+        r'^depicted in this image,?\s+',
+        r'^present in this image,?\s+'
+    ]
+    # Check if prompt starts with any of these patterns
+    for pattern in image_prefix_patterns:
+        if re.match(pattern, final_t5.lower()):
+            final_t5 = re.sub(pattern, '', final_t5, flags=re.IGNORECASE)
+            print(f"Removed image description prefix from beginning of T5 prompt", color.YELLOW)
+            break
     
     return final_t5
 
