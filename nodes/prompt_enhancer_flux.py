@@ -3,18 +3,17 @@ import os
 import random
 import shutil
 import hashlib
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Dict, Any
 from ..utils.colored_print import color, style
-
 import comfy.model_management
 import comfy.model_patcher
 import folder_paths
 import torch
 from transformers import AutoModelForCausalLM, AutoProcessor, AutoTokenizer
 from huggingface_hub import snapshot_download
+import numpy as np
 
-
-
+ 
 # Function Call Sequence
 # Y7Nodes_PromptEnhancerFlux.enhance()
 #   ├── model_path_download_if_needed() - Checks if model exists, downloads if needed
@@ -54,14 +53,33 @@ class ModelCache:
 
 # logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
-LLM_REPO_NAME = "unsloth/Llama-3.2-3B-Instruct"
+# LLM_REPO_NAME = "unsloth/Llama-3.2-3B-Instruct"
 
-# LLM_NAME = [
-#     "unsloth/Llama-3.2-3B-Instruct",
-#     # Add more models here as needed
-# ]
+# LLM MODELS : 
+# Tuples of : model_name, model repo path, quantized version (FOR GGUF models only)
+LLM_MODELS = [
+    ("Llama-3.2-3B-Instruct", "unsloth/Llama-3.2-3B-Instruct"),
+    ("OpenHermes-2.5-Mistral-7B", "teknium/OpenHermes-2.5-Mistral-7B"),
+    # Add more models here as needed
+]
 
-# required files for llama_3_2_3b_instruct
+# Extract display names for the dropdown
+LLM_DISPLAY_NAMES = [model[0] for model in LLM_MODELS]
+
+# Helper function to get repository information from display name
+def get_repo_info(display_name):
+    """Get the repository information from a display name.
+    Returns:
+        tuple: (repo_path, quant_version)
+    """
+    for model_info in LLM_MODELS:
+        if model_info[0] == display_name:
+            return model_info[1]
+    return None
+
+
+# required files for unsloth/llama_3_2_3b_instruct
+# single file available so we can ignore the sharded version of the model
 llama_3_2_3b_instruct_req_files = [
                                     "config.json",
                                     "generation_config.json",
@@ -71,9 +89,22 @@ llama_3_2_3b_instruct_req_files = [
                                     "tokenizer.json",
                                     "tokenizer_config.json"]
 
-_MAX_NEW_TOKENS=1024
-# _MAX_NEW_TOKENS=2048
+# required files for teknium/OpenHermes-2.5-Mistral-7B
+# only sharded version available
+openhermes_2_5_mistral_7b_req_files = [
+                                "added_tokens.json",
+                                "config.json",
+                                "generation_config.json",
+                                "model-00001-of-00002.safetensors",
+                                "model-00002-of-00002.safetensors",
+                                "model.safetensors.index.json",
+                                "special_tokens_map.json",
+                                "tokenizer.model",
+                                "tokenizer_config.json",
+                                "transformers_inference.py"]
 
+# _MAX_NEW_TOKENS=1024
+_MAX_NEW_TOKENS=2048
 
 
 MODELS_PATH_KEY = "LLM"
@@ -139,17 +170,17 @@ CLIP Prompt: [Your concise keyword list]
 ---
 **Special Subject Override Rule**:
 
-If the user's prompt contains a phrase inside square brackets (e.g., `[agg woman]`), you must treat the content inside the brackets as the **explicit and literal subject** of the image. Do not reinterpret, paraphrase, or alter this phrase. Use it exactly as written, as the primary subject in both the T5 and CLIP prompts.
+If the user's prompt contains a phrase inside square brackets (e.g., "[agg woman]"), you must treat the content inside the brackets as the **explicit and literal subject** of the image. Do not reinterpret, paraphrase, or alter this phrase. Use it exactly as written, as the primary subject in both the T5 and CLIP prompts.
 
 - preserve the subject phrase exactly inside the square brackets, including the case of the phrase!
 
 Examples:
-- `[agg woman] walking through a neon-lit alley` → Subject is "agg woman"
-- `[agg, a young woman] walking through a neon-lit alley` → Subject is "agg, a young woman"
-- `[ohwx man] sitting in a cafe` → Subject is "ohwx man"
-- `[ohwx, an old man] sitting in a cafe` → Subject is "ohwx, an old man"
-- `[sks knight] standing in ruins` → Subject is "void knight"
-- `[sks dog] playing in a park` → Subject is "sks dog"
+- "[agg woman] walking through a neon-lit alley" = "agg woman walking through a neon-lit alley"
+- "[agg, a young woman] standing on a busy sidewalk" = "agg, a young woman standing on a busy sidewalk"
+- "[ohwx man] sitting in a cafe" = "ohwx man sitting in a quiet cafe"
+- "[ohwx, an old man] standing next to an old car" = "ohwx, an old man standing next to an old car"
+- "[sks knight] standing in ruins" = "sks knight standing in ruins"
+- "[sks dog] playing in a park" = "sks dog playing in a park"
 
 """
 # ==================================================================================
@@ -165,13 +196,13 @@ class Y7Nodes_PromptEnhancerFlux:
                         "default": DEFAULT_PROMPT
                     }
                 ),
-                # "llm_name": (
-                #     LLM_NAME,  # Use the list directly as options
-                #     {
-                #         "default": LLM_NAME[0],  # Default to first model
-                #         "tooltip": "Select LLM model."
-                #     }
-                # ),                
+                "llm_name": (
+                    LLM_DISPLAY_NAMES,  # Use display names for the dropdown
+                    {
+                        "default": LLM_DISPLAY_NAMES[0],  # Default to first model
+                        "tooltip": "Select LLM model."
+                    }
+                ),                
                 "temperature": (
                     "FLOAT",
                     {"default": 0.7, "min": 0.1, "max": 2.0, "step": 0.1, 
@@ -218,14 +249,18 @@ class Y7Nodes_PromptEnhancerFlux:
                 
         # Extract parameters that affect the output
         prompt = kwargs.get("prompt", "")
-        llm_name = LLM_REPO_NAME
+        llm_display_name = kwargs.get("llm_name", "")
+        
+        # Get the repo path for hashing
+        repo_path, _ = get_repo_info(llm_display_name)
+        
         seed = kwargs.get("seed", 0)
         temperature = kwargs.get("temperature", 0.7)
         top_p = kwargs.get("top_p", 0.9)
         top_k = kwargs.get("top_k", 40)
         
         # Create a string with all parameters
-        input_string = f"{prompt}_{llm_name}_{seed}_{temperature}_{top_p}_{top_k}"
+        input_string = f"{prompt}_{repo_path}_{seed}_{temperature}_{top_p}_{top_k}"
         
         # Generate a hash of the input string (cos prompts can be long)
         hash_object = hashlib.md5(input_string.encode())
@@ -239,7 +274,11 @@ class Y7Nodes_PromptEnhancerFlux:
     def enhance(self, **kwargs):
 
         prompt = kwargs.get("prompt")
-        llm_repo_name = LLM_REPO_NAME
+        llm_display_name = kwargs.get("llm_name")  # This is now the display name
+        
+        # Get the repository path
+        # repo_path = get_repo_info(llm_display_name)
+        
         seed = kwargs.get("seed")
         temperature = kwargs.get("temperature")
         top_p = kwargs.get("top_p")
@@ -256,8 +295,8 @@ class Y7Nodes_PromptEnhancerFlux:
             load_device = comfy.model_management.get_torch_device()
             offload_device = comfy.model_management.unet_offload_device()
             
-            # Load the model directly without wrappers
-            llm_model, llm_tokenizer = self.down_load_llm_model(llm_repo_name, load_device)
+            # Load/download the model 
+            llm_model, llm_tokenizer = self.down_load_llm_model(llm_display_name, load_device)
             
             # Calculate model size for memory management and handle device placement
             model_size = get_model_size(llm_model) + 1073741824  # Add 1GB extra as buffer
@@ -279,7 +318,15 @@ class Y7Nodes_PromptEnhancerFlux:
                 top_p=top_p, 
                 top_k=top_k
             )
-            
+
+            if not t5_clip_prompts or not t5_clip_prompts[0] or not t5_clip_prompts[0][0]:
+                print("WARNING: Empty or invalid result from generate_flux_t5_clip_prompts", color.RED)
+                # Return a fallback response
+                return (
+                    f"Error: Model failed to generate proper output.",
+                    f"Error: Please try again with different parameters or a different model."
+                )
+
             # Get the first pair of prompts (t5, clip)
             t5xxl_prompt, clip_l_prompt = t5_clip_prompts[0]
             
@@ -304,9 +351,9 @@ class Y7Nodes_PromptEnhancerFlux:
                 # REFERENCE MANAGEMENT: Remove from cache to allow garbage collection
                 # This is crucial - simply moving to CPU isn't enough to free VRAM
                 # We must remove all references so the garbage collector can free the memory
-                if llm_repo_name in ModelCache.loaded_models:
-                    del ModelCache.loaded_models[llm_repo_name]
-                    del ModelCache.loaded_tokenizers[llm_repo_name]
+                if llm_display_name in ModelCache.loaded_models:
+                    del ModelCache.loaded_models[llm_display_name]
+                    del ModelCache.loaded_tokenizers[llm_display_name]
                 
                 # Trigger memory cleanup
                 comfy.model_management.soft_empty_cache()
@@ -320,8 +367,8 @@ class Y7Nodes_PromptEnhancerFlux:
                 # This maintains a persistent reference to prevent garbage collection
                 # other custom nodes keeps models in separate nodes,
                 # our approach uses this dictionary to maintain references
-                ModelCache.loaded_models[llm_repo_name] = llm_model
-                ModelCache.loaded_tokenizers[llm_repo_name] = llm_tokenizer
+                ModelCache.loaded_models[llm_display_name] = llm_model
+                ModelCache.loaded_tokenizers[llm_display_name] = llm_tokenizer
             
             return (clip_l_prompt, t5xxl_prompt,)
             
@@ -334,7 +381,10 @@ class Y7Nodes_PromptEnhancerFlux:
             )
                 
     # ==================================================================================
-    def model_path_download_if_needed(self, model_repo_name):
+    def model_path_download_if_needed(self, model_display_name):
+
+        # Get repo path
+        repo_path = get_repo_info(model_display_name)
         
         # path to the LLM model i.e /Path-To/ComfyUI/models/LLM
         llm_model_directory = os.path.join(folder_paths.models_dir, MODELS_PATH_KEY)
@@ -342,38 +392,43 @@ class Y7Nodes_PromptEnhancerFlux:
         # make the dir if not exist, don't raise error otherwise
         os.makedirs(llm_model_directory, exist_ok=True)
 
-        # split and get last element of model_repo_name
-        model_name = model_repo_name.rsplit("/", 1)[-1]
+        # split and get last element of repo_path
+        model_name = repo_path.rsplit("/", 1)[-1]
         full_model_path = os.path.join(llm_model_directory, model_name)
 
         # Check if directory and files exists, if not....
         if not os.path.exists(full_model_path):
-
             # attempt to download the model
-            print(f"⬇️ Downloading model {model_repo_name} from HF to models/LLM.\nThis may take a while. (Download might appear stuck but it really is downloading)", color.YELLOW)
+            print(f"⬇️ Downloading model {repo_path} from HF to models/LLM.\nThis may take a while. (Download might appear stuck but it really is downloading)", color.YELLOW)
                         
             try:                
-                                
-                # Model-specific settings
-                if "Llama-3.2-3B-Instruct" in model_repo_name:
-                    print(f"ℹ️ Downloading {model_repo_name} (consolidated model only, ≈6.5GB)", color.BRIGHT_BLUE)
-                    # For Llama-3.2-3B-Instruct, we know it has both fragmented and whole models
-                    # So we can safely ignore the fragmented versions
+
+                # Regular model download logic
+                if "Llama-3.2-3B-Instruct" in repo_path:
+                    print(f"ℹ️ Downloading {repo_path} (≈6.5GB)", color.BRIGHT_BLUE)
                     allow_patterns = llama_3_2_3b_instruct_req_files
 
+                elif "OpenHermes-2.5-Mistral-7B" in repo_path:
+                    print(f"ℹ️ Downloading {repo_path} (≈14.5GB)", color.BRIGHT_BLUE)
+                    allow_patterns = openhermes_2_5_mistral_7b_req_files
+
+
                 snapshot_download(
-                    repo_id=model_repo_name,
+                    repo_id=repo_path,
                     local_dir=full_model_path,
                     allow_patterns=allow_patterns                    
                 )
 
-                print(f"✅ Model {model_repo_name} downloaded successfully!", color.BRIGHT_GREEN)
+                print(f"✅ Model {repo_path} downloaded successfully.", color.BRIGHT_GREEN)
+
             except Exception as e:
-                print(f"❌ Error downloading model {model_repo_name}: {str(e)}", color.BRIGHT_RED)
+                print(f"❌ Error downloading model {repo_path}: {str(e)}", color.BRIGHT_RED)
                 raise
         else:
             # directory does exist, check if all necessary files exist (per model)
-            if "Llama-3.2-3B-Instruct" in model_repo_name:
+
+            if model_display_name == "Llama-3.2-3B-Instruct":
+                
                 # check if ALL of the following files exist in the directory.  if not, download that file             
                 required_files = llama_3_2_3b_instruct_req_files
                 missing_files = []
@@ -383,28 +438,55 @@ class Y7Nodes_PromptEnhancerFlux:
                         missing_files.append(file)
                 
                 if missing_files:
-                    print(f"ℹ️ Found {model_repo_name} directory but missing files: {', '.join(missing_files)}", color.YELLOW)
-                    print(f"⬇️ Downloading missing files for {model_repo_name}", color.YELLOW)
+                    print(f"ℹ️ Found {repo_path} directory but missing files: {', '.join(missing_files)}", color.YELLOW)
+                    print(f"⬇️ Downloading missing files for {repo_path}", color.YELLOW)
                     try:
                         snapshot_download(
-                            repo_id=model_repo_name,
+                            repo_id=repo_path,
                             local_dir=full_model_path,
                             allow_patterns=missing_files
                         )
-                        print(f"✅ Missing files for {model_repo_name} downloaded successfully!", color.BRIGHT_GREEN)
+                        print(f"✅ Missing files for {repo_path} downloaded successfully!", color.BRIGHT_GREEN)
                     except Exception as e:
-                        print(f"❌ Error downloading missing files for {model_repo_name}: {str(e)}", color.BRIGHT_RED)
+                        print(f"❌ Error downloading missing files for {repo_path}: {str(e)}", color.BRIGHT_RED)
                         raise
                 else:
-                    print(f"✅ All required files for {model_repo_name} found.", color.BRIGHT_GREEN)
+                    print(f"✅ All required files for {repo_path} found.", color.BRIGHT_GREEN)
+
+            elif model_display_name == "OpenHermes-2.5-Mistral-7B":
+
+                # Check for OpenHermes-2.5-Mistral-7B model files
+                required_files = openhermes_2_5_mistral_7b_req_files
+                missing_files = []
+                
+                for file in required_files:
+                    if not os.path.exists(os.path.join(full_model_path, file)):
+                        missing_files.append(file)
+                
+                if missing_files:
+                    print(f"ℹ️ Found {repo_path} directory but missing files: {', '.join(missing_files)}", color.YELLOW)
+                    print(f"⬇️ Downloading missing files for {repo_path}", color.YELLOW)
+                    try:
+                        snapshot_download(
+                            repo_id=repo_path,
+                            local_dir=full_model_path,
+                            allow_patterns=missing_files
+                        )
+                        print(f"✅ Missing files for {repo_path} downloaded successfully!", color.BRIGHT_GREEN)
+                    except Exception as e:
+                        print(f"❌ Error downloading missing files for {repo_path}: {str(e)}", color.BRIGHT_RED)
+                        raise
+                else:
+                    print(f"✅ All required files for {repo_path} found.", color.BRIGHT_GREEN)
+
             else:
                 # For other models, just inform user that the directory exists
-                print(f"ℹ️ Model directory for {model_repo_name} already exists", color.BRIGHT_BLUE)
+                print(f"ℹ️ Model directory for {repo_path} already exists", color.BRIGHT_BLUE)
 
         return full_model_path
 
     # ==================================================================================
-    def down_load_llm_model(self, llm_repo_name, load_device):
+    def down_load_llm_model(self, model_display_name, load_device):
         # ==================================================================================
         # MODEL PERSISTENCE OPTIMIZATION
         # ==================================================================================
@@ -414,18 +496,23 @@ class Y7Nodes_PromptEnhancerFlux:
         # 2. Provides fast access to previously loaded models
         # 3. Maintains model state between function calls
         # ==================================================================================
-        if llm_repo_name in ModelCache.loaded_models and llm_repo_name in ModelCache.loaded_tokenizers:
-            print(f"Using cached model {llm_repo_name} from previous run", color.BRIGHT_GREEN)
-            return ModelCache.loaded_models[llm_repo_name], ModelCache.loaded_tokenizers[llm_repo_name]
+        # Get repo path 
+        repo_path = get_repo_info(model_display_name)
+        
+        if model_display_name in ModelCache.loaded_models and model_display_name in ModelCache.loaded_tokenizers:
+            print(f"Using cached model {model_display_name} from previous run", color.BRIGHT_GREEN)
+            # immediately return the model and tokenizer
+            return ModelCache.loaded_models[model_display_name], ModelCache.loaded_tokenizers[model_display_name]
             
-        model_path = self.model_path_download_if_needed(llm_repo_name)
+        # otherwise.. attempt to download the model
+        model_path = self.model_path_download_if_needed(model_display_name)
                 
         try:
             # Try to load the model
-            llm_name = llm_repo_name.split("/")[-1]
-            print(f"Loading model {llm_name}", color.BRIGHT_BLUE)
             
-            # Load Transformers model
+            print(f"Loading model {model_display_name}", color.BRIGHT_BLUE)
+        
+            # Regular Transformers model loading
             llm_model = AutoModelForCausalLM.from_pretrained(
                 model_path,
                 torch_dtype=torch.bfloat16,
@@ -443,8 +530,8 @@ class Y7Nodes_PromptEnhancerFlux:
             # when the local variables go out of scope after the function returns.
             # These cached models will persist until explicitly removed.
             # ==================================================================================
-            ModelCache.loaded_models[llm_repo_name] = llm_model
-            ModelCache.loaded_tokenizers[llm_repo_name] = llm_tokenizer
+            ModelCache.loaded_models[model_display_name] = llm_model
+            ModelCache.loaded_tokenizers[model_display_name] = llm_tokenizer
             
             return llm_model, llm_tokenizer
             
@@ -453,9 +540,10 @@ class Y7Nodes_PromptEnhancerFlux:
             print(f"❌ Error: Model files are incomplete or corrupted: {str(e)}", color.RED)
             print(f"🔄 Please manually delete the directory : {model_path}", color.YELLOW)
             print(f"🔄 Then re-launch the workflow to attempt downloading again.", color.YELLOW)
-            print(f"🔄 Alternatively you can manually download the model from: \nhttps://huggingface.co/unsloth/Llama-3.2-3B-Instruct/tree/main", color.YELLOW)
+            
+            
+            print(f"🔄 Alternatively you can manually download the model from: \nhttps://huggingface.co/{repo_path}", color.YELLOW)                
             print(f"   and places the files to: {model_path}", color.YELLOW)
-
             
             # Re-raise the exception to stop execution
             raise RuntimeError(f"Model at {model_path} is incomplete or corrupted. Please delete this directory and try again.")
@@ -465,29 +553,31 @@ class Y7Nodes_PromptEnhancerFlux:
 
 # Helper function to calculate model size
 def get_model_size(model):
-    """Calculate the memory size of a PyTorch model based on parameters and buffers.
+    """Calculate the memory size of a model based on parameters and buffers.
     
     Args:
-        model: PyTorch model
+        model: PyTorch model or LlamaCppModel
         
     Returns:
         Total memory size in bytes
     """
+
+    # For PyTorch models, calculate based on parameters and buffers
     total_size = sum(p.numel() * p.element_size() for p in model.parameters())
     total_size += sum(b.numel() * b.element_size() for b in model.buffers())
     return total_size
 
 # ==================================================================================
 def generate_flux_t5_clip_prompts(
-    prompt_enhancer_model, 
-    prompt_enhancer_tokenizer, 
-    prompt: Union[str, List[str]], 
-    seed: int = None, 
-    temperature: float = 0.7,
-    top_p: float = 0.9,
-    top_k: int = 40,
-    max_new_tokens: int = _MAX_NEW_TOKENS
-) -> List[Tuple[str, str]]:
+                    prompt_enhancer_model, 
+                    prompt_enhancer_tokenizer, 
+                    prompt: Union[str, List[str]], 
+                    seed: int = None, 
+                    temperature: float = 0.7,
+                    top_p: float = 0.9,
+                    top_k: int = 40,
+                    max_new_tokens: int = _MAX_NEW_TOKENS
+                ) -> List[Tuple[str, str]]:
     
     """
     Generate T5 and CLIP prompts for Flux image generation model.
@@ -572,16 +662,18 @@ def _generate_and_decode_flux_prompts(
         
     Returns: List of tuples containing (t5_prompt, clip_prompt) pairs
     """
+
     # For transformers models, use the standard API
     with torch.inference_mode():
         outputs = prompt_enhancer_model.generate(
-            **model_inputs, 
-            max_new_tokens=max_new_tokens,
-            do_sample=True,
-            temperature=temperature,
-            top_p=top_p,
-            top_k=top_k                
-        )
+                                        **model_inputs, 
+                                        max_new_tokens=max_new_tokens,
+                                        do_sample=True,
+                                        temperature=temperature,
+                                        top_p=top_p,
+                                        top_k=top_k)
+        
+        # seed is already set in generate_flux_t5_clip_prompts() function
         generated_ids = [
             output_ids[len(input_ids):]
             for input_ids, output_ids in zip(model_inputs.input_ids, outputs)
@@ -592,48 +684,66 @@ def _generate_and_decode_flux_prompts(
 
     result_pairs = []
 
-    # print(f"decoded_responses = \n{decoded_responses}", color.RED)
-
     for response in decoded_responses:
         t5_prompt = ""
         clip_prompt = ""
 
-        if "T5 Prompt" in response and "CLIP Prompt" in response:
-            # Extract everything after "T5 Prompt"
-            t5_raw = response.split("T5 Prompt", 1)[1]
-            # Now split at "CLIP Prompt" to isolate just the T5 section
-            t5_section = t5_raw.split("CLIP Prompt", 1)[0]
+        print(f"Processing response:\n{response}\n\n", color.ORANGE)
+        
+        # Enhanced parsing logic with better error handling
+        try:
+            if "T5 Prompt" in response and "CLIP Prompt" in response:
+                # Extract everything after "T5 Prompt"
+                t5_raw = response.split("T5 Prompt", 1)[1]
+                # Now split at "CLIP Prompt" to isolate just the T5 section
+                t5_section = t5_raw.split("CLIP Prompt", 1)[0]
 
-            # Cleanup: remove colons, quotes, asterisks, and trim whitespace
-            t5_prompt = (
-                t5_section.replace(":", "") # remove colons
-                .replace("*", "") # remove asterisks
-                .replace("[", "") # remove [
-                .replace("]", "") # remove ]
-                .strip() # removes leading and trailing whitespace (spaces, tabs, newlines).
-                .strip('"') # removes leading or trailing double quptes             
-            )
+                # Cleanup: remove colons, quotes, asterisks, and trim whitespace
+                t5_prompt = (
+                    t5_section.replace(":", "") # remove colons
+                    .replace("*", "") # remove asterisks
+                    .replace("[", "") # remove [
+                    .replace("]", "") # remove ]
+                    .replace("\n", "") # remove \n
+                    .strip() # removes leading and trailing whitespace
+                    .strip('"') # removes leading or trailing double quotes             
+                    
+                )
 
-            # Now extract everything after "CLIP Prompt"
-            clip_section = response.split("CLIP Prompt", 1)[1]
-            clip_prompt = (
-                clip_section.replace(":", "")
-                .replace("*", "")
-                .replace("[", "") # remove [
-                .replace("]", "") # remove ]                
-                .strip()
-                .strip('"')
-            )
+                # Now extract everything after "CLIP Prompt"
+                clip_section = response.split("CLIP Prompt", 1)[1]
+                clip_prompt = (
+                    clip_section.replace(":", "")
+                    .replace("*", "")
+                    .replace("[", "") # remove [
+                    .replace("]", "") # remove ]   
+                    .replace("\n", "") # remove \n             
+                    .strip()
+                    .strip('"')
+                )
+            else:
+                # Llama-3.2-3B-Instruct is quite censored and will return strings that start with:
+                if response.startswith(("I can't create", "I can't generate")):
+                    print("Refusal detected.")
+                    t5_prompt = response
+                    clip_prompt = response  
 
-            # print(f"\n\nt5_prompt = \n{t5_prompt}", color.ORANGE)
-            # print(f"\n\nclip_prompt = \n{clip_prompt}", color.ORANGE)
+                    
 
-        else:
-            # Fallback if format is not as expected
-            t5_prompt = response.replace("*", "").strip().strip('"')
-            clip_prompt = "Error extracting CLIP prompt, please check the model output format"
+        except Exception as e:
+            print(f"Error during prompt parsing: {str(e)}", color.RED)
+            t5_prompt = f"Error during prompt parsing: {str(e)}"
+            clip_prompt = "Unable to extract CLIP prompt from model output"
+        
+        # Check if prompts are empty after parsing
+            t5_prompt = "Error: Unable to extract T5 prompt from model response"
+        
+        if not clip_prompt.strip():
+            clip_prompt = "Error: Unable to extract CLIP prompt from model response"
 
+        print(f"Extracted T5 prompt: {t5_prompt[:50]}...", color.GREEN)
+        print(f"Extracted CLIP prompt: {clip_prompt[:50]}...", color.GREEN)
+        
         result_pairs.append((t5_prompt, clip_prompt))
     
     return result_pairs
-
