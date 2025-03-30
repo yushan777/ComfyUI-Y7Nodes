@@ -119,12 +119,12 @@ app.registerExtension({
                 // Add button - Copy button
                 // serialize: false tells ComfyUI not to save the button's state when 
                 // saving the workflow since buttons here are transient
+                // Add button - Copy button
                 this.addWidget("button", "📋 Copy Text", null, () => {
-                    
-                    // get the text from the text widget
+                    // Get the text from the text widget
                     const textToCopy = this.widgets[TEXT_WIDGET].value;
                     
-                    console.log("textToCopy =====> \n " + textToCopy)
+                    console.log("textToCopy =====> \n " + textToCopy);
 
                     // Function to show success message
                     const showSuccess = () => {
@@ -156,64 +156,31 @@ app.registerExtension({
                         app.graph.setDirtyCanvas(true, false);
                     };
                     
-                    // Try to copy using the Clipboard API if available
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(textToCopy)
-                            .then(showSuccess)
-                            .catch(err => {
-                                console.log("Clipboard API failed, trying fallback method");
-                                // Try fallback method
-                                try {
-                                    // Create a temporary textarea element
-                                    const textarea = document.createElement('textarea');
-                                    textarea.value = textToCopy;
-                                    // Make the textarea out of viewport
-                                    textarea.style.position = 'fixed';
-                                    textarea.style.left = '-999999px';
-                                    textarea.style.top = '-999999px';
-                                    document.body.appendChild(textarea);
-                                    textarea.focus();
-                                    textarea.select();
-                                    
-                                    // Execute the copy command
-                                    const successful = document.execCommand('copy');
-                                    document.body.removeChild(textarea);
-                                    
-                                    if (successful) {
-                                        showSuccess();
-                                    } else {
-                                        showError(new Error("execCommand('copy') failed"));
-                                    }
-                                } catch (fallbackErr) {
-                                    showError(fallbackErr);
-                                }
-                            });
-                    } else {
-                        // Clipboard API not available, try the fallback directly
-                        try {
-                            const textarea = document.createElement('textarea');
-                            textarea.value = textToCopy;
-                            textarea.style.position = 'fixed';
-                            textarea.style.left = '-999999px';
-                            textarea.style.top = '-999999px';
-                            document.body.appendChild(textarea);
-                            textarea.focus();
-                            textarea.select();
-                            
-                            const successful = document.execCommand('copy');
-                            document.body.removeChild(textarea);
-                            
-                            if (successful) {
-                                showSuccess();
-                            } else {
-                                showError(new Error("execCommand('copy') failed"));
-                            }
-                        } catch (err) {
-                            showError(err);
+                    // Use only the fallback method which is more reliable in this environment
+                    try {
+                        // Create a temporary textarea element
+                        const textarea = document.createElement('textarea');
+                        textarea.value = textToCopy;
+                        // Make the textarea out of viewport
+                        textarea.style.position = 'fixed';
+                        textarea.style.left = '-999999px';
+                        textarea.style.top = '-999999px';
+                        document.body.appendChild(textarea);
+                        textarea.focus();
+                        textarea.select();
+                        
+                        // Execute the copy command
+                        const successful = document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        
+                        if (successful) {
+                            showSuccess();
+                        } else {
+                            showError(new Error("execCommand('copy') failed"));
                         }
+                    } catch (err) {
+                        showError(err);
                     }
-
-                 
                 }, { serialize: false });
 
 
