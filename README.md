@@ -18,7 +18,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 1. Clone this repository into your ComfyUI custom_nodes directory:
    ```bash
    cd /path/to/ComfyUI/custom_nodes
-   git clone https://github.com/yushan777/ComfyUI-Y7Nodes
+   git clone https://github.com/yushan777/ComfyUI-Y7Nodes comfyui-y7nodes
    
    ```
 
