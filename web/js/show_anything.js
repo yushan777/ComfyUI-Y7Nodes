@@ -124,38 +124,94 @@ app.registerExtension({
                     // get the text from the text widget
                     const textToCopy = this.widgets[TEXT_WIDGET].value;
                     
-                    // Copy to clipboard 
-                    navigator.clipboard.writeText(textToCopy)
-                        .then(() => {
-                            // Temporarily change button text to show success
-                            const button = this.widgets[COPYBUTTON_WIDGET];  // The button is the 4th widget in array
-                            const originalText = button.name;
-                            button.name = "✅ Text copied.";
-                            
-                            // Reset button text after 1 second
-                            setTimeout(() => {
-                                button.name = originalText;
-                                // Redraw the canvas
-                                app.graph.setDirtyCanvas(true, false);  
-                            }, 1000);
-                            
-                            // Redraw the canvas
-                            app.graph.setDirtyCanvas(true, false);  
-                        })
-                        .catch(err => {
-                            console.error('Failed to copy text:', err);
-                            // Show error state
-                            const button = this.widgets[COPYBUTTON_WIDGET];
-                            const originalText = button.name;
-                            button.name = "❌ Failed to copy text.";
-                            
-                            setTimeout(() => {
-                                button.name = originalText;
-                                app.graph.setDirtyCanvas(true, false);
-                            }, 2000);
-                            
+                    console.log("textToCopy =====> \n " + textToCopy)
+
+                    // Function to show success message
+                    const showSuccess = () => {
+                        const button = this.widgets[COPYBUTTON_WIDGET];
+                        const originalText = button.name;
+                        button.name = "✅ Text copied.";
+                        
+                        // Reset button text after 1 second
+                        setTimeout(() => {
+                            button.name = originalText;
                             app.graph.setDirtyCanvas(true, false);
-                        });                    
+                        }, 1000);
+                        
+                        app.graph.setDirtyCanvas(true, false);
+                    };
+                    
+                    // Function to show error message
+                    const showError = (err) => {
+                        console.error('Failed to copy text:', err);
+                        const button = this.widgets[COPYBUTTON_WIDGET];
+                        const originalText = button.name;
+                        button.name = "❌ Failed to copy text.";
+                        
+                        setTimeout(() => {
+                            button.name = originalText;
+                            app.graph.setDirtyCanvas(true, false);
+                        }, 2000);
+                        
+                        app.graph.setDirtyCanvas(true, false);
+                    };
+                    
+                    // Try to copy using the Clipboard API if available
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(textToCopy)
+                            .then(showSuccess)
+                            .catch(err => {
+                                console.log("Clipboard API failed, trying fallback method");
+                                // Try fallback method
+                                try {
+                                    // Create a temporary textarea element
+                                    const textarea = document.createElement('textarea');
+                                    textarea.value = textToCopy;
+                                    // Make the textarea out of viewport
+                                    textarea.style.position = 'fixed';
+                                    textarea.style.left = '-999999px';
+                                    textarea.style.top = '-999999px';
+                                    document.body.appendChild(textarea);
+                                    textarea.focus();
+                                    textarea.select();
+                                    
+                                    // Execute the copy command
+                                    const successful = document.execCommand('copy');
+                                    document.body.removeChild(textarea);
+                                    
+                                    if (successful) {
+                                        showSuccess();
+                                    } else {
+                                        showError(new Error("execCommand('copy') failed"));
+                                    }
+                                } catch (fallbackErr) {
+                                    showError(fallbackErr);
+                                }
+                            });
+                    } else {
+                        // Clipboard API not available, try the fallback directly
+                        try {
+                            const textarea = document.createElement('textarea');
+                            textarea.value = textToCopy;
+                            textarea.style.position = 'fixed';
+                            textarea.style.left = '-999999px';
+                            textarea.style.top = '-999999px';
+                            document.body.appendChild(textarea);
+                            textarea.focus();
+                            textarea.select();
+                            
+                            const successful = document.execCommand('copy');
+                            document.body.removeChild(textarea);
+                            
+                            if (successful) {
+                                showSuccess();
+                            } else {
+                                showError(new Error("execCommand('copy') failed"));
+                            }
+                        } catch (err) {
+                            showError(err);
+                        }
+                    }
 
                  
                 }, { serialize: false });

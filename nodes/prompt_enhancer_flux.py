@@ -137,7 +137,7 @@ Examples:
 PROMPT_T5_INSTRUCTIONS = """
 First, I need you to create a T5 Prompt:
 
-This should be a detailed natural language description (up to 512 T5 tokens - maybe max 350 words) with:
+This should be a detailed natural language description (up to 512 T5 tokens - maybe max 300 words) with:
 
 - Do not start with, "in this image..." or similar assume that we know it is an image, go straight to the point!
 Bad:
@@ -150,15 +150,16 @@ Good:
 - Subject always comes first: Start with the main subject(s): determined by the input prompt. this can be a person, object or scene or something else. 
 - Subject Details: When applicable, describe physical appearance, pose, action, expression, attire
 - Scene Description: Overall setting, environment, background, visual style
-- Time & Place: Time of day, season, architecture, objects
-- Lighting: Sources, intensity, direction, color temperature, shadows
-- Color Palette: Dominant and supporting colors
+- Time & Place: Time of day, season, location
+- Lighting and color palette: Sources, intensity, direction, color temperature, shadows
 - Composition: Layout of elements and focal points
-- Mood & Atmosphere: Emotional tone using evocative language
-- Descriptions of sounds and motion is less important than the visuals
+- Mood & Atmosphere: Emotional tone using evocative language (but not too much of this!)
+- Avoid purple prose - overly elaborate, flowery, or excessively descriptive - this is bad
+- Minimize words that describe sounds or smells if they add nothing to the visuals. 
+- Avoid descriptions of motion and action (unless important to the subject's pose)
 
 Use only positive descriptions — focus on what should appear in the image.
-Avoid repetition and use diverse, sensory-rich vocabulary, but try to avoid very esoteric vocabulary.
+Avoid repetition of the subject, instead use she, he, her, his etc
 """
 
 # T5 example
@@ -176,19 +177,22 @@ creating deep shadows that frame the woman in dramatic contrast.
 PROMPT_CLIP_INSTRUCTIONS = """
 Next, I need you to create a CLIP Prompt:
 
-This must be a concise keyword list (up to 70 CLIP TOKENS - roughly equates to 40-50 words):
-
-- Prioritized, comma-separated list of essential keywords
+This must be a concise, short, less verbose keyword list (up to 60 CLIP TOKENS which roughly equates to 20-40 words):
+- Prioritized, comma-separated list of essential keywords, but word limit priority is crucial.
+- Subject(s) MUST come first
 - Include: subject(s), art style, setting, major visual features, mood, lighting, color scheme
 - Include specific artistic terms if relevant (e.g., "soft focus," "cinematic lighting")
-- Ensure full alignment with the T5 prompt
-- Use only positive keywords — no negative terms or exclusions
+- Ensure alignment with the T5 prompt, but remove any extraneous details - it does not need to be exhaustive.
+- Avoid words that describe sounds or smells if they add nothing to the visuals. 
+- Do not start with the words 'CLIP Prompt:' - go straight to the keywords
+- Remember to keep the word count under 40. - remove keywords if they go over the limit
 """
 
 # CLIP example
 PROMPT_CLIP_EXAMPLE = """
 Example CLIP Prompt:
-woman, shoulder-length black hair, brown eyes, emerald satin dress, vintage clutch, dim hallway, cinematic lighting, pensive, statuesque, wooden railing, moonlight, sheer curtains, amber wall sconces, dust in air, dramatic shadows, chandelier, soft focus, contemplative mood
+woman, shoulder-length black hair, brown eyes, emerald satin dress, vintage clutch, hallway, dim, lighting, pensive, moonlight, 
+sheer curtains, amber wall sconces, dust in air, shadows, soft focus, contemplative mood
 """
 
 # Combine sections for T5 instruction
@@ -278,10 +282,31 @@ def process_subject_override_smart_version(short_prompt, generated_text, llm_mod
     
     try:
         # Use the loaded LLM to perform subject replacement
+        # messages = [
+        #     {"role": "system", "content": "You are an expert text editor. Your task is to replace the first instance of a subject noun (person, animal, object, etc.) in the given text with a specific replacement term, while preserving the grammatical structure of the sentence."},
+        #     {"role": "user", "content": f"In the following text, identify and replace the first instance of a subject noun (like person, man, woman, child, dog, cat, tree, building, etc.) with '{bracketed_subject}'. Keep everything else exactly the same. Here's the text: {generated_text}"}
+        # ]
+        # Use the loaded LLM to perform subject replacement
         messages = [
-            {"role": "system", "content": "You are an expert text editor. Your task is to replace the first instance of a subject noun (person, animal, object, etc.) in the given text with a specific replacement term, while preserving the grammatical structure of the sentence."},
-            {"role": "user", "content": f"In the following text, identify and replace the first instance of a subject noun (like person, man, woman, child, dog, cat, tree, building, etc.) with '{bracketed_subject}'. Keep everything else exactly the same. Here's the text: {generated_text}"}
+            {
+                "role": "system",
+                "content": (
+                    "Your task is to replace the first instance of a subject noun (man, woman, person, animal, object, etc.) in the given text with a "
+                    "specific replacement term, while preserving the grammatical structure of the sentence. - only the first instance."
+                )
+            },
+            {
+                "role": "user",
+                "content": (
+                    "In the following text, identify and replace the first instance of a subject noun "
+                    "(like person, man, woman, child, dog, cat, tree, building, etc.) with "
+                    f"'{bracketed_subject}'. Keep everything else exactly the same. "
+                    "For all other instances, use pronouns, he, she, it instead. " 
+                    f"Here's the text:\n\n{generated_text}"
+                )
+            }
         ]
+
         
         # Format messages for the model
         if hasattr(llm_tokenizer, 'chat_template') and llm_tokenizer.chat_template is not None:
@@ -545,11 +570,13 @@ def generate_clip_prompt(
     # Clean up the CLIP prompt (simpler than T5 as it's just keywords)
     clip_prompt = decoded_response.strip().strip('"').strip("'")
     
-    # Check if bracketed subject needs to be included
-    bracketed_subject = extract_square_brackets(original_prompt)
-    if bracketed_subject and bracketed_subject.lower() not in clip_prompt.lower():
-        print(f"Adding subject '{bracketed_subject}' to CLIP prompt", color.YELLOW)
-        clip_prompt = f"{bracketed_subject}, {clip_prompt}"
+    # # Check if bracketed subject needs to be included
+    # bracketed_subject = extract_square_brackets(original_prompt)
+    # print(f"bracketed_subject =\n{bracketed_subject}\n\nclip_prompt =\n{clip_prompt}", color.ORANGE)
+
+    # if bracketed_subject and bracketed_subject.lower() not in clip_prompt.lower():
+    #     print(f"Adding subject '{bracketed_subject}' to CLIP prompt", color.YELLOW)
+    #     clip_prompt = f"{bracketed_subject}, {clip_prompt}"
     
     # Final cleanup - remove brackets from final output
     final_clip = clip_prompt.replace("[", "").replace("]", "")
