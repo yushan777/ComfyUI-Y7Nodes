@@ -1,0 +1,1 @@
+CLIP output needs fixing (somtimes includes all of the raw response.)
