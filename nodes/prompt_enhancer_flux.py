@@ -1,157 +1,610 @@
 import logging
 import os
-import random
-import shutil
+import platform
+import gc
 import hashlib
-from typing import List, Optional, Tuple, Union
+import re
+from typing import List, Optional, Tuple, Union, Dict, Any
 from ..utils.colored_print import color, style
-
 import comfy.model_management
 import comfy.model_patcher
 import folder_paths
 import torch
 from transformers import AutoModelForCausalLM, AutoProcessor, AutoTokenizer
 from huggingface_hub import snapshot_download
+import numpy as np
 
+# Y7Nodes_PromptEnhancerFlux
 
+# .enhance()
+# │
+# ├── down_load_llm_model()
+# │   ├── model_path_download_if_needed() [if model not cached]
+# │   │   └── snapshot_download() [if model files missing]
+# │   └── AutoModelForCausalLM.from_pretrained() + AutoTokenizer.from_pretrained()
+# │
+# ├── generate_t5_prompt()
+# │   ├── get_t5_prompt_instruction()
+# │   ├── format_chat_messages() or tokenizer.apply_chat_template()
+# │   ├── model.generate() [with torch.inference_mode()]
+# │   ├── tokenizer.decode()
+# │   └── process_subject_override() [if square brackets present]
+# │       └── extract_square_brackets()
+# │
+# ├── generate_clip_prompt()
+# │   ├── get_clip_prompt_instruction()
+# │   ├── format_chat_messages() or tokenizer.apply_chat_template()
+# │   ├── model.generate() [with torch.inference_mode()]
+# │   ├── tokenizer.decode()
+# │   └── extract_square_brackets() [to check for subject override]
+# │
+# └── [Memory Management]
+#     └── Offload model or keep loaded based on keep_model_loaded parameter
 
-# Function Call Sequence
-# Y7Nodes_PromptEnhancerFlux.enhance()
-#   ├── model_path_download_if_needed() - Checks if model exists, downloads if needed
-#   │
-#   ├── down_load_llm_model() - Loads model from disk
-#   │   └── model_path_download_if_needed() - Called again from within
-#   │
-#   ├── Calculate model size for memory management
-#   │
-#   ├── comfy.model_management.free_memory() - Ensures GPU has space
-#   │
-#   ├── Model moved to the correct device (GPU)
-#   │
-#   ├── generate_flux_t5_clip_prompts() - Generates enhanced prompts
-#   │   ├── Prompt preprocessing and tokenization
-#   │   └── _generate_and_decode_flux_prompts()
-#   │       ├── model.generate() - Generates text with the LLM
-#   │       ├── batch_decode() - Decodes output tokens to text
-#   │       └── Parsing and cleanup of the response
-#   │
-#   └── return (t5_prompt, clip_prompt)
+# function to detect Apple Silicon
+def is_apple_silicon():    
+    return platform.system() == "Darwin" and platform.machine().startswith(("arm", "M"))
 
-# ==================================================================================
-# MODEL PERSISTENCE
-# ==================================================================================
-# ModelCache class provides a persistent storage mechanism for loaded models and tokenizers.
-# Unlike other (similar) custom nodes which use separate nodes for model loading and 
-# inference, we use a class-level cache to maintain refs to loaded models between 
-# calls. This prevents Python's garbage collector from freeing models when 
-# keep_model_loaded=True.
-# ==================================================================================
+# Function to check if CUDA is available
+def is_cuda_available():
+    return torch.cuda.is_available()
+
+# ======================================
+# ModelCache class - unchanged
 class ModelCache:
-    # These dicts persist for the entire lifetime of the Python process
-    # Models stored here will not be garbage collected until explicitly removed
     loaded_models = {}
     loaded_tokenizers = {}
 
-# logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
-LLM_REPO_NAME = "unsloth/Llama-3.2-3B-Instruct"
+# LLM model information - unchanged
+LLM_MODELS = [
+    ("OpenHermes-2.5-Mistral-7B", "teknium/OpenHermes-2.5-Mistral-7B"),
+    ("Hermes-Trismegistus-Mistral-7B", "teknium/Hermes-Trismegistus-Mistral-7B"),
+]
 
-# LLM_NAME = [
-#     "unsloth/Llama-3.2-3B-Instruct",
-#     # Add more models here as needed
-# ]
+LLM_DISPLAY_NAMES = [model[0] for model in LLM_MODELS]
 
-# required files for llama_3_2_3b_instruct
-llama_3_2_3b_instruct_req_files = [
-                                    "config.json",
-                                    "generation_config.json",
-                                    "model.safetensors",
-                                    "model.safetensors.index.json",
-                                    "special_tokens_map.json",
-                                    "tokenizer.json",
-                                    "tokenizer_config.json"]
+def get_repo_info(display_name):
+    for model_info in LLM_MODELS:
+        if model_info[0] == display_name:
+            return model_info[1]
+    return None
 
-_MAX_NEW_TOKENS=1024
-# _MAX_NEW_TOKENS=2048
+# Required files definitions - unchanged
+openhermes_2_5_mistral_7b_req_files = [
+    "added_tokens.json",
+    "config.json",
+    "generation_config.json",
+    "model-00001-of-00002.safetensors",
+    "model-00002-of-00002.safetensors",
+    "model.safetensors.index.json",
+    "special_tokens_map.json",
+    "tokenizer.model",
+    "tokenizer_config.json",
+    "transformers_inference.py"
+]
 
+hermes_trismegistus_mistral_7b_req_files = [
+    "added_tokens.json",
+    "config.json",
+    "generation_config.json",
+    "pytorch_model-00001-of-00002.bin",
+    "pytorch_model-00002-of-00002.bin",
+    "pytorch_model.bin.index.json",
+    "special_tokens_map.json",
+    "tokenizer.model",
+    "tokenizer_config.json"
+]
 
-
+_MAX_NEW_TOKENS = 1024
 MODELS_PATH_KEY = "LLM"
 DEFAULT_PROMPT = ""
 
-PROMPT_INSTRUCTION = """
+# ==================================================================================
+# REVISED PROMPT INSTRUCTIONS
+# ==================================================================================
+
+# Base introduction and purpose
+PROMPT_BASE = """
 You are an AI assistant specialized in generating comprehensive text-to-image prompts for 
-the Flux image generation model. Each output must include two complementary prompt types that work together:
+the Flux image generation model. I'm going to ask you to create a prompt in two parts.
+"""
 
----
-
-1. **T5 Prompt** (Detailed natural language description, simulate approximately up to 512 T5 tokens (roughly up to 400 words)):
-
-Structure your description in this order:
-
-- **Subject comes first**: Clearly state the main subject(s) at the beginning 
-- **Subject Details**: Describe the subject(s) in vivid detail, including physical appearance, pose, action, expression, attire, and interactions.
-- **Scene Description**: Describe the overall setting including environment, background, location type (e.g., interior, exterior), and visual style.
-- **Time & Place**: Indicate time of day, season, architecture, and relevant objects or decor.
-- **Lighting**: Describe lighting sources, intensity, direction, color temperature, shadows, and effects.
-- **Color Palette**: Specify dominant and supporting colors, including visual harmony or contrasts.
-- **Composition**: Detail the layout — foreground, middle ground, background, and focal points.
-- **Mood & Atmosphere**: Convey emotional tone using evocative, poetic, or cinematic language.
-- **Use only positive descriptions** — focus solely on what should appear in the image.
-- **Avoid repetition and filler words. Use diverse, sensory-rich vocabulary.**
-
-**Example T5 Prompt (But it does not need to be this long)**:
-A woman with shoulder-length black hair and luminous brown eyes stands alone in a dimly lit interior hallway. She wears a sleek, 
-emerald green satin dress that catches the light with a subtle shimmer. Her posture is still, almost statuesque, as she gazes 
-slightly off-camera with a pensive expression. One hand rests gently on a weathered wooden railing, while the other clutches a 
-small vintage clutch.
-The hallway is narrow and elegant, lined with tall windows draped in sheer curtains that allow soft shafts of moonlight to filter 
-in. Dust particles drift through the air, caught in the light. Ornate wall sconces cast warm amber glows along the wallpapered walls, 
-creating deep shadows that frame the woman in dramatic contrast.
-Muted jewel tones dominate the color palette: deep greens, soft golds, and shadowy blues. In the background, a blurred chandelier 
-hangs overhead, adding a subtle sparkle. The composition places the woman slightly off-center, with the lines of the corridor drawing 
-focus toward her. The overall mood is contemplative and cinematic, evoking the quiet tension of a moment suspended in time.
-
----
-
-2. **CLIP Prompt** (Concise keyword list; simulate approximately up to 75 CLIP tokens (roughly up to 30-40 words)):
-
-- Provide a prioritized, comma-separated list of essential keywords.
-- Include: subject(s), art style (if any), setting, major visual features, mood, lighting, and color scheme.
-- Include specific artistic or stylistic terms if relevant (e.g., "soft focus," "cinematic lighting," "Baroque detail").
-- Ensure full alignment with the T5 prompt.
-- Use only **positive keywords** — no negative terms or exclusions.
-- Avoid overgeneralizations or generic terms like "high quality" or "detailed" unless critical to the style.
-
-**Example CLIP Prompt**:  
-woman, shoulder-length black hair, luminous brown eyes, emerald satin dress, vintage clutch, dim hallway, cinematic lighting, pensive, 
-statuesque, wooden railing, moonlight, sheer curtains, amber wall sconces, dust in air, dramatic shadows, chandelier, soft focus, 
-contemplative mood, baroque detail
-
-
----
-
-**Output Format**:
-
-T5 Prompt: [Your detailed natural language description]  
-CLIP Prompt: [Your concise keyword list]
-
----
-**Special Subject Override Rule**:
-
-If the user's prompt contains a phrase inside square brackets (e.g., `[agg woman]`), you must treat the content inside the brackets as the **explicit and literal subject** of the image. Do not reinterpret, paraphrase, or alter this phrase. Use it exactly as written, as the primary subject in both the T5 and CLIP prompts.
-
-- preserve the subject phrase exactly inside the square brackets, including the case of the phrase!
+# Special subject override instruction
+PROMPT_SPECIAL_OVERRIDE = """
+IMPORTANT: If the user's prompt contains a phrase inside square brackets (e.g., "[agg woman]"), 
+then treat the content inside the brackets as the exact subject. Do not reinterpret, paraphrase, 
+or alter this phrase. Use it exactly as written, as the primary subject.
 
 Examples:
-- `[agg woman] walking through a neon-lit alley` → Subject is "agg woman"
-- `[agg, a young woman] walking through a neon-lit alley` → Subject is "agg, a young woman"
-- `[ohwx man] sitting in a cafe` → Subject is "ohwx man"
-- `[ohwx, an old man] sitting in a cafe` → Subject is "ohwx, an old man"
-- `[sks knight] standing in ruins` → Subject is "void knight"
-- `[sks dog] playing in a park` → Subject is "sks dog"
-
+- "[agg woman] walking through a neon-lit alley" = The subject is exactly "agg woman"
+- "[ohwx man] sitting in a cafe" = The subject is exactly "ohwx man"
+- "[sks knight] standing in ruins" = The subject is exactly "sks knight"
 """
+
+# T5 Prompt instructions
+PROMPT_T5_INSTRUCTIONS = """
+First, I need you to create a T5 Prompt:
+
+This should be a detailed natural language description (up to 512 T5 tokens - maybe max 300 words) with:
+
+- Do not start with, "in this image..." or similar assume that we know it is an image, go straight to the point!
+Bad:
+"In this image, a woman stands in..."
+"The image shows a woman who is..."
+
+Good:
+"A woman stands in..."
+
+- Subject always comes first: Start with the main subject(s): determined by the input prompt. this can be a person, object or scene or something else. 
+- Subject Details: When applicable, describe physical appearance, pose, action, expression, attire
+- Scene Description: Overall setting, environment, background, visual style
+- Time & Place: Time of day, season, location
+- Lighting and color palette: Sources, intensity, direction, color temperature, shadows
+- Composition: Layout of elements and focal points
+- Mood & Atmosphere: Emotional tone using evocative language (but not too much of this!)
+- Avoid purple prose - overly elaborate, flowery, or excessively descriptive - this is bad
+- Minimize words that describe sounds or smells if they add nothing to the visuals. 
+- Avoid descriptions of motion and action (unless important to the subject's pose)
+
+Use only positive descriptions — focus on what should appear in the image.
+Avoid repetition of the subject, instead use she, he, her, his etc
+"""
+
+# T5 example
+PROMPT_T5_EXAMPLE = """
+Example T5 Prompt:
+A woman with shoulder-length black hair and luminous brown eyes stands alone in a dimly lit interior hallway. She wears a sleek, 
+emerald green satin dress that catches the light with a subtle shimmer. Her posture is still, almost statuesque, as she gazes slightly 
+off-camera with a pensive expression. One hand rests gently on a weathered wooden railing, while the other clutches a small vintage clutch. 
+The hallway is narrow and elegant, lined with tall windows draped in sheer curtains that allow soft shafts of moonlight to filter in. 
+Dust particles drift through the air, caught in the light. Ornate wall sconces cast warm amber glows along the wallpapered walls, 
+creating deep shadows that frame the woman in dramatic contrast.
+"""
+
+# CLIP prompt instructions
+PROMPT_CLIP_INSTRUCTIONS = """
+Next, I need you to create a CLIP Prompt:
+
+This must be a concise, short, less verbose keyword list (up to 60 CLIP TOKENS which roughly equates to 20-40 words):
+- Prioritized, comma-separated list of essential keywords, but word limit priority is crucial.
+- Subject(s) MUST come first
+- Include: subject(s), art style, setting, major visual features, mood, lighting, color scheme
+- Include specific artistic terms if relevant (e.g., "soft focus," "cinematic lighting")
+- Ensure alignment with the T5 prompt, but remove any extraneous details - it does not need to be exhaustive.
+- Avoid words that describe sounds or smells if they add nothing to the visuals. 
+- Do not start with the words 'CLIP Prompt:' - go straight to the keywords
+- Remember to keep the word count under 40. - remove keywords if they go over the limit
+"""
+
+# CLIP example
+PROMPT_CLIP_EXAMPLE = """
+Example CLIP Prompt:
+woman, shoulder-length black hair, brown eyes, emerald satin dress, vintage clutch, hallway, dim, lighting, pensive, moonlight, 
+sheer curtains, amber wall sconces, dust in air, shadows, soft focus, contemplative mood
+"""
+
+# Combine sections for T5 instruction
+def get_t5_prompt_instruction():
+    return (
+        PROMPT_BASE + "\n\n" + 
+        PROMPT_SPECIAL_OVERRIDE + "\n\n" + 
+        PROMPT_T5_INSTRUCTIONS + "\n\n" + 
+        PROMPT_T5_EXAMPLE
+    )
+
+# Combine sections for CLIP instruction
+def get_clip_prompt_instruction():
+    return (
+        PROMPT_CLIP_INSTRUCTIONS + "\n\n" + 
+        PROMPT_CLIP_EXAMPLE + "\n\n" +
+        "Create a CLIP prompt that perfectly complements the T5 prompt I generated earlier."
+    )
+
+# ==================================================================================
+# SUBJECT EXTRACTION HELPER FUNCTIONS
+# ==================================================================================
+
+def extract_square_brackets(text):
+    """Extract content inside square brackets."""
+    if not text:
+        return None
+    
+    match = re.search(r'\[(.*?)\]', text)
+    if match:
+        return match.group(1)
+    return None
+
+def process_subject_override_dumb_version(short_prompt, generated_text):
+    """
+    Process subject override if square brackets are present in the original short prompt.
+    Apply post-processing to ensure override is applied correctly.
+    short_prompt could be:
+                        "[ohwx man] sitting in a cafe" (bracketed_subject exists)
+                        "a man sitting in a cafe" (no bracketed_subject)
+    generated_text: either the T5 or CLIP generated response 
+    """
+
+    print(f"prompt=\n{short_prompt}\n\ngenerated_text=\n{generated_text}", color.ORANGE)
+
+    # get the token or trigger word from the sqare brackets
+    bracketed_subject = extract_square_brackets(short_prompt)
+    
+    # If no bracketed subject found, then just return original T5 or CLIP response text as is
+    if not bracketed_subject:
+        return generated_text
+    
+    # otherwise bracketed_subject subject exists
+    # If bracketed subject exists, check if it is already in the generated text
+    if bracketed_subject.lower() in generated_text.lower():
+        # if so then return the generated text as is.  no changes. 
+        print(f"Subject '{bracketed_subject}' already present in generated text", color.BRIGHT_GREEN)
+        return generated_text
+    
+    # If not present, prepend the subject to the generated text
+    print(f"Applying subject override: '{bracketed_subject}'", color.YELLOW)
+    return f"{bracketed_subject} {generated_text}"
+
+def process_subject_override_smart_version(short_prompt, generated_text, llm_model=None, llm_tokenizer=None):
+    """
+    Process subject override if square brackets are present in the original short prompt.
+    Apply post-processing to replace the first subject in the generated text with the bracketed subject.
+    """
+    print(f"short_prompt=\n{short_prompt}\n\ngenerated_text=\n{generated_text}", color.ORANGE)
+
+    # Get the token or trigger word from the square brackets
+    bracketed_subject = extract_square_brackets(short_prompt)
+    
+    # If no bracketed subject found, then just return original response text as is
+    if not bracketed_subject:
+        return generated_text
+    
+    # If bracketed subject exists, check if it is already in the generated text
+    if bracketed_subject.lower() in generated_text.lower():
+        print(f"Subject '{bracketed_subject}' already present in generated text", color.BRIGHT_GREEN)
+        return generated_text
+    
+    # If we don't have a model to use for intelligent replacement, fall back to prepending
+    if llm_model is None or llm_tokenizer is None:
+        print(f"No LLM available for intelligent replacement, prepending subject: '{bracketed_subject}'", color.YELLOW)
+        return f"{bracketed_subject} {generated_text}"
+    
+    try:
+        # Use the loaded LLM to perform subject replacement
+        # messages = [
+        #     {"role": "system", "content": "You are an expert text editor. Your task is to replace the first instance of a subject noun (person, animal, object, etc.) in the given text with a specific replacement term, while preserving the grammatical structure of the sentence."},
+        #     {"role": "user", "content": f"In the following text, identify and replace the first instance of a subject noun (like person, man, woman, child, dog, cat, tree, building, etc.) with '{bracketed_subject}'. Keep everything else exactly the same. Here's the text: {generated_text}"}
+        # ]
+        # Use the loaded LLM to perform subject replacement
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "Your task is to replace the first instance of a subject noun (man, woman, person, animal, object, etc.) in the given text with a "
+                    "specific replacement term, while preserving the grammatical structure of the sentence. - only the first instance."
+                )
+            },
+            {
+                "role": "user",
+                "content": (
+                    "In the following text, identify and replace the first instance of a subject noun "
+                    "(like person, man, woman, child, dog, cat, tree, building, etc.) with "
+                    f"'{bracketed_subject}'. Keep everything else exactly the same. "
+                    "For all other instances, use pronouns, he, she, it instead. " 
+                    f"Here's the text:\n\n{generated_text}"
+                )
+            }
+        ]
+
+        
+        # Format messages for the model
+        if hasattr(llm_tokenizer, 'chat_template') and llm_tokenizer.chat_template is not None:
+            formatted_text = llm_tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        else:
+            formatted_text = format_chat_messages(messages, add_generation_prompt=True)
+        
+        # Generate replacement
+        model_inputs = llm_tokenizer([formatted_text], return_tensors="pt")
+        model_inputs = model_inputs.to(llm_model.device)
+        
+        with torch.inference_mode():
+            outputs = llm_model.generate(
+                **model_inputs,
+                max_new_tokens=_MAX_NEW_TOKENS,  # Reduced for efficiency
+                do_sample=False  # Deterministic for this task
+            )
+            
+            generated_ids = outputs[0][len(model_inputs.input_ids[0]):]
+            modified_text = llm_tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
+        
+        print(f"Intelligently replaced subject with '{bracketed_subject}'", color.BRIGHT_GREEN)
+        print(f"modified_text=\n{modified_text}\n\n", color.ORANGE)
+
+        return modified_text
+    
+    except Exception as e:
+        print(f"Error during intelligent subject replacement: {str(e)}", color.RED)
+        print(f"Falling back to prepending subject: '{bracketed_subject}'", color.YELLOW)
+        return f"{bracketed_subject} {generated_text}"
+
+# ==================================================================================
+# NEW SEPARATE GENERATION FUNCTIONS
+# ==================================================================================
+
+def generate_t5_prompt(
+        prompt_enhancer_model, 
+        prompt_enhancer_tokenizer, 
+        prompt: str, 
+        seed: int = None, 
+        temperature: float = 0.7,
+        top_p: float = 0.9,
+        top_k: int = 40,
+        max_new_tokens: int = _MAX_NEW_TOKENS
+    ) -> str:
+
+
+    # First we generate the wordy T5 prompt
+    
+    if seed is not None:
+        torch.manual_seed(seed)
+    
+    # Create messages with T5-specific instructions
+    messages = [
+        {"role": "system", "content": get_t5_prompt_instruction()},
+        {"role": "user", "content": prompt.strip() if prompt.strip() else DEFAULT_PROMPT},
+    ]
+    
+    # Format messages
+    try:
+        if hasattr(prompt_enhancer_tokenizer, 'chat_template') and prompt_enhancer_tokenizer.chat_template is not None:
+            print("Using tokenizer's built-in chat template for T5 prompt", color.BRIGHT_GREEN)
+            formatted_text = prompt_enhancer_tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
+        else:
+            print("Using custom formatting for T5 prompt", color.YELLOW)
+            formatted_text = format_chat_messages(messages, add_generation_prompt=True)
+    except Exception as e:
+        print(f"Error formatting messages for T5 prompt: {str(e)}", color.RED)
+        formatted_text = format_chat_messages(messages, add_generation_prompt=True)
+    
+
+
+    # Free memory before tokenization
+    gc.collect()
+    
+    # Get device information from model
+    device = prompt_enhancer_model.device
+    device_type = device.type if hasattr(device, 'type') else str(device)
+    print(f"Model is on device: {device_type}", color.BRIGHT_GREEN)
+    
+    # Create inputs and generate - more memory efficient
+    model_inputs = prompt_enhancer_tokenizer([formatted_text], return_tensors="pt")
+    model_inputs = {k: v.to(device) for k, v in model_inputs.items()}
+    
+    # Apply platform-specific optimizations
+    try:
+        if is_apple_silicon() and device_type == "mps":
+            print("Using Apple Silicon MPS optimizations", color.BRIGHT_GREEN)
+            with torch.inference_mode(), torch.autocast("mps"):
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+        elif device_type == "cuda":
+            print("Using CUDA optimizations", color.BRIGHT_GREEN)
+            with torch.inference_mode(), torch.amp.autocast(device_type="cuda"):
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+        else:
+            print(f"Using standard inference on {device_type}", color.YELLOW)
+            with torch.inference_mode():
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+    except Exception as e:
+        print(f"Error with optimized generation: {str(e)}, falling back to standard mode", color.YELLOW)
+        with torch.inference_mode():
+            outputs = prompt_enhancer_model.generate(
+                **model_inputs, 
+                max_new_tokens=max_new_tokens,
+                do_sample=True,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k
+            )
+    
+    # Efficiently get the generated text portion only
+    generated_ids = outputs[0][len(model_inputs["input_ids"][0]):]
+    decoded_response = prompt_enhancer_tokenizer.decode(generated_ids, skip_special_tokens=True)
+    
+    # Clean up memory explicitly
+    del model_inputs, outputs, generated_ids
+    gc.collect()
+    
+    print(f"T5 raw response:\n{decoded_response}\n", color.ORANGE)
+    
+    # Clean up and post-process the T5 prompt
+    t5_prompt = decoded_response.strip().strip('"').strip("'")
+    
+    # print(f"{prompt}\n{t5_prompt}", color.MAGENTA)
+
+    # Apply subject override from original prompt if needed
+    # processed_t5 = process_subject_override_smart_version(prompt, t5_prompt, prompt_enhancer_model, prompt_enhancer_tokenizer)
+    
+    processed_t5 = t5_prompt
+
+    # Final cleanup - remove brackets from final output
+    final_t5 = processed_t5.replace("[", "").replace("]", "").replace("\n", "")
+    
+    print(f"final_t5 (processed)=\n{final_t5}", color.ORANGE)
+
+    return final_t5
+
+def generate_clip_prompt(
+        prompt_enhancer_model, 
+        prompt_enhancer_tokenizer, 
+        original_prompt: str,
+        t5_prompt: str,
+        seed: int = None, 
+        temperature: float = 0.7,
+        top_p: float = 0.9,
+        top_k: int = 40,
+        max_new_tokens: int = _MAX_NEW_TOKENS
+    ) -> str:
+
+    # Generate CLIP prompt based on original prompt + T5 prompt response
+    
+    if seed is not None:
+        torch.manual_seed(seed)
+    
+    # Create messages with CLIP-specific instructions and reference to T5
+    messages = [
+        {"role": "system", "content": get_clip_prompt_instruction()},
+        {"role": "user", "content": f"Original prompt: {original_prompt}\n\nT5 prompt: {t5_prompt}\n\nNow create a matching CLIP prompt."},
+    ]
+    
+    # Format messages
+    try:
+        if hasattr(prompt_enhancer_tokenizer, 'chat_template') and prompt_enhancer_tokenizer.chat_template is not None:
+            print("Using tokenizer's built-in chat template for CLIP prompt", color.BRIGHT_GREEN)
+            formatted_text = prompt_enhancer_tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
+        else:
+            print("Using custom formatting for CLIP prompt", color.YELLOW)
+            formatted_text = format_chat_messages(messages, add_generation_prompt=True)
+    except Exception as e:
+        print(f"Error formatting messages for CLIP prompt: {str(e)}", color.RED)
+        formatted_text = format_chat_messages(messages, add_generation_prompt=True)
+    
+    # Free memory before tokenization
+    gc.collect()
+    
+    # Get device information from model
+    device = prompt_enhancer_model.device
+    device_type = device.type if hasattr(device, 'type') else str(device)
+    
+    # Create inputs and generate - more memory efficient
+    model_inputs = prompt_enhancer_tokenizer([formatted_text], return_tensors="pt")
+    model_inputs = {k: v.to(device) for k, v in model_inputs.items()}
+    
+    # Apply platform-specific optimizations
+    try:
+        if is_apple_silicon() and device_type == "mps":
+            with torch.inference_mode(), torch.autocast("mps"):
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+        elif device_type == "cuda":
+            with torch.inference_mode(), torch.amp.autocast(device_type="cuda"):
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+        else:
+            with torch.inference_mode():
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+    except Exception as e:
+        print(f"Error with optimized generation: {str(e)}, falling back to standard mode", color.YELLOW)
+        with torch.inference_mode():
+            outputs = prompt_enhancer_model.generate(
+                **model_inputs, 
+                max_new_tokens=max_new_tokens,
+                do_sample=True,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k
+            )
+    
+    generated_ids = outputs[0][len(model_inputs["input_ids"][0]):]
+    decoded_response = prompt_enhancer_tokenizer.decode(generated_ids, skip_special_tokens=True)
+    
+    # Clean up memory explicitly
+    del model_inputs, outputs, generated_ids
+    gc.collect()
+    
+    print(f"CLIP raw response:\n{decoded_response}\n", color.ORANGE)
+    
+    # Clean up the CLIP prompt (simpler than T5 as it's just keywords)
+    clip_prompt = decoded_response.strip().strip('"').strip("'")
+    
+    # # Check if bracketed subject needs to be included
+    # bracketed_subject = extract_square_brackets(original_prompt)
+    # print(f"bracketed_subject =\n{bracketed_subject}\n\nclip_prompt =\n{clip_prompt}", color.ORANGE)
+
+    # if bracketed_subject and bracketed_subject.lower() not in clip_prompt.lower():
+    #     print(f"Adding subject '{bracketed_subject}' to CLIP prompt", color.YELLOW)
+    #     clip_prompt = f"{bracketed_subject}, {clip_prompt}"
+    
+    # Final cleanup - remove brackets from final output
+    final_clip = clip_prompt.replace("[", "").replace("]", "")
+    
+    return final_clip
+# ==================================================================================
+# Helper function to format chat messages - unchanged
+def format_chat_messages(messages, add_generation_prompt=True):
+    """Format chat messages into a single string."""
+    formatted_text = ""
+    
+    for message in messages:
+        role = message.get("role", "").lower()
+        content = message.get("content", "")
+        
+        if role == "system":
+            formatted_text += f"System: {content}\n\n"
+        elif role == "user":
+            formatted_text += f"User: {content}\n\n"
+        elif role == "assistant":
+            formatted_text += f"Assistant: {content}\n\n"
+        else:
+            formatted_text += f"{content}\n\n"
+    
+    if add_generation_prompt:
+        formatted_text += "Assistant: "
+    
+    return formatted_text
+
+# Helper function to calculate model size - unchanged
+def get_model_size(model):
+    """Calculate the memory size of a model based on parameters and buffers."""
+    total_size = sum(p.numel() * p.element_size() for p in model.parameters())
+    total_size += sum(b.numel() * b.element_size() for b in model.buffers())
+    return total_size
+
+# ==================================================================================
+# MAIN NODE CLASS
 # ==================================================================================
 class Y7Nodes_PromptEnhancerFlux:
     @classmethod
@@ -165,13 +618,13 @@ class Y7Nodes_PromptEnhancerFlux:
                         "default": DEFAULT_PROMPT
                     }
                 ),
-                # "llm_name": (
-                #     LLM_NAME,  # Use the list directly as options
-                #     {
-                #         "default": LLM_NAME[0],  # Default to first model
-                #         "tooltip": "Select LLM model."
-                #     }
-                # ),                
+                "llm_name": (
+                    LLM_DISPLAY_NAMES,
+                    {
+                        "default": LLM_DISPLAY_NAMES[0],
+                        "tooltip": "Select LLM model."
+                    }
+                ),                
                 "temperature": (
                     "FLOAT",
                     {"default": 0.7, "min": 0.1, "max": 2.0, "step": 0.1, 
@@ -196,9 +649,7 @@ class Y7Nodes_PromptEnhancerFlux:
                     {"default": False, "tooltip": "If enabled, keeps the model loaded in VRAM for faster subsequent runs"}
                 ),
             }, 
-            "hidden":{
-
-            }
+            "hidden":{}
         }
 
     RETURN_TYPES = ("STRING", "STRING",)
@@ -207,39 +658,28 @@ class Y7Nodes_PromptEnhancerFlux:
     CATEGORY = "Y7Nodes/Prompt"
     OUTPUT_NODE = False
     
-
-    # =================================================================================
-    # the IS_CHANGED method used to determine whether the node's outputs need to be 
-    # recalculated when inputs change. Return a unique value (usually a string or hash) 
-    # that represents the current state of the node. When this value changes compared 
-    # to the previous run, ComfyUI knows it needs to re-execute the node.
     @classmethod
     def IS_CHANGED(cls, **kwargs):
-                
-        # Extract parameters that affect the output
         prompt = kwargs.get("prompt", "")
-        llm_name = LLM_REPO_NAME
+        llm_display_name = kwargs.get("llm_name", "")                
         seed = kwargs.get("seed", 0)
         temperature = kwargs.get("temperature", 0.7)
         top_p = kwargs.get("top_p", 0.9)
         top_k = kwargs.get("top_k", 40)
         
-        # Create a string with all parameters
-        input_string = f"{prompt}_{llm_name}_{seed}_{temperature}_{top_p}_{top_k}"
-        
-        # Generate a hash of the input string (cos prompts can be long)
+        input_string = f"{prompt}_{llm_display_name}_{seed}_{temperature}_{top_p}_{top_k}"
         hash_object = hashlib.md5(input_string.encode())
         hash_hex = hash_object.hexdigest()
         
-        # print(f"IS_CHANGED hash = {hash_hex}", color.ORANGE)
+        print(f"IS_CHANGED hash = {hash_hex}", color.ORANGE)
         return hash_hex
         
-   # ==================================================================================
-    # def enhance(self, prompt, llm_name, seed=0, temperature=0.7, top_p=0.9, top_k=40, keep_model_loaded=False, **kwargs):
+    # ==================================================================================
+    # main function
+    # ==================================================================================
     def enhance(self, **kwargs):
-
         prompt = kwargs.get("prompt")
-        llm_repo_name = LLM_REPO_NAME
+        llm_display_name = kwargs.get("llm_name")
         seed = kwargs.get("seed")
         temperature = kwargs.get("temperature")
         top_p = kwargs.get("top_p")
@@ -248,29 +688,51 @@ class Y7Nodes_PromptEnhancerFlux:
 
         # Default prompt if empty
         if not prompt.strip():
-            prompt = DEFAULT_PROMPT
-            t5xxl_prompt = 'Please provide a prompt, no matter how basic.  If you wish to use a token or trigger words enclose them in square brackets.\nExamples:\n\n"A man sitting in a cafe".\n"[ohwx woman] standing in the middle of a busy street"'
+            t5xxl_prompt = 'Please provide a prompt, no matter how basic. If you wish to use a token or trigger words enclose them in square brackets.\nExamples:\n\n"A man sitting in a cafe".\n"[ohwx woman] standing in the middle of a busy street"'
             clip_l_prompt = ""
-            return (t5xxl_prompt, clip_l_prompt,)
+            return (clip_l_prompt, t5xxl_prompt,)
+        
         try:
-            load_device = comfy.model_management.get_torch_device()
-            offload_device = comfy.model_management.unet_offload_device()
+            # Force garbage collection before starting
+            gc.collect()
+
+            # For Apple Silicon, use MPS device if available
+            if is_apple_silicon() and torch.backends.mps.is_available():
+                print("Using MPS (Metal Performance Shaders) for Apple Silicon", color.BRIGHT_GREEN)
+                load_device = "mps"
+            elif is_cuda_available():
+                print("Using CUDA device for NVIDIA GPU", color.BRIGHT_GREEN)
+                load_device = comfy.model_management.get_torch_device()
+                offload_device = comfy.model_management.unet_offload_device()                
+            else:
+                print("No GPU detected, using CPU (this will be slow)", color.YELLOW)
+                load_device = "cpu"
+                offload_device = "cpu"
             
-            # Load the model directly without wrappers
-            llm_model, llm_tokenizer = self.down_load_llm_model(llm_repo_name, load_device)
+            # Load/download the model - it will be placed on the correct device by down_load_llm_model
+            llm_model, llm_tokenizer = self.down_load_llm_model(llm_display_name, load_device)
             
-            # Calculate model size for memory management and handle device placement
-            model_size = get_model_size(llm_model) + 1073741824  # Add 1GB extra as buffer
-            
-            # Free memory before loading model to GPU
-            comfy.model_management.free_memory(model_size, comfy.model_management.get_torch_device(),)
-            
-            # Ensure model is on the correct device
-            llm_model.to(load_device)
-            print(f"Model device: {next(llm_model.parameters()).device}", color.BRIGHT_GREEN)
-            
-            # Generate prompts
-            t5_clip_prompts = generate_flux_t5_clip_prompts(
+            # Calculate model size for memory management
+            model_size = get_model_size(llm_model) 
+            if is_apple_silicon():
+                # Use a smaller buffer on Apple Silicon to avoid over-allocation
+                model_size += 536870912  # Add 512MB as buffer instead of 1GB
+            else:
+                model_size += 1073741824  # Add 1GB as buffer for other platforms
+                comfy.model_management.free_memory(model_size, load_device)
+                        
+            print(f"Seed={seed}", color.BRIGHT_BLUE)
+
+            # Verify model is on the correct device
+            if hasattr(llm_model, 'device'):
+                print(f"Model is on device: {llm_model.device}", color.BRIGHT_GREEN)
+            else:
+                print(f"Model device info not available", color.YELLOW)
+                
+            # FIRST: Generate T5 prompt
+            print("Generating T5 prompt...", color.BRIGHT_BLUE)
+
+            t5xxl_prompt = generate_t5_prompt(
                 llm_model, 
                 llm_tokenizer, 
                 prompt, 
@@ -279,361 +741,221 @@ class Y7Nodes_PromptEnhancerFlux:
                 top_p=top_p, 
                 top_k=top_k
             )
+
+            # Force cleanup between generations
+            gc.collect()
+            if is_cuda_available():
+                torch.cuda.empty_cache()
+
+            # THEN: Generate CLIP prompt with reference to T5 prompt
+            print("Generating CLIP prompt...", color.BRIGHT_BLUE)
+            clip_l_prompt = generate_clip_prompt(
+                llm_model, 
+                llm_tokenizer,
+                prompt,  # Original user prompt
+                t5xxl_prompt,  # Generated T5 prompt
+                seed, 
+                temperature=temperature, 
+                top_p=top_p, 
+                top_k=top_k
+            )
             
-            # Get the first pair of prompts (t5, clip)
-            t5xxl_prompt, clip_l_prompt = t5_clip_prompts[0]
-            
-            # ==================================================================================
-            # MODEL PERSISTENCE - MEMORY MANAGEMENT
-            # ==================================================================================
-            # This section determines whether to keep or unload the model based on the 
-            # keep_model_loaded parameter. Two critical functions are performed here:
-            #
-            # 1. Device Management: Moving the model between GPU and CPU/offload device
-            # 2. Reference Management: Maintaining or removing references in the ModelCache
-            #
-            # Even if a model stays on the GPU, without a persistent reference (like in the
-            # ModelCache), Python's garbage collector would free it once this function returns.
-            # ==================================================================================
+            # Memory management based on keep_model_loaded parameter
             if not keep_model_loaded:
-                print("Offloading model from VRAM...\n", color.BRIGHT_BLUE)
+                print("Cleaning up model...\n", color.BRIGHT_BLUE)
                 
-                # DEVICE MANAGEMENT: Move the model to the offload device (usually CPU)
-                llm_model.to(offload_device)
+                # Platform-specific cleanup
+                if is_apple_silicon():
+                    # For Apple Silicon, just delete references and let GC handle it
+                    if llm_display_name in ModelCache.loaded_models:
+                        del ModelCache.loaded_models[llm_display_name]
+                        del ModelCache.loaded_tokenizers[llm_display_name]
+                    
+                    # Force garbage collection
+                    gc.collect()
+                    if hasattr(torch.mps, 'empty_cache'):
+                        torch.mps.empty_cache()
                 
-                # REFERENCE MANAGEMENT: Remove from cache to allow garbage collection
-                # This is crucial - simply moving to CPU isn't enough to free VRAM
-                # We must remove all references so the garbage collector can free the memory
-                if llm_repo_name in ModelCache.loaded_models:
-                    del ModelCache.loaded_models[llm_repo_name]
-                    del ModelCache.loaded_tokenizers[llm_repo_name]
+                elif is_cuda_available():
+                    # For NVIDIA GPUs, we can safely move to CPU then clean up
+                    try:
+                        llm_model.to("cpu")
+                    except Exception as e:
+                        print(f"Warning: Could not move model to CPU: {str(e)}", color.YELLOW)
+                    
+                    if llm_display_name in ModelCache.loaded_models:
+                        del ModelCache.loaded_models[llm_display_name]
+                        del ModelCache.loaded_tokenizers[llm_display_name]
+                    
+                    # Force garbage collection and CUDA cache cleanup
+                    gc.collect()
+                    torch.cuda.empty_cache()
+                    comfy.model_management.soft_empty_cache()
                 
-                # Trigger memory cleanup
-                comfy.model_management.soft_empty_cache()
+                else:
+                    # CPU fallback
+                    if llm_display_name in ModelCache.loaded_models:
+                        del ModelCache.loaded_models[llm_display_name]
+                        del ModelCache.loaded_tokenizers[llm_display_name]
+                    gc.collect()
             else:
-                print("Keeping model loaded in VRAM for future use.", color.BRIGHT_BLUE)
-                
-                # DEVICE MANAGEMENT: Ensure the model stays on the GPU
-                llm_model.to(load_device)
-                
-                # REFERENCE MANAGEMENT: Ensure the model stays in the cache
-                # This maintains a persistent reference to prevent garbage collection
-                # other custom nodes keeps models in separate nodes,
-                # our approach uses this dictionary to maintain references
-                ModelCache.loaded_models[llm_repo_name] = llm_model
-                ModelCache.loaded_tokenizers[llm_repo_name] = llm_tokenizer
+                print("Keeping model loaded for future use.", color.BRIGHT_BLUE)
+                ModelCache.loaded_models[llm_display_name] = llm_model
+                ModelCache.loaded_tokenizers[llm_display_name] = llm_tokenizer
             
             return (clip_l_prompt, t5xxl_prompt,)
-            
+        
         except Exception as e:
-            # Return a generic error message
             print(f"❌ Error: {str(e)}", color.BRIGHT_RED)
             return (
                 f"Error: {str(e)}",
                 f"Error: Please check the model output format"
             )
-                
+    
     # ==================================================================================
-    def model_path_download_if_needed(self, model_repo_name):
-        
-        # path to the LLM model i.e /Path-To/ComfyUI/models/LLM
+    # Model download and loading methods - unchanged functionality but optimized
+    def model_path_download_if_needed(self, model_display_name):
+        repo_path = get_repo_info(model_display_name)
         llm_model_directory = os.path.join(folder_paths.models_dir, MODELS_PATH_KEY)
-        
-        # make the dir if not exist, don't raise error otherwise
         os.makedirs(llm_model_directory, exist_ok=True)
 
-        # split and get last element of model_repo_name
-        model_name = model_repo_name.rsplit("/", 1)[-1]
+        model_name = repo_path.rsplit("/", 1)[-1]
         full_model_path = os.path.join(llm_model_directory, model_name)
 
-        # Check if directory and files exists, if not....
         if not os.path.exists(full_model_path):
-
-            # attempt to download the model
-            print(f"⬇️ Downloading model {model_repo_name} from HF to models/LLM.\nThis may take a while. (Download might appear stuck but it really is downloading)", color.YELLOW)
-                        
-            try:                
-                                
-                # Model-specific settings
-                if "Llama-3.2-3B-Instruct" in model_repo_name:
-                    print(f"ℹ️ Downloading {model_repo_name} (consolidated model only, ≈6.5GB)", color.BRIGHT_BLUE)
-                    # For Llama-3.2-3B-Instruct, we know it has both fragmented and whole models
-                    # So we can safely ignore the fragmented versions
-                    allow_patterns = llama_3_2_3b_instruct_req_files
+            print(f"⬇️ Downloading model {repo_path} from HF to models/LLM. This may take a while.", color.YELLOW)
+            try:
+                # Select the correct file list based on model
+                if "OpenHermes-2.5-Mistral-7B" in repo_path:
+                    print(f"ℹ️ Downloading {repo_path} (≈14.5GB)", color.BRIGHT_BLUE)
+                    allow_patterns = openhermes_2_5_mistral_7b_req_files
+                elif "Hermes-Trismegistus-Mistral-7B" in repo_path:
+                    print(f"ℹ️ Downloading {repo_path} (≈14.5GB)", color.BRIGHT_BLUE)
+                    allow_patterns = hermes_trismegistus_mistral_7b_req_files
 
                 snapshot_download(
-                    repo_id=model_repo_name,
+                    repo_id=repo_path,
                     local_dir=full_model_path,
                     allow_patterns=allow_patterns                    
                 )
-
-                print(f"✅ Model {model_repo_name} downloaded successfully!", color.BRIGHT_GREEN)
+                print(f"✅ Model {repo_path} downloaded successfully.", color.BRIGHT_GREEN)
             except Exception as e:
-                print(f"❌ Error downloading model {model_repo_name}: {str(e)}", color.BRIGHT_RED)
+                print(f"❌ Error downloading model {repo_path}: {str(e)}", color.BRIGHT_RED)
                 raise
         else:
-            # directory does exist, check if all necessary files exist (per model)
-            if "Llama-3.2-3B-Instruct" in model_repo_name:
-                # check if ALL of the following files exist in the directory.  if not, download that file             
-                required_files = llama_3_2_3b_instruct_req_files
-                missing_files = []
-                
-                for file in required_files:
-                    if not os.path.exists(os.path.join(full_model_path, file)):
-                        missing_files.append(file)
-                
-                if missing_files:
-                    print(f"ℹ️ Found {model_repo_name} directory but missing files: {', '.join(missing_files)}", color.YELLOW)
-                    print(f"⬇️ Downloading missing files for {model_repo_name}", color.YELLOW)
-                    try:
-                        snapshot_download(
-                            repo_id=model_repo_name,
-                            local_dir=full_model_path,
-                            allow_patterns=missing_files
-                        )
-                        print(f"✅ Missing files for {model_repo_name} downloaded successfully!", color.BRIGHT_GREEN)
-                    except Exception as e:
-                        print(f"❌ Error downloading missing files for {model_repo_name}: {str(e)}", color.BRIGHT_RED)
-                        raise
-                else:
-                    print(f"✅ All required files for {model_repo_name} found.", color.BRIGHT_GREEN)
+            # Check for missing files
+            missing_files = []
+            required_files = []
+
+            if model_display_name == "OpenHermes-2.5-Mistral-7B":
+                required_files = openhermes_2_5_mistral_7b_req_files
+            elif model_display_name == "Hermes-Trismegistus-Mistral-7B":
+                required_files = hermes_trismegistus_mistral_7b_req_files
+
+            for file in required_files:
+                if not os.path.exists(os.path.join(full_model_path, file)):
+                    missing_files.append(file)
+            
+            if missing_files:
+                print(f"ℹ️ Found {repo_path} directory but missing files: {', '.join(missing_files)}", color.YELLOW)
+                print(f"⬇️ Downloading missing files for {repo_path}", color.YELLOW)
+                try:
+                    snapshot_download(
+                        repo_id=repo_path,
+                        local_dir=full_model_path,
+                        allow_patterns=missing_files
+                    )
+                    print(f"✅ Missing files for {repo_path} downloaded successfully!", color.BRIGHT_GREEN)
+                except Exception as e:
+                    print(f"❌ Error downloading missing files for {repo_path}: {str(e)}", color.BRIGHT_RED)
+                    raise
             else:
-                # For other models, just inform user that the directory exists
-                print(f"ℹ️ Model directory for {model_repo_name} already exists", color.BRIGHT_BLUE)
+                print(f"✅ All required files for {repo_path} found.", color.BRIGHT_GREEN)
 
         return full_model_path
 
-    # ==================================================================================
-    def down_load_llm_model(self, llm_repo_name, load_device):
-        # ==================================================================================
-        # MODEL PERSISTENCE OPTIMIZATION
-        # ==================================================================================
-        # Check if the model is already in the cache before loading it again
-        # This is critical for the keep_model_loaded functionality, as it:
-        # 1. Avoids redundant loading of the same model
-        # 2. Provides fast access to previously loaded models
-        # 3. Maintains model state between function calls
-        # ==================================================================================
-        if llm_repo_name in ModelCache.loaded_models and llm_repo_name in ModelCache.loaded_tokenizers:
-            print(f"Using cached model {llm_repo_name} from previous run", color.BRIGHT_GREEN)
-            return ModelCache.loaded_models[llm_repo_name], ModelCache.loaded_tokenizers[llm_repo_name]
+    # ==============================================================================================
+    def down_load_llm_model(self, model_display_name, load_device):
+        repo_path = get_repo_info(model_display_name)
+        
+        # Check cache first
+        if model_display_name in ModelCache.loaded_models and model_display_name in ModelCache.loaded_tokenizers:
+            print(f"Using cached model {model_display_name} from previous run", color.BRIGHT_GREEN)
+            return ModelCache.loaded_models[model_display_name], ModelCache.loaded_tokenizers[model_display_name]
             
-        model_path = self.model_path_download_if_needed(llm_repo_name)
+        # Download if needed
+        model_path = self.model_path_download_if_needed(model_display_name)
                 
         try:
-            # Try to load the model
-            llm_name = llm_repo_name.split("/")[-1]
-            print(f"Loading model {llm_name}", color.BRIGHT_BLUE)
+            print(f"Loading model {model_display_name}", color.BRIGHT_BLUE)
             
-            # Load Transformers model
-            llm_model = AutoModelForCausalLM.from_pretrained(
-                model_path,
-                torch_dtype=torch.bfloat16,
-            )
+            # Force garbage collection before loading model
+            gc.collect()
+            torch.cuda.empty_cache() if hasattr(torch.cuda, 'empty_cache') else None
             
+            # Apply optimizations for Apple Silicon
+            if is_apple_silicon():
+                print(f"Detected Apple Silicon, applying optimizations...", color.BRIGHT_GREEN)
+                torch_dtype = torch.float16  # Use float16 instead of bfloat16 for Apple Silicon
+                
+                # Load model with Apple-specific optimizations but DON'T use device_map="auto"
+                llm_model = AutoModelForCausalLM.from_pretrained(
+                    model_path,
+                    torch_dtype=torch_dtype,
+                    low_cpu_mem_usage=True,
+                )
+                
+                # Explicitly move to the correct device
+                if torch.backends.mps.is_available():
+                    print("Using MPS backend for model", color.BRIGHT_GREEN)
+                    llm_model = llm_model.to("mps")
+                else:
+                    print("MPS not available, using CPU", color.YELLOW)
+                    llm_model = llm_model.to("cpu")
+
+            elif is_cuda_available():
+                print(f"Detected CUDA device, using NVIDIA GPU optimizations...", color.BRIGHT_GREEN)
+                
+                # Use native CUDA device from comfy
+                cuda_device = comfy.model_management.get_torch_device()
+                print(f"Using CUDA device: {cuda_device}", color.BRIGHT_GREEN)
+                
+                # Load model with CUDA optimizations
+                llm_model = AutoModelForCausalLM.from_pretrained(
+                    model_path,
+                    torch_dtype=torch.bfloat16,
+                    low_cpu_mem_usage=True,
+                )
+                
+                # Explicitly move to CUDA device
+                llm_model = llm_model.to(cuda_device)
+            else:
+                # Fallback for other devices
+                print(f"No GPU detected, using CPU (this will be very slow)", color.YELLOW)                
+                # Load model
+                llm_model = AutoModelForCausalLM.from_pretrained(
+                    model_path,
+                    torch_dtype=torch.bfloat16,
+                )
+                
+
+            # llm_tokenizer
             llm_tokenizer = AutoTokenizer.from_pretrained(
                 model_path,
             )
+
             
-            # ==================================================================================
-            # MODEL PERSISTENCE - CACHING MECHANISM
-            # ==================================================================================
-            # Store the model and tokenizer in the class-level cache to maintain references
-            # This prevents Python's garbage collector from freeing the model memory
-            # when the local variables go out of scope after the function returns.
-            # These cached models will persist until explicitly removed.
-            # ==================================================================================
-            ModelCache.loaded_models[llm_repo_name] = llm_model
-            ModelCache.loaded_tokenizers[llm_repo_name] = llm_tokenizer
+            # Cache model and tokenizer
+            ModelCache.loaded_models[model_display_name] = llm_model
+            ModelCache.loaded_tokenizers[model_display_name] = llm_tokenizer
             
             return llm_model, llm_tokenizer
             
         except (FileNotFoundError, ValueError) as e:
-            # Handle the case of a partially downloaded or corrupted model
             print(f"❌ Error: Model files are incomplete or corrupted: {str(e)}", color.RED)
             print(f"🔄 Please manually delete the directory : {model_path}", color.YELLOW)
             print(f"🔄 Then re-launch the workflow to attempt downloading again.", color.YELLOW)
-            print(f"🔄 Alternatively you can manually download the model from: \nhttps://huggingface.co/unsloth/Llama-3.2-3B-Instruct/tree/main", color.YELLOW)
+            print(f"🔄 Alternatively you can manually download the model from: \nhttps://huggingface.co/{repo_path}", color.YELLOW)                
             print(f"   and places the files to: {model_path}", color.YELLOW)
-
             
-            # Re-raise the exception to stop execution
             raise RuntimeError(f"Model at {model_path} is incomplete or corrupted. Please delete this directory and try again.")
-                        
-
- 
-
-# Helper function to calculate model size
-def get_model_size(model):
-    """Calculate the memory size of a PyTorch model based on parameters and buffers.
-    
-    Args:
-        model: PyTorch model
-        
-    Returns:
-        Total memory size in bytes
-    """
-    total_size = sum(p.numel() * p.element_size() for p in model.parameters())
-    total_size += sum(b.numel() * b.element_size() for b in model.buffers())
-    return total_size
-
-# ==================================================================================
-def generate_flux_t5_clip_prompts(
-    prompt_enhancer_model, 
-    prompt_enhancer_tokenizer, 
-    prompt: Union[str, List[str]], 
-    seed: int = None, 
-    temperature: float = 0.7,
-    top_p: float = 0.9,
-    top_k: int = 40,
-    max_new_tokens: int = _MAX_NEW_TOKENS
-) -> List[Tuple[str, str]]:
-    
-    """
-    Generate T5 and CLIP prompts for Flux image generation model.
-    
-    Args:
-        prompt_enhancer_model: The language model to use for prompt enhancement
-        prompt_enhancer_tokenizer: The tokenizer for the language model
-        prompt: Input prompt(s) to enhance
-        seed: Random seed for reproducibility
-        max_new_tokens: Maximum number of new tokens to generate
-        temperature: Controls randomness of outputs
-        top_p: Nucleus sampling parameter
-        top_k: Limits token selection to k most likely tokens
-        
-    Returns:
-        List of tuples containing (t5_prompt, clip_prompt) pairs
-    """
-    if seed is not None:
-        random.seed(seed)
-        torch.manual_seed(seed)
-    
-    # Process single prompt or list of prompts
-    if isinstance(prompt, str):
-        prompts = [prompt.strip() if prompt.strip() else DEFAULT_PROMPT]
-    else:
-        prompts = [p.strip() if p.strip() else DEFAULT_PROMPT for p in prompt]
-
-    messages = [
-        [
-            {"role": "system", "content": PROMPT_INSTRUCTION},
-            {"role": "user", "content": f"{p}"},
-        ]
-        for p in prompts
-    ]
-
-    texts = [
-        prompt_enhancer_tokenizer.apply_chat_template(
-            m, tokenize=False, add_generation_prompt=True
-        )
-        for m in messages
-    ]
-    
-    # Handle device placement for PyTorch models
-    model_inputs = prompt_enhancer_tokenizer(texts, return_tensors="pt")
-    model_inputs = model_inputs.to(prompt_enhancer_model.device)
-
-    return _generate_and_decode_flux_prompts(
-        prompt_enhancer_model, 
-        prompt_enhancer_tokenizer, 
-        model_inputs, 
-        seed,
-        temperature,
-        top_p,
-        top_k,
-        max_new_tokens
-    )
-
-# ==================================================================================
-def _generate_and_decode_flux_prompts(
-    prompt_enhancer_model, 
-    prompt_enhancer_tokenizer, 
-    model_inputs, 
-    seed,
-    temperature,
-    top_p,
-    top_k,
-    max_new_tokens=_MAX_NEW_TOKENS
-) -> List[Tuple[str, str]]:
-    
-    """
-    Generate and decode the T5 and CLIP prompts from the model output.
-    
-    Args:
-        prompt_enhancer_model: The language model
-        prompt_enhancer_tokenizer: The tokenizer
-        model_inputs: Inputs to the model
-        max_new_tokens: Maximum number of new tokens to generate
-        seed: Random seed for reproducibility
-        temperature: Controls randomness of outputs
-        top_p: Nucleus sampling parameter
-        top_k: Limits token selection to k most likely tokens
-        
-    Returns: List of tuples containing (t5_prompt, clip_prompt) pairs
-    """
-    # For transformers models, use the standard API
-    with torch.inference_mode():
-        outputs = prompt_enhancer_model.generate(
-            **model_inputs, 
-            max_new_tokens=max_new_tokens,
-            do_sample=True,
-            temperature=temperature,
-            top_p=top_p,
-            top_k=top_k                
-        )
-        generated_ids = [
-            output_ids[len(input_ids):]
-            for input_ids, output_ids in zip(model_inputs.input_ids, outputs)
-        ]
-        decoded_responses = prompt_enhancer_tokenizer.batch_decode(
-            generated_ids, skip_special_tokens=True
-        )
-
-    result_pairs = []
-
-    # print(f"decoded_responses = \n{decoded_responses}", color.RED)
-
-    for response in decoded_responses:
-        t5_prompt = ""
-        clip_prompt = ""
-
-        if "T5 Prompt" in response and "CLIP Prompt" in response:
-            # Extract everything after "T5 Prompt"
-            t5_raw = response.split("T5 Prompt", 1)[1]
-            # Now split at "CLIP Prompt" to isolate just the T5 section
-            t5_section = t5_raw.split("CLIP Prompt", 1)[0]
-
-            # Cleanup: remove colons, quotes, asterisks, and trim whitespace
-            t5_prompt = (
-                t5_section.replace(":", "") # remove colons
-                .replace("*", "") # remove asterisks
-                .replace("[", "") # remove [
-                .replace("]", "") # remove ]
-                .strip() # removes leading and trailing whitespace (spaces, tabs, newlines).
-                .strip('"') # removes leading or trailing double quptes             
-            )
-
-            # Now extract everything after "CLIP Prompt"
-            clip_section = response.split("CLIP Prompt", 1)[1]
-            clip_prompt = (
-                clip_section.replace(":", "")
-                .replace("*", "")
-                .replace("[", "") # remove [
-                .replace("]", "") # remove ]                
-                .strip()
-                .strip('"')
-            )
-
-            # print(f"\n\nt5_prompt = \n{t5_prompt}", color.ORANGE)
-            # print(f"\n\nclip_prompt = \n{clip_prompt}", color.ORANGE)
-
-        else:
-            # Fallback if format is not as expected
-            t5_prompt = response.replace("*", "").strip().strip('"')
-            clip_prompt = "Error extracting CLIP prompt, please check the model output format"
-
-        result_pairs.append((t5_prompt, clip_prompt))
-    
-    return result_pairs
-
