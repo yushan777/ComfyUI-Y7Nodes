@@ -3,7 +3,7 @@ name = "comfyui-y7nodes"
 description = "A collection of utility / quality-of-life nodes for ComfyUI. Probably only useful to me."
 version = "1.0.6"
 license = {file = "LICENSE"}
-dependencies = ["torch", "transformers", "protobuf", "sentencepiece", "huggingface_hub"]
+dependencies = ["torch", "transformers", "protobuf", "sentencepiece", "huggingface_hub", "accelerate"]
 
 [project.urls]
 Repository = "https://github.com/yushan777/ComfyUI-Y7Nodes"

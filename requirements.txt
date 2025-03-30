@@ -1,5 +1,6 @@
 torch
-transformers
-protobuf
-sentencepiece
-huggingface_hub
+transformers>=4.49.0
+protobuf>=4.25.6
+sentencepiece>=0.2.0
+huggingface_hub>=0.29.0
+accelerate>=0.26.0

@@ -1,6 +1,7 @@
 import logging
 import os
-import shutil
+import platform
+import gc
 import hashlib
 import re
 from typing import List, Optional, Tuple, Union, Dict, Any
@@ -40,6 +41,13 @@ import numpy as np
 # └── [Memory Management]
 #     └── Offload model or keep loaded based on keep_model_loaded parameter
 
+# function to detect Apple Silicon
+def is_apple_silicon():    
+    return platform.system() == "Darwin" and platform.machine().startswith(("arm", "M"))
+
+# Function to check if CUDA is available
+def is_cuda_available():
+    return torch.cuda.is_available()
 
 # ======================================
 # ModelCache class - unchanged
@@ -147,6 +155,7 @@ Good:
 - Color Palette: Dominant and supporting colors
 - Composition: Layout of elements and focal points
 - Mood & Atmosphere: Emotional tone using evocative language
+- Descriptions of sounds and motion is less important than the visuals
 
 Use only positive descriptions — focus on what should appear in the image.
 Avoid repetition and use diverse, sensory-rich vocabulary, but try to avoid very esoteric vocabulary.
@@ -345,64 +354,90 @@ def generate_t5_prompt(
         print(f"Error formatting messages for T5 prompt: {str(e)}", color.RED)
         formatted_text = format_chat_messages(messages, add_generation_prompt=True)
     
-    # Create inputs and generate
-    model_inputs = prompt_enhancer_tokenizer([formatted_text], return_tensors="pt")
-    model_inputs = model_inputs.to(prompt_enhancer_model.device)
+
+
+    # Free memory before tokenization
+    gc.collect()
     
-    with torch.inference_mode():
-        outputs = prompt_enhancer_model.generate(
-            **model_inputs, 
-            max_new_tokens=max_new_tokens,
-            do_sample=True,
-            temperature=temperature,
-            top_p=top_p,
-            top_k=top_k
-        )
-        
-        generated_ids = outputs[0][len(model_inputs.input_ids[0]):]
-        decoded_response = prompt_enhancer_tokenizer.decode(generated_ids, skip_special_tokens=True)
+    # Get device information from model
+    device = prompt_enhancer_model.device
+    device_type = device.type if hasattr(device, 'type') else str(device)
+    print(f"Model is on device: {device_type}", color.BRIGHT_GREEN)
+    
+    # Create inputs and generate - more memory efficient
+    model_inputs = prompt_enhancer_tokenizer([formatted_text], return_tensors="pt")
+    model_inputs = {k: v.to(device) for k, v in model_inputs.items()}
+    
+    # Apply platform-specific optimizations
+    try:
+        if is_apple_silicon() and device_type == "mps":
+            print("Using Apple Silicon MPS optimizations", color.BRIGHT_GREEN)
+            with torch.inference_mode(), torch.autocast("mps"):
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+        elif device_type == "cuda":
+            print("Using CUDA optimizations", color.BRIGHT_GREEN)
+            with torch.inference_mode(), torch.amp.autocast(device_type="cuda"):
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+        else:
+            print(f"Using standard inference on {device_type}", color.YELLOW)
+            with torch.inference_mode():
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+    except Exception as e:
+        print(f"Error with optimized generation: {str(e)}, falling back to standard mode", color.YELLOW)
+        with torch.inference_mode():
+            outputs = prompt_enhancer_model.generate(
+                **model_inputs, 
+                max_new_tokens=max_new_tokens,
+                do_sample=True,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k
+            )
+    
+    # Efficiently get the generated text portion only
+    generated_ids = outputs[0][len(model_inputs["input_ids"][0]):]
+    decoded_response = prompt_enhancer_tokenizer.decode(generated_ids, skip_special_tokens=True)
+    
+    # Clean up memory explicitly
+    del model_inputs, outputs, generated_ids
+    gc.collect()
     
     print(f"T5 raw response:\n{decoded_response}\n", color.ORANGE)
     
     # Clean up and post-process the T5 prompt
     t5_prompt = decoded_response.strip().strip('"').strip("'")
     
-    print(f"{prompt}\n{t5_prompt}", color.MAGENTA)
+    # print(f"{prompt}\n{t5_prompt}", color.MAGENTA)
 
     # Apply subject override from original prompt if needed
-    # processed_t5 = process_subject_override_dumb_version(prompt, t5_prompt)
     processed_t5 = process_subject_override_smart_version(prompt, t5_prompt, prompt_enhancer_model, prompt_enhancer_tokenizer)
     
-    # Final cleanup - remove brackets from final output
-    final_t5 = processed_t5.replace("[", "").replace("]", "")
     
-    # =======================================================
-    # Remove various "image description" prefixes
-    # image_prefix_patterns = [
-    #     r'^in this image,?\s+',
-    #     r'^the image shows,?\s+',
-    #     r'^this image depicts,?\s+',
-    #     r'^in the image,?\s+',
-    #     r'^the image features,?\s+',
-    #     r'^this picture shows,?\s+',
-    #     r'^the picture depicts,?\s+',
-    #     r'^visible in this image,?\s+',
-    #     r'^this photograph shows,?\s+',
-    #     r'^as seen in the image,?\s+',
-    #     r'^the scene shows,?\s+',
-    #     r'^the scene depicts,?\s+',
-    #     r'^the photograph displays,?\s+',
-    #     r'^shown in this image,?\s+',
-    #     r'^depicted in this image,?\s+',
-    #     r'^present in this image,?\s+'
-    # ]
-    # # Check if prompt starts with any of these patterns
-    # for pattern in image_prefix_patterns:
-    #     if re.match(pattern, final_t5.lower()):
-    #         final_t5 = re.sub(pattern, '', final_t5, flags=re.IGNORECASE)
-    #         print(f"Removed image description prefix from beginning of T5 prompt", color.YELLOW)
-    #         break    
-    # =======================================================
+    # Final cleanup - remove brackets from final output
+    final_t5 = processed_t5.replace("[", "").replace("]", "").replace("\n", "")
+    
+    print(f"final_t5 (processed)=\n{final_t5}", color.ORANGE)
 
     return final_t5
 
@@ -443,22 +478,67 @@ def generate_clip_prompt(
         print(f"Error formatting messages for CLIP prompt: {str(e)}", color.RED)
         formatted_text = format_chat_messages(messages, add_generation_prompt=True)
     
-    # Create inputs and generate
-    model_inputs = prompt_enhancer_tokenizer([formatted_text], return_tensors="pt")
-    model_inputs = model_inputs.to(prompt_enhancer_model.device)
+    # Free memory before tokenization
+    gc.collect()
     
-    with torch.inference_mode():
-        outputs = prompt_enhancer_model.generate(
-            **model_inputs, 
-            max_new_tokens=max_new_tokens,
-            do_sample=True,
-            temperature=temperature,
-            top_p=top_p,
-            top_k=top_k
-        )
-        
-        generated_ids = outputs[0][len(model_inputs.input_ids[0]):]
-        decoded_response = prompt_enhancer_tokenizer.decode(generated_ids, skip_special_tokens=True)
+    # Get device information from model
+    device = prompt_enhancer_model.device
+    device_type = device.type if hasattr(device, 'type') else str(device)
+    
+    # Create inputs and generate - more memory efficient
+    model_inputs = prompt_enhancer_tokenizer([formatted_text], return_tensors="pt")
+    model_inputs = {k: v.to(device) for k, v in model_inputs.items()}
+    
+    # Apply platform-specific optimizations
+    try:
+        if is_apple_silicon() and device_type == "mps":
+            with torch.inference_mode(), torch.autocast("mps"):
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+        elif device_type == "cuda":
+            with torch.inference_mode(), torch.amp.autocast(device_type="cuda"):
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+        else:
+            with torch.inference_mode():
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+    except Exception as e:
+        print(f"Error with optimized generation: {str(e)}, falling back to standard mode", color.YELLOW)
+        with torch.inference_mode():
+            outputs = prompt_enhancer_model.generate(
+                **model_inputs, 
+                max_new_tokens=max_new_tokens,
+                do_sample=True,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k
+            )
+    
+    generated_ids = outputs[0][len(model_inputs["input_ids"][0]):]
+    decoded_response = prompt_enhancer_tokenizer.decode(generated_ids, skip_special_tokens=True)
+    
+    # Clean up memory explicitly
+    del model_inputs, outputs, generated_ids
+    gc.collect()
     
     print(f"CLIP raw response:\n{decoded_response}\n", color.ORANGE)
     
@@ -471,13 +551,10 @@ def generate_clip_prompt(
         print(f"Adding subject '{bracketed_subject}' to CLIP prompt", color.YELLOW)
         clip_prompt = f"{bracketed_subject}, {clip_prompt}"
     
-    # processed_clip = process_subject_override_smart_version(original_prompt, clip_prompt, prompt_enhancer_model, prompt_enhancer_tokenizer)
-
     # Final cleanup - remove brackets from final output
     final_clip = clip_prompt.replace("[", "").replace("]", "")
     
     return final_clip
-
 # ==================================================================================
 # Helper function to format chat messages - unchanged
 def format_chat_messages(messages, add_generation_prompt=True):
@@ -581,6 +658,8 @@ class Y7Nodes_PromptEnhancerFlux:
         return hash_hex
         
     # ==================================================================================
+    # main function
+    # ==================================================================================
     def enhance(self, **kwargs):
         prompt = kwargs.get("prompt")
         llm_display_name = kwargs.get("llm_name")
@@ -597,28 +676,44 @@ class Y7Nodes_PromptEnhancerFlux:
             return (clip_l_prompt, t5xxl_prompt,)
         
         try:
-            load_device = comfy.model_management.get_torch_device()
-            offload_device = comfy.model_management.unet_offload_device()
+            # Force garbage collection before starting
+            gc.collect()
+
+            # For Apple Silicon, use MPS device if available
+            if is_apple_silicon() and torch.backends.mps.is_available():
+                print("Using MPS (Metal Performance Shaders) for Apple Silicon", color.BRIGHT_GREEN)
+                load_device = "mps"
+            elif is_cuda_available():
+                print("Using CUDA device for NVIDIA GPU", color.BRIGHT_GREEN)
+                load_device = comfy.model_management.get_torch_device()
+                offload_device = comfy.model_management.unet_offload_device()                
+            else:
+                print("No GPU detected, using CPU (this will be slow)", color.YELLOW)
+                load_device = "cpu"
+                offload_device = "cpu"
             
-            # Load/download the model 
+            # Load/download the model - it will be placed on the correct device by down_load_llm_model
             llm_model, llm_tokenizer = self.down_load_llm_model(llm_display_name, load_device)
             
-            # Calculate model size for memory management and handle device placement
-            model_size = get_model_size(llm_model) + 1073741824  # Add 1GB extra as buffer
-            
-            # Free memory before loading model to GPU
-            comfy.model_management.free_memory(model_size, comfy.model_management.get_torch_device(),)
-            
-            # Ensure model is on the correct device
-            llm_model.to(load_device)
-            # print(f"Model device: {next(llm_model.parameters()).device}", color.BRIGHT_GREEN)
-            
+            # Calculate model size for memory management
+            model_size = get_model_size(llm_model) 
+            if is_apple_silicon():
+                # Use a smaller buffer on Apple Silicon to avoid over-allocation
+                model_size += 536870912  # Add 512MB as buffer instead of 1GB
+            else:
+                model_size += 1073741824  # Add 1GB as buffer for other platforms
+                comfy.model_management.free_memory(model_size, load_device)
+                        
             print(f"Seed={seed}", color.BRIGHT_BLUE)
 
+            # Verify model is on the correct device
+            if hasattr(llm_model, 'device'):
+                print(f"Model is on device: {llm_model.device}", color.BRIGHT_GREEN)
+            else:
+                print(f"Model device info not available", color.YELLOW)
+                
             # FIRST: Generate T5 prompt
             print("Generating T5 prompt...", color.BRIGHT_BLUE)
-
-            
 
             t5xxl_prompt = generate_t5_prompt(
                 llm_model, 
@@ -629,7 +724,12 @@ class Y7Nodes_PromptEnhancerFlux:
                 top_p=top_p, 
                 top_k=top_k
             )
-            
+
+            # Force cleanup between generations
+            gc.collect()
+            if is_cuda_available():
+                torch.cuda.empty_cache()
+
             # THEN: Generate CLIP prompt with reference to T5 prompt
             print("Generating CLIP prompt...", color.BRIGHT_BLUE)
             clip_l_prompt = generate_clip_prompt(
@@ -645,22 +745,49 @@ class Y7Nodes_PromptEnhancerFlux:
             
             # Memory management based on keep_model_loaded parameter
             if not keep_model_loaded:
-                print("Offloading model from VRAM...\n", color.BRIGHT_BLUE)
-                llm_model.to(offload_device)
+                print("Cleaning up model...\n", color.BRIGHT_BLUE)
                 
-                if llm_display_name in ModelCache.loaded_models:
-                    del ModelCache.loaded_models[llm_display_name]
-                    del ModelCache.loaded_tokenizers[llm_display_name]
+                # Platform-specific cleanup
+                if is_apple_silicon():
+                    # For Apple Silicon, just delete references and let GC handle it
+                    if llm_display_name in ModelCache.loaded_models:
+                        del ModelCache.loaded_models[llm_display_name]
+                        del ModelCache.loaded_tokenizers[llm_display_name]
+                    
+                    # Force garbage collection
+                    gc.collect()
+                    if hasattr(torch.mps, 'empty_cache'):
+                        torch.mps.empty_cache()
                 
-                comfy.model_management.soft_empty_cache()
+                elif is_cuda_available():
+                    # For NVIDIA GPUs, we can safely move to CPU then clean up
+                    try:
+                        llm_model.to("cpu")
+                    except Exception as e:
+                        print(f"Warning: Could not move model to CPU: {str(e)}", color.YELLOW)
+                    
+                    if llm_display_name in ModelCache.loaded_models:
+                        del ModelCache.loaded_models[llm_display_name]
+                        del ModelCache.loaded_tokenizers[llm_display_name]
+                    
+                    # Force garbage collection and CUDA cache cleanup
+                    gc.collect()
+                    torch.cuda.empty_cache()
+                    comfy.model_management.soft_empty_cache()
+                
+                else:
+                    # CPU fallback
+                    if llm_display_name in ModelCache.loaded_models:
+                        del ModelCache.loaded_models[llm_display_name]
+                        del ModelCache.loaded_tokenizers[llm_display_name]
+                    gc.collect()
             else:
-                print("Keeping model loaded in VRAM for future use.", color.BRIGHT_BLUE)
-                llm_model.to(load_device)
+                print("Keeping model loaded for future use.", color.BRIGHT_BLUE)
                 ModelCache.loaded_models[llm_display_name] = llm_model
                 ModelCache.loaded_tokenizers[llm_display_name] = llm_tokenizer
             
             return (clip_l_prompt, t5xxl_prompt,)
-            
+        
         except Exception as e:
             print(f"❌ Error: {str(e)}", color.BRIGHT_RED)
             return (
@@ -735,6 +862,7 @@ class Y7Nodes_PromptEnhancerFlux:
 
         return full_model_path
 
+    # ==============================================================================================
     def down_load_llm_model(self, model_display_name, load_device):
         repo_path = get_repo_info(model_display_name)
         
@@ -749,15 +877,61 @@ class Y7Nodes_PromptEnhancerFlux:
         try:
             print(f"Loading model {model_display_name}", color.BRIGHT_BLUE)
             
-            # Load model
-            llm_model = AutoModelForCausalLM.from_pretrained(
-                model_path,
-                torch_dtype=torch.bfloat16,
-            )
+            # Force garbage collection before loading model
+            gc.collect()
+            torch.cuda.empty_cache() if hasattr(torch.cuda, 'empty_cache') else None
             
+            # Apply optimizations for Apple Silicon
+            if is_apple_silicon():
+                print(f"Detected Apple Silicon, applying optimizations...", color.BRIGHT_GREEN)
+                torch_dtype = torch.float16  # Use float16 instead of bfloat16 for Apple Silicon
+                
+                # Load model with Apple-specific optimizations but DON'T use device_map="auto"
+                llm_model = AutoModelForCausalLM.from_pretrained(
+                    model_path,
+                    torch_dtype=torch_dtype,
+                    low_cpu_mem_usage=True,
+                )
+                
+                # Explicitly move to the correct device
+                if torch.backends.mps.is_available():
+                    print("Using MPS backend for model", color.BRIGHT_GREEN)
+                    llm_model = llm_model.to("mps")
+                else:
+                    print("MPS not available, using CPU", color.YELLOW)
+                    llm_model = llm_model.to("cpu")
+
+            elif is_cuda_available():
+                print(f"Detected CUDA device, using NVIDIA GPU optimizations...", color.BRIGHT_GREEN)
+                
+                # Use native CUDA device from comfy
+                cuda_device = comfy.model_management.get_torch_device()
+                print(f"Using CUDA device: {cuda_device}", color.BRIGHT_GREEN)
+                
+                # Load model with CUDA optimizations
+                llm_model = AutoModelForCausalLM.from_pretrained(
+                    model_path,
+                    torch_dtype=torch.bfloat16,
+                    low_cpu_mem_usage=True,
+                )
+                
+                # Explicitly move to CUDA device
+                llm_model = llm_model.to(cuda_device)
+            else:
+                # Fallback for other devices
+                print(f"No GPU detected, using CPU (this will be very slow)", color.YELLOW)                
+                # Load model
+                llm_model = AutoModelForCausalLM.from_pretrained(
+                    model_path,
+                    torch_dtype=torch.bfloat16,
+                )
+                
+
+            # llm_tokenizer
             llm_tokenizer = AutoTokenizer.from_pretrained(
                 model_path,
             )
+
             
             # Cache model and tokenizer
             ModelCache.loaded_models[model_display_name] = llm_model
