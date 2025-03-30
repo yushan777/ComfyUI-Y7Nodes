@@ -1,6 +1,5 @@
 import logging
 import os
-import random
 import shutil
 import hashlib
 import re
@@ -14,10 +13,40 @@ from transformers import AutoModelForCausalLM, AutoProcessor, AutoTokenizer
 from huggingface_hub import snapshot_download
 import numpy as np
 
+# Y7Nodes_PromptEnhancerFlux
+
+# .enhance()
+# │
+# ├── down_load_llm_model()
+# │   ├── model_path_download_if_needed() [if model not cached]
+# │   │   └── snapshot_download() [if model files missing]
+# │   └── AutoModelForCausalLM.from_pretrained() + AutoTokenizer.from_pretrained()
+# │
+# ├── generate_t5_prompt()
+# │   ├── get_t5_prompt_instruction()
+# │   ├── format_chat_messages() or tokenizer.apply_chat_template()
+# │   ├── model.generate() [with torch.inference_mode()]
+# │   ├── tokenizer.decode()
+# │   └── process_subject_override() [if square brackets present]
+# │       └── extract_square_brackets()
+# │
+# ├── generate_clip_prompt()
+# │   ├── get_clip_prompt_instruction()
+# │   ├── format_chat_messages() or tokenizer.apply_chat_template()
+# │   ├── model.generate() [with torch.inference_mode()]
+# │   ├── tokenizer.decode()
+# │   └── extract_square_brackets() [to check for subject override]
+# │
+# └── [Memory Management]
+#     └── Offload model or keep loaded based on keep_model_loaded parameter
+
+
+# ======================================
 # ModelCache class - unchanged
 class ModelCache:
     loaded_models = {}
     loaded_tokenizers = {}
+
 
 # LLM model information - unchanged
 LLM_MODELS = [
@@ -138,7 +167,7 @@ creating deep shadows that frame the woman in dramatic contrast.
 PROMPT_CLIP_INSTRUCTIONS = """
 Next, I need you to create a CLIP Prompt:
 
-This should be a concise keyword list (up to 50 CLIP TOKENS) with:
+This must be a concise keyword list (up to 70 CLIP TOKENS - roughly equates to 40-50 words):
 
 - Prioritized, comma-separated list of essential keywords
 - Include: subject(s), art style, setting, major visual features, mood, lighting, color scheme
@@ -150,7 +179,7 @@ This should be a concise keyword list (up to 50 CLIP TOKENS) with:
 # CLIP example
 PROMPT_CLIP_EXAMPLE = """
 Example CLIP Prompt:
-woman, shoulder-length black hair, luminous brown eyes, emerald satin dress, vintage clutch, dim hallway, cinematic lighting, pensive, statuesque, wooden railing, moonlight, sheer curtains, amber wall sconces, dust in air, dramatic shadows, chandelier, soft focus, contemplative mood
+woman, shoulder-length black hair, brown eyes, emerald satin dress, vintage clutch, dim hallway, cinematic lighting, pensive, statuesque, wooden railing, moonlight, sheer curtains, amber wall sconces, dust in air, dramatic shadows, chandelier, soft focus, contemplative mood
 """
 
 # Combine sections for T5 instruction
@@ -184,25 +213,96 @@ def extract_square_brackets(text):
         return match.group(1)
     return None
 
-def process_subject_override(prompt, generated_text):
+def process_subject_override_dumb_version(short_prompt, generated_text):
     """
-    Process subject override if square brackets are present in the original prompt.
+    Process subject override if square brackets are present in the original short prompt.
     Apply post-processing to ensure override is applied correctly.
+    short_prompt could be:
+                        "[ohwx man] sitting in a cafe" (bracketed_subject exists)
+                        "a man sitting in a cafe" (no bracketed_subject)
+    generated_text: either the T5 or CLIP generated response 
     """
-    bracketed_subject = extract_square_brackets(prompt)
+
+    print(f"prompt=\n{short_prompt}\n\ngenerated_text=\n{generated_text}", color.ORANGE)
+
+    # get the token or trigger word from the sqare brackets
+    bracketed_subject = extract_square_brackets(short_prompt)
     
-    # If no bracketed subject found, return original text
+    # If no bracketed subject found, then just return original T5 or CLIP response text as is
     if not bracketed_subject:
         return generated_text
     
-    # If brackets are found, check if the content is already in the generated text
+    # otherwise bracketed_subject subject exists
+    # If bracketed subject exists, check if it is already in the generated text
     if bracketed_subject.lower() in generated_text.lower():
+        # if so then return the generated text as is.  no changes. 
         print(f"Subject '{bracketed_subject}' already present in generated text", color.BRIGHT_GREEN)
         return generated_text
     
     # If not present, prepend the subject to the generated text
     print(f"Applying subject override: '{bracketed_subject}'", color.YELLOW)
     return f"{bracketed_subject} {generated_text}"
+
+def process_subject_override_smart_version(short_prompt, generated_text, llm_model=None, llm_tokenizer=None):
+    """
+    Process subject override if square brackets are present in the original short prompt.
+    Apply post-processing to replace the first subject in the generated text with the bracketed subject.
+    """
+    print(f"short_prompt=\n{short_prompt}\n\ngenerated_text=\n{generated_text}", color.ORANGE)
+
+    # Get the token or trigger word from the square brackets
+    bracketed_subject = extract_square_brackets(short_prompt)
+    
+    # If no bracketed subject found, then just return original response text as is
+    if not bracketed_subject:
+        return generated_text
+    
+    # If bracketed subject exists, check if it is already in the generated text
+    if bracketed_subject.lower() in generated_text.lower():
+        print(f"Subject '{bracketed_subject}' already present in generated text", color.BRIGHT_GREEN)
+        return generated_text
+    
+    # If we don't have a model to use for intelligent replacement, fall back to prepending
+    if llm_model is None or llm_tokenizer is None:
+        print(f"No LLM available for intelligent replacement, prepending subject: '{bracketed_subject}'", color.YELLOW)
+        return f"{bracketed_subject} {generated_text}"
+    
+    try:
+        # Use the loaded LLM to perform subject replacement
+        messages = [
+            {"role": "system", "content": "You are an expert text editor. Your task is to replace the first instance of a subject noun (person, animal, object, etc.) in the given text with a specific replacement term, while preserving the grammatical structure of the sentence."},
+            {"role": "user", "content": f"In the following text, identify and replace the first instance of a subject noun (like person, man, woman, child, dog, cat, tree, building, etc.) with '{bracketed_subject}'. Keep everything else exactly the same. Here's the text: {generated_text}"}
+        ]
+        
+        # Format messages for the model
+        if hasattr(llm_tokenizer, 'chat_template') and llm_tokenizer.chat_template is not None:
+            formatted_text = llm_tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        else:
+            formatted_text = format_chat_messages(messages, add_generation_prompt=True)
+        
+        # Generate replacement
+        model_inputs = llm_tokenizer([formatted_text], return_tensors="pt")
+        model_inputs = model_inputs.to(llm_model.device)
+        
+        with torch.inference_mode():
+            outputs = llm_model.generate(
+                **model_inputs,
+                max_new_tokens=_MAX_NEW_TOKENS,  # Reduced for efficiency
+                do_sample=False  # Deterministic for this task
+            )
+            
+            generated_ids = outputs[0][len(model_inputs.input_ids[0]):]
+            modified_text = llm_tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
+        
+        print(f"Intelligently replaced subject with '{bracketed_subject}'", color.BRIGHT_GREEN)
+        print(f"modified_text=\n{modified_text}\n\n", color.ORANGE)
+
+        return modified_text
+    
+    except Exception as e:
+        print(f"Error during intelligent subject replacement: {str(e)}", color.RED)
+        print(f"Falling back to prepending subject: '{bracketed_subject}'", color.YELLOW)
+        return f"{bracketed_subject} {generated_text}"
 
 # ==================================================================================
 # NEW SEPARATE GENERATION FUNCTIONS
@@ -218,10 +318,11 @@ def generate_t5_prompt(
         top_k: int = 40,
         max_new_tokens: int = _MAX_NEW_TOKENS
     ) -> str:
-    """Generate T5 prompt separately."""
+
+
+    # First we generate the wordy T5 prompt
     
     if seed is not None:
-        random.seed(seed)
         torch.manual_seed(seed)
     
     # Create messages with T5-specific instructions
@@ -266,38 +367,43 @@ def generate_t5_prompt(
     # Clean up and post-process the T5 prompt
     t5_prompt = decoded_response.strip().strip('"').strip("'")
     
+    print(f"{prompt}\n{t5_prompt}", color.MAGENTA)
+
     # Apply subject override from original prompt if needed
-    processed_t5 = process_subject_override(prompt, t5_prompt)
+    # processed_t5 = process_subject_override_dumb_version(prompt, t5_prompt)
+    processed_t5 = process_subject_override_smart_version(prompt, t5_prompt, prompt_enhancer_model, prompt_enhancer_tokenizer)
     
     # Final cleanup - remove brackets from final output
     final_t5 = processed_t5.replace("[", "").replace("]", "")
     
+    # =======================================================
     # Remove various "image description" prefixes
-    image_prefix_patterns = [
-        r'^in this image,?\s+',
-        r'^the image shows,?\s+',
-        r'^this image depicts,?\s+',
-        r'^in the image,?\s+',
-        r'^the image features,?\s+',
-        r'^this picture shows,?\s+',
-        r'^the picture depicts,?\s+',
-        r'^visible in this image,?\s+',
-        r'^this photograph shows,?\s+',
-        r'^as seen in the image,?\s+',
-        r'^the scene shows,?\s+',
-        r'^the scene depicts,?\s+',
-        r'^the photograph displays,?\s+',
-        r'^shown in this image,?\s+',
-        r'^depicted in this image,?\s+',
-        r'^present in this image,?\s+'
-    ]
-    # Check if prompt starts with any of these patterns
-    for pattern in image_prefix_patterns:
-        if re.match(pattern, final_t5.lower()):
-            final_t5 = re.sub(pattern, '', final_t5, flags=re.IGNORECASE)
-            print(f"Removed image description prefix from beginning of T5 prompt", color.YELLOW)
-            break
-    
+    # image_prefix_patterns = [
+    #     r'^in this image,?\s+',
+    #     r'^the image shows,?\s+',
+    #     r'^this image depicts,?\s+',
+    #     r'^in the image,?\s+',
+    #     r'^the image features,?\s+',
+    #     r'^this picture shows,?\s+',
+    #     r'^the picture depicts,?\s+',
+    #     r'^visible in this image,?\s+',
+    #     r'^this photograph shows,?\s+',
+    #     r'^as seen in the image,?\s+',
+    #     r'^the scene shows,?\s+',
+    #     r'^the scene depicts,?\s+',
+    #     r'^the photograph displays,?\s+',
+    #     r'^shown in this image,?\s+',
+    #     r'^depicted in this image,?\s+',
+    #     r'^present in this image,?\s+'
+    # ]
+    # # Check if prompt starts with any of these patterns
+    # for pattern in image_prefix_patterns:
+    #     if re.match(pattern, final_t5.lower()):
+    #         final_t5 = re.sub(pattern, '', final_t5, flags=re.IGNORECASE)
+    #         print(f"Removed image description prefix from beginning of T5 prompt", color.YELLOW)
+    #         break    
+    # =======================================================
+
     return final_t5
 
 def generate_clip_prompt(
@@ -311,10 +417,10 @@ def generate_clip_prompt(
         top_k: int = 40,
         max_new_tokens: int = _MAX_NEW_TOKENS
     ) -> str:
-    """Generate CLIP prompt based on original prompt and T5 prompt."""
+
+    # Generate CLIP prompt based on original prompt + T5 prompt response
     
     if seed is not None:
-        random.seed(seed)
         torch.manual_seed(seed)
     
     # Create messages with CLIP-specific instructions and reference to T5
@@ -365,6 +471,8 @@ def generate_clip_prompt(
         print(f"Adding subject '{bracketed_subject}' to CLIP prompt", color.YELLOW)
         clip_prompt = f"{bracketed_subject}, {clip_prompt}"
     
+    # processed_clip = process_subject_override_smart_version(original_prompt, clip_prompt, prompt_enhancer_model, prompt_enhancer_tokenizer)
+
     # Final cleanup - remove brackets from final output
     final_clip = clip_prompt.replace("[", "").replace("]", "")
     
@@ -503,10 +611,15 @@ class Y7Nodes_PromptEnhancerFlux:
             
             # Ensure model is on the correct device
             llm_model.to(load_device)
-            print(f"Model device: {next(llm_model.parameters()).device}", color.BRIGHT_GREEN)
+            # print(f"Model device: {next(llm_model.parameters()).device}", color.BRIGHT_GREEN)
             
-            # FIRST: Generate T5 prompt separately
+            print(f"Seed={seed}", color.BRIGHT_BLUE)
+
+            # FIRST: Generate T5 prompt
             print("Generating T5 prompt...", color.BRIGHT_BLUE)
+
+            
+
             t5xxl_prompt = generate_t5_prompt(
                 llm_model, 
                 llm_tokenizer, 

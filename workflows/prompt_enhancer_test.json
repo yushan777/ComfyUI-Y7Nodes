@@ -1,8 +1,8 @@
 {
   "id": "efd192c5-6790-4604-b26b-81560b59cb7e",
   "revision": 0,
-  "last_node_id": 14,
-  "last_link_id": 19,
+  "last_node_id": 12,
+  "last_link_id": 17,
   "nodes": [
     {
       "id": 2,
@@ -34,7 +34,7 @@
           "name": "text_out",
           "type": "STRING",
           "links": [
-            19
+            3
           ]
         }
       ],
@@ -86,7 +86,7 @@
           "name": "text_out",
           "type": "STRING",
           "links": [
-            18
+            4
           ]
         }
       ],
@@ -107,39 +107,43 @@
       ]
     },
     {
-      "id": 12,
-      "type": "Seed (rgthree)",
+      "id": 4,
+      "type": "Y7Nodes_ShowAnything",
       "pos": [
-        -544.0745239257812,
-        30.179296493530273
+        488.6373291015625,
+        -16.608428955078125
       ],
       "size": [
-        315,
-        130
+        593.158447265625,
+        576.6904296875
       ],
       "flags": {},
-      "order": 0,
+      "order": 5,
       "mode": 0,
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 3
+        }
+      ],
       "outputs": [
         {
-          "dir": 4,
-          "name": "SEED",
-          "shape": 3,
-          "type": "INT",
-          "links": [
-            17
-          ]
+          "name": "output",
+          "type": "*",
+          "links": []
         }
       ],
       "properties": {
-        "cnr_id": "rgthree-comfy",
-        "ver": "cb3612624037ad50d76a8caf44ed58694648e245"
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda",
+        "Node name for S&R": "Y7Nodes_ShowAnything"
       },
       "widgets_values": [
-        123,
-        null,
-        null,
+        "agg woman A woman with tousled, auburn curls and piercing green eyes is depicted in the image, fully nude and comfortably reclined on a plush, emerald green velvet chaise lounge. She holds a sleek glass pipe in her right hand, delicately inhaling a cloud of smoke that billows around her, creating an ethereal haze. Her left hand rests casually on her abdomen, as she gazes off into the distance with a carefree, slightly dreamy expression. The room is dimly lit, with soft amber hues emanating from candles placed around the space. The walls are adorned with vibrant, eclectic artwork, adding to the bohemian atmosphere. The scene exudes a sense of freedom, creativity, and self-expression.",
+        true,
+        "11",
         null
       ]
     },
@@ -189,7 +193,7 @@
         "Node name for S&R": "Y7Nodes_PromptEnhancerFlux"
       },
       "widgets_values": [
-        "[ohwx woman] standing in the middle of a forest",
+        "[agg woman] smoking weed naked",
         "OpenHermes-2.5-Mistral-7B",
         0.7,
         0.9,
@@ -200,15 +204,52 @@
       ]
     },
     {
-      "id": 13,
+      "id": 12,
+      "type": "Seed (rgthree)",
+      "pos": [
+        -544.0745239257812,
+        30.179296493530273
+      ],
+      "size": [
+        315,
+        130
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "dir": 4,
+          "name": "SEED",
+          "shape": 3,
+          "type": "INT",
+          "links": [
+            17
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "rgthree-comfy",
+        "ver": "cb3612624037ad50d76a8caf44ed58694648e245"
+      },
+      "widgets_values": [
+        123,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 5,
       "type": "Y7Nodes_ShowAnything",
       "pos": [
         497.22430419921875,
         -330.2776184082031
       ],
       "size": [
-        579.432861328125,
-        217.86257934570312
+        505.4632568359375,
+        234.08950805664062
       ],
       "flags": {},
       "order": 4,
@@ -218,64 +259,23 @@
           "name": "anything",
           "shape": 7,
           "type": "*",
-          "link": 18
+          "link": 4
         }
       ],
       "outputs": [
         {
           "name": "output",
           "type": "*",
-          "links": null
+          "links": []
         }
       ],
       "properties": {
         "cnr_id": "comfyui-y7nodes",
-        "ver": "6de017d91073793810d60f938ee8116f843607cc",
+        "ver": "c9a15dd29314f5885f8e6e7f6cc43c2671872bda",
         "Node name for S&R": "Y7Nodes_ShowAnything"
       },
       "widgets_values": [
-        "",
-        true,
-        "11",
-        null
-      ]
-    },
-    {
-      "id": 14,
-      "type": "Y7Nodes_ShowAnything",
-      "pos": [
-        488.6373291015625,
-        -16.608428955078125
-      ],
-      "size": [
-        598.7361450195312,
-        449.95098876953125
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "shape": 7,
-          "type": "*",
-          "link": 19
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-y7nodes",
-        "ver": "6de017d91073793810d60f938ee8116f843607cc",
-        "Node name for S&R": "Y7Nodes_ShowAnything"
-      },
-      "widgets_values": [
-        "",
+        "agg woman, tousled auburn curls, piercing green eyes, nude, plush emerald green velvet chaise lounge, sleek glass pipe, inhaling smoke, ethereal haze, carefree, slightly dreamy expression, soft amber lighting, candles, vibrant eclectic artwork, bohemian atmosphere, freedom, creativity, self-expression",
         true,
         "11",
         null
@@ -283,6 +283,22 @@
     }
   ],
   "links": [
+    [
+      3,
+      2,
+      0,
+      4,
+      0,
+      "*"
+    ],
+    [
+      4,
+      3,
+      0,
+      5,
+      0,
+      "*"
+    ],
     [
       15,
       11,
@@ -306,32 +322,16 @@
       11,
       0,
       "INT"
-    ],
-    [
-      18,
-      3,
-      0,
-      13,
-      0,
-      "*"
-    ],
-    [
-      19,
-      2,
-      0,
-      14,
-      0,
-      "*"
     ]
   ],
   "groups": [],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.8264462809917354,
+      "scale": 0.9090909090909091,
       "offset": [
-        945.126499309732,
-        717.5072205397992
+        732.8083095381783,
+        852.6791530543343
       ]
     },
     "VHS_latentpreview": false,
