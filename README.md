@@ -86,9 +86,13 @@ Takes text (string) as input and, using the T5 XXl tokenizer, displays:
 
 ![Prompt Enhancer (Flux) ](assets/prompt_enhancer.jpg)
 
+### (Work-in-Progress)
+
 **Prompt Enhancer (Flux)** will take any basic prompt and enhance it and produce T5 and CLIP friendly variants of the enhanced prompt. If you have fine-tuned a model with a token / trigger word then use `[trigger_word]` or if it's combined with a subject `[trigger_word man]`.
 
-LLM model used is: Meta's [Llama-3.2-3B-Instruct (from unsloth's repo)](https://huggingface.co/unsloth/Llama-3.2-3B-Instruct)
+LLM models available are:
+[teknium/OpenHermes-2.5-Mistral-7B](https://huggingface.co/teknium/OpenHermes-2.5-Mistral-7B)
+[teknium/Hermes-Trismegistus-Mistral-7B](https://huggingface.co/teknium/Hermes-Trismegistus-Mistral-7B)
 
 #### Background: 
 
@@ -100,20 +104,34 @@ Front-loading long prose too early can reduce CLIP’s effectiveness, while cram
 
 For better results (possibly), a hybrid approach of starting with high-impact keywords to guide CLIP, then follow with flowing, descriptive language tailored for T5. This approach plays to the strengths of both encoders (maybe).
 
-The node will attempt to download the required model files (approx 6.5GB) if they don't exist.  If you wish to download them manually then you can get the files from https://huggingface.co/unsloth/Llama-3.2-3B-Instruct and place them under `ComfyUI/models/LLM/Llama-3.2-3B-Instruct`. The files you need are:
+The node will attempt to download the required model files (approx 14.5GB) if they don't exist.  If you wish to download them manually then you can get the files from:
+https://huggingface.co/teknium/OpenHermes-2.5-Mistral-7B
+https://huggingface.co/teknium/Hermes-Trismegistus-Mistral-7B
 
 ```
-ComfyUI
-└── models
-    └── LLM
-        └── Llama-3.2-3B-Instruct
-            ├── config.json
-            ├── generation_config.json
-            ├── model.safetensors
-            ├── model.safetensors.index.json
-            ├── special_tokens_map.json
-            ├── tokenizer.json
-            └── tokenizer_config.json
+models
+    ├── LLM
+    │   ├── Hermes-Trismegistus-Mistral-7B
+    │   │   ├── added_tokens.json
+    │   │   ├── config.json
+    │   │   ├── generation_config.json
+    │   │   ├── pytorch_model-00001-of-00002.bin
+    │   │   ├── pytorch_model-00002-of-00002.bin
+    │   │   ├── pytorch_model.bin.index.json
+    │   │   ├── special_tokens_map.json
+    │   │   ├── tokenizer.model
+    │   │   └── tokenizer_config.json
+    │   └── OpenHermes-2.5-Mistral-7B
+    │       ├── added_tokens.json
+    │       ├── config.json
+    │       ├── generation_config.json
+    │       ├── model-00001-of-00002.safetensors
+    │       ├── model-00002-of-00002.safetensors
+    │       ├── model.safetensors.index.json
+    │       ├── special_tokens_map.json
+    │       ├── tokenizer.model
+    │       ├── tokenizer_config.json
+    │       └── transformers_inference.py
 ```
 
 
