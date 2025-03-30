@@ -58,7 +58,6 @@ class ModelCache:
 
 # LLM model information - unchanged
 LLM_MODELS = [
-    ("Llama-3.2-3B-Instruct", "unsloth/Llama-3.2-3B-Instruct"),
     ("OpenHermes-2.5-Mistral-7B", "teknium/OpenHermes-2.5-Mistral-7B"),
     ("Hermes-Trismegistus-Mistral-7B", "teknium/Hermes-Trismegistus-Mistral-7B"),
 ]
@@ -72,16 +71,6 @@ def get_repo_info(display_name):
     return None
 
 # Required files definitions - unchanged
-llama_3_2_3b_instruct_req_files = [
-    "config.json",
-    "generation_config.json",
-    "model.safetensors",
-    "model.safetensors.index.json",
-    "special_tokens_map.json",
-    "tokenizer.json",
-    "tokenizer_config.json"
-]
-
 openhermes_2_5_mistral_7b_req_files = [
     "added_tokens.json",
     "config.json",
@@ -456,9 +445,10 @@ def generate_t5_prompt(
     # print(f"{prompt}\n{t5_prompt}", color.MAGENTA)
 
     # Apply subject override from original prompt if needed
-    processed_t5 = process_subject_override_smart_version(prompt, t5_prompt, prompt_enhancer_model, prompt_enhancer_tokenizer)
+    # processed_t5 = process_subject_override_smart_version(prompt, t5_prompt, prompt_enhancer_model, prompt_enhancer_tokenizer)
     
-    
+    processed_t5 = t5_prompt
+
     # Final cleanup - remove brackets from final output
     final_t5 = processed_t5.replace("[", "").replace("]", "").replace("\n", "")
     
@@ -836,10 +826,7 @@ class Y7Nodes_PromptEnhancerFlux:
             print(f"⬇️ Downloading model {repo_path} from HF to models/LLM. This may take a while.", color.YELLOW)
             try:
                 # Select the correct file list based on model
-                if "Llama-3.2-3B-Instruct" in repo_path:
-                    print(f"ℹ️ Downloading {repo_path} (≈6.5GB)", color.BRIGHT_BLUE)
-                    allow_patterns = llama_3_2_3b_instruct_req_files
-                elif "OpenHermes-2.5-Mistral-7B" in repo_path:
+                if "OpenHermes-2.5-Mistral-7B" in repo_path:
                     print(f"ℹ️ Downloading {repo_path} (≈14.5GB)", color.BRIGHT_BLUE)
                     allow_patterns = openhermes_2_5_mistral_7b_req_files
                 elif "Hermes-Trismegistus-Mistral-7B" in repo_path:
@@ -860,9 +847,7 @@ class Y7Nodes_PromptEnhancerFlux:
             missing_files = []
             required_files = []
 
-            if model_display_name == "Llama-3.2-3B-Instruct":                                       
-                required_files = llama_3_2_3b_instruct_req_files
-            elif model_display_name == "OpenHermes-2.5-Mistral-7B":
+            if model_display_name == "OpenHermes-2.5-Mistral-7B":
                 required_files = openhermes_2_5_mistral_7b_req_files
             elif model_display_name == "Hermes-Trismegistus-Mistral-7B":
                 required_files = hermes_trismegistus_mistral_7b_req_files
