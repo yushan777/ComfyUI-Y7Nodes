@@ -96,8 +96,6 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >   
 >   ![Prompt Enhancer (Flux) ](assets/prompt_enhancer.jpg)
-
->   #### Background: 
 >   
 >   Flux.1 uses two encoders: CLIP and T5 XXL. CLIP processes only the first 77 tokens (including <bos>/<eos>), and anything beyond that depends on the implementation. In ComfyUI, long prompts are split into 77-token chunks for CLIP, which are then batched and concatenated. On the other hand, T5, supports up to 512 tokens (or 256 in the "schnell" version) and works well with natural, descriptive language.
 >   
