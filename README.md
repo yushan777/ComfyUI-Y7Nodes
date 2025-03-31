@@ -52,21 +52,38 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 > </details>
 
 ---
+### CLIP Token Counter
 
-### T5 Token Counter
-
-> Takes text (string) as input and, using the T5 XXl tokenizer, displays:
+> Takes text (string) as input and, using the CLIP tokenizer, displays token count and more:
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >   
->   - The number of tokens in the text  
->   - Whether the input exceeds the model's token limit  (256 or 512)
+>   - Displays the number of tokens in the text  
+>   - Whether the input exceeds the model's token limit  (77 - Including BOS and EOS)
 >   - The final token within the range, along with surrounding context  
 >   - All tokens within the limit, plus any overflow tokens beyond it
->   - Copy Text button: copies the contets displayed in the text widget
+>   - Copy Text button: copies the contents displayed in the text widget
 >   - Pass-though output for original text
 >
->   ![clip_token_count](assets/t5_token_count.jpg)
+>   ![clip_token_count](assets/clip_token_count.jpg)
+> </details>
+
+---
+
+### T5 Token Counter
+
+> Takes text (string) as input and, using the T5 XXL tokenizer, displays token count and more:
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>   
+>   - Displays the number of tokens in the text  
+>   - Whether the input exceeds the model's token limit  (256 or 512 - Including EOS)
+>   - The final token within the range, along with surrounding context  
+>   - All tokens within the limit, plus any overflow tokens beyond it
+>   - Copy Text button: copies the contents displayed in the text widget
+>   - Pass-though output for original text
+>
+>   ![t5_token_count](assets/t5_token_count.jpg)
 > </details>
 
 ------
