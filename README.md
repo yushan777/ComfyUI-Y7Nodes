@@ -95,7 +95,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >   
-> ![Prompt Enhancer (Flux) ](assets/prompt_enhancer.jpg)
+>   ![Prompt Enhancer (Flux) ](assets/prompt_enhancer.jpg)
 
 >   #### Background: 
 >   
