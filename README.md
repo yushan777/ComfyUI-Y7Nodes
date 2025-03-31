@@ -110,7 +110,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   Two LLM models are available here, offering the ideal balance of knowledge, instruction-following, and minimal censorship.
 >
 >   The node will attempt to download the selected model (approx 14.5GB) if it can't be found.  
-
+>
 >   If you wish to download it manually then you can get the files from 
 >   https://huggingface.co/teknium/OpenHermes-2.5-Mistral-7B and place them under the directory path show below:
 >   
