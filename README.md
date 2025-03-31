@@ -105,7 +105,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   
 >   For better results (possibly), a hybrid approach of starting with high-impact keywords to guide CLIP, then follow with flowing, descriptive language tailored for T5. This approach plays to the strengths of both encoders (maybe).
 >   
->   Token/Trigger words are handled by encasing them inside square brackets `[ohwx woman]`, but occasionally it might not work.
+>   **Token/Trigger words** are handled by encasing them inside square brackets `[ohwx woman]`, but occasionally it might not work.
 >
 >   The node will attempt to download the default model (approx 6.5GB) if it can't be found.  
 >   If you wish to download it manually then you can get the files from 
