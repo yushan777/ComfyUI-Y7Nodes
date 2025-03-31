@@ -105,9 +105,12 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   
 >   For better results (possibly), a hybrid approach of starting with high-impact keywords to guide CLIP, then follow with flowing, descriptive language tailored for T5. This approach plays to the strengths of both encoders (maybe).
 >   
->   **Token/Trigger words** are handled by encasing them inside square brackets `[ohwx woman]`, but occasionally it might not work.
+>   **Token/Trigger words** are handled by enclosing them inside square brackets `[ohwx woman]`, but occasionally it might not work.
 >
->   The node will attempt to download the default model (approx 6.5GB) if it can't be found.  
+>   Two LLM models are available here, offering the ideal balance of knowledge, instruction-following, and minimal censorship.
+>
+>   The node will attempt to download the selected model (approx 14.5GB) if it can't be found.  
+
 >   If you wish to download it manually then you can get the files from 
 >   https://huggingface.co/teknium/OpenHermes-2.5-Mistral-7B and place them under the directory path show below:
 >   
@@ -129,7 +132,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >           |
 >   ```
 >   
->   Likewise for https://huggingface.co/teknium/Hermes-Trismegistus-Mistral-7B
+>   Likewise for https://huggingface.co/teknium/Hermes-Trismegistus-Mistral-7B (also approx. 14.5GB)
 >   
 >   ```
 >   ComfyUI
