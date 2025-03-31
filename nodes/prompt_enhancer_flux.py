@@ -303,6 +303,8 @@ Your detailed T5 prompt here...
 [CLIP]
 Your concise CLIP prompt here...
 [/CLIP]
+
+The START AND END TAGS ARE IMPORTANT!
 """
     
     # Create messages with combined instructions
@@ -782,7 +784,7 @@ class Y7Nodes_PromptEnhancerFlux:
         hash_object = hashlib.md5(input_string.encode())
         hash_hex = hash_object.hexdigest()
         
-        print(f"IS_CHANGED hash = {hash_hex}", color.ORANGE)
+        # print(f"IS_CHANGED hash = {hash_hex}", color.ORANGE)
         return hash_hex
         
     # ==================================================================================
