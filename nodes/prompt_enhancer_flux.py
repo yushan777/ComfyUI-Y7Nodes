@@ -114,7 +114,7 @@ the Flux image generation model. I'm going to ask you to create a prompt in two 
 PROMPT_T5_INSTRUCTIONS = """
 First, I need you to create a T5 Prompt:
 
-This should be a detailed natural language description (up to 512 T5 tokens - maybe max 400 words) with:
+This should be a detailed natural language description (up to 512 T5 tokens - approximately 400 or more words) with:
 
 - Do not start with, "in this image..." or similar assume that we know it is an image, go straight to the point!
 Bad:
@@ -131,10 +131,6 @@ Good:
 - Lighting and color palette: Sources, intensity, direction, color temperature, shadows
 - Composition: Layout of elements and focal points
 - Mood & Atmosphere: Emotional tone using evocative language (but not too much of this!)
-- Avoid purple prose - overly elaborate, flowery, or excessively descriptive - this is bad
-- Minimize words that describe sounds or smells if they add nothing to the visuals. 
-- Avoid descriptions of motion and action (unless important to the subject's pose)
-
 Use only positive descriptions — focus on what should appear in the image.
 Avoid repetition of the subject, instead use she, he, her, his etc
 """
