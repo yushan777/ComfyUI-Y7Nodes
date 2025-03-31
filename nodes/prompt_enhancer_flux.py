@@ -106,27 +106,15 @@ DEFAULT_PROMPT = ""
 
 # Base introduction and purpose
 PROMPT_BASE = """
-You are an AI assistant specialized in generating comprehensive text-to-image prompts for 
+You are a Generative AI assistant specialized in generating comprehensive text-to-image prompts for 
 the Flux image generation model. I'm going to ask you to create a prompt in two parts.
-"""
-
-# Special subject override instruction
-PROMPT_SPECIAL_OVERRIDE = """
-IMPORTANT: If the user's prompt contains a phrase inside square brackets (e.g., "[agg woman]"), 
-then treat the content inside the brackets as the exact subject. Do not reinterpret, paraphrase, 
-or alter this phrase. Use it exactly as written, as the primary subject.
-
-Examples:
-- "[agg woman] walking through a neon-lit alley" = The subject is exactly "agg woman"
-- "[ohwx man] sitting in a cafe" = The subject is exactly "ohwx man"
-- "[sks knight] standing in ruins" = The subject is exactly "sks knight"
 """
 
 # T5 Prompt instructions
 PROMPT_T5_INSTRUCTIONS = """
 First, I need you to create a T5 Prompt:
 
-This should be a detailed natural language description (up to 512 T5 tokens - maybe max 300 words) with:
+This should be a detailed natural language description (up to 512 T5 tokens - maybe max 400 words) with:
 
 - Do not start with, "in this image..." or similar assume that we know it is an image, go straight to the point!
 Bad:
@@ -166,7 +154,7 @@ creating deep shadows that frame the woman in dramatic contrast.
 PROMPT_CLIP_INSTRUCTIONS = """
 Next, I need you to create a CLIP Prompt:
 
-This must be a concise, short, less verbose keyword list (up to 60 CLIP TOKENS which roughly equates to 20-40 words):
+This must be a concise, short, less verbose keyword list (up to 70 CLIP TOKENS which roughly equates to 40-50 words):
 - Prioritized, comma-separated list of essential keywords, but word limit priority is crucial.
 - Subject(s) MUST come first
 - Include: subject(s), art style, setting, major visual features, mood, lighting, color scheme
@@ -182,6 +170,28 @@ PROMPT_CLIP_EXAMPLE = """
 Example CLIP Prompt:
 woman, shoulder-length black hair, brown eyes, emerald satin dress, vintage clutch, hallway, dim, lighting, pensive, moonlight, 
 sheer curtains, amber wall sconces, dust in air, shadows, soft focus, contemplative mood
+"""
+
+# Special subject override instruction
+PROMPT_SPECIAL_OVERRIDE = """
+CRITICAL SUBJECT INSTRUCTION: 
+When a user's prompt contains a phrase inside square brackets like "[agg woman]", you MUST treat this EXACT text as the primary subject.
+
+1. NEVER modify, interpret, or expand the bracketed phrase
+2. NEVER add adjectives or descriptions to the bracketed phrase itself
+3. NEVER change "[agg woman]" into "agg-inspired woman" or any variation
+4. The bracketed phrase MUST appear EXACTLY as written at the beginning of your description
+
+CORRECT EXAMPLE:
+User input: "[agg woman] in a cafe"
+Correct T5 start: "agg woman sits in a dimly lit cafe..."
+INCORRECT: "A woman with an agg-inspired look sits in a cafe..."
+
+User input: "[ohwx man] smoking"
+Correct T5 start: "ohwx man smoking a cigarette..."
+INCORRECT: "A man with ohwx-style features smoking..."
+
+If you see a bracketed subject, preserve it EXACTLY as provided.
 """
 
 # Combine sections for T5 instruction
@@ -245,91 +255,190 @@ def process_subject_override_dumb_version(short_prompt, generated_text):
     print(f"Applying subject override: '{bracketed_subject}'", color.YELLOW)
     return f"{bracketed_subject} {generated_text}"
 
-def process_subject_override_smart_version(short_prompt, generated_text, llm_model=None, llm_tokenizer=None):
-    """
-    Process subject override if square brackets are present in the original short prompt.
-    Apply post-processing to replace the first subject in the generated text with the bracketed subject.
-    """
-    print(f"short_prompt=\n{short_prompt}\n\ngenerated_text=\n{generated_text}", color.ORANGE)
+# ==================================================================================
+# COMBO & SEPARATE GENERATION FUNCTIONS
+# ==================================================================================
 
-    # Get the token or trigger word from the square brackets
-    bracketed_subject = extract_square_brackets(short_prompt)
+# COMBO generation func.
+def generate_both_prompts(
+                        prompt_enhancer_model, 
+                        prompt_enhancer_tokenizer, 
+                        prompt: str, 
+                        seed: int = None, 
+                        temperature: float = 0.7,
+                        top_p: float = 0.9,
+                        top_k: int = 40,
+                        max_new_tokens: int = _MAX_NEW_TOKENS) -> tuple:
     
-    # If no bracketed subject found, then just return original response text as is
-    if not bracketed_subject:
-        return generated_text
+    """
+    Generate both T5 and CLIP prompts in a single model call.
+    Returns a tuple of (clip_prompt, t5_prompt)
+    """
+    if seed is not None:
+        torch.manual_seed(seed)
     
-    # If bracketed subject exists, check if it is already in the generated text
-    if bracketed_subject.lower() in generated_text.lower():
-        print(f"Subject '{bracketed_subject}' already present in generated text", color.BRIGHT_GREEN)
-        return generated_text
+    # Combined instruction that asks for both prompts in a single generation
+    combined_instruction = f"""
+
+{PROMPT_BASE}
+
+SPECIAL PROMPT OVERRIDE:
+{PROMPT_SPECIAL_OVERRIDE}
+
+I need you to create two different prompts for the same image:
+
+1. T5 PROMPT:
+{PROMPT_T5_INSTRUCTIONS}
+
+2. CLIP PROMPT:
+{PROMPT_CLIP_INSTRUCTIONS}
+
+Respond in the following format:
+[T5]
+Your detailed T5 prompt here...
+[/T5]
+
+[CLIP]
+Your concise CLIP prompt here...
+[/CLIP]
+"""
     
-    # If we don't have a model to use for intelligent replacement, fall back to prepending
-    if llm_model is None or llm_tokenizer is None:
-        print(f"No LLM available for intelligent replacement, prepending subject: '{bracketed_subject}'", color.YELLOW)
-        return f"{bracketed_subject} {generated_text}"
+    # Create messages with combined instructions
+    messages = [
+        {"role": "system", "content": combined_instruction},
+        {"role": "user", "content": prompt.strip() if prompt.strip() else DEFAULT_PROMPT},
+    ]
     
+    # Format messages
     try:
-        # Use the loaded LLM to perform subject replacement
-        # messages = [
-        #     {"role": "system", "content": "You are an expert text editor. Your task is to replace the first instance of a subject noun (person, animal, object, etc.) in the given text with a specific replacement term, while preserving the grammatical structure of the sentence."},
-        #     {"role": "user", "content": f"In the following text, identify and replace the first instance of a subject noun (like person, man, woman, child, dog, cat, tree, building, etc.) with '{bracketed_subject}'. Keep everything else exactly the same. Here's the text: {generated_text}"}
-        # ]
-        # Use the loaded LLM to perform subject replacement
-        messages = [
-            {
-                "role": "system",
-                "content": (
-                    "Your task is to replace the first instance of a subject noun (man, woman, person, animal, object, etc.) in the given text with a "
-                    "specific replacement term, while preserving the grammatical structure of the sentence. - only the first instance."
-                )
-            },
-            {
-                "role": "user",
-                "content": (
-                    "In the following text, identify and replace the first instance of a subject noun "
-                    "(like person, man, woman, child, dog, cat, tree, building, etc.) with "
-                    f"'{bracketed_subject}'. Keep everything else exactly the same. "
-                    "For all other instances, use pronouns, he, she, it instead. " 
-                    f"Here's the text:\n\n{generated_text}"
-                )
-            }
-        ]
-
-        
-        # Format messages for the model
-        if hasattr(llm_tokenizer, 'chat_template') and llm_tokenizer.chat_template is not None:
-            formatted_text = llm_tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        else:
-            formatted_text = format_chat_messages(messages, add_generation_prompt=True)
-        
-        # Generate replacement
-        model_inputs = llm_tokenizer([formatted_text], return_tensors="pt")
-        model_inputs = model_inputs.to(llm_model.device)
-        
-        with torch.inference_mode():
-            outputs = llm_model.generate(
-                **model_inputs,
-                max_new_tokens=_MAX_NEW_TOKENS,  # Reduced for efficiency
-                do_sample=False  # Deterministic for this task
+        if hasattr(prompt_enhancer_tokenizer, 'chat_template') and prompt_enhancer_tokenizer.chat_template is not None:
+            print("Using tokenizer's built-in chat template for combined prompt", color.BRIGHT_GREEN)
+            formatted_text = prompt_enhancer_tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
             )
-            
-            generated_ids = outputs[0][len(model_inputs.input_ids[0]):]
-            modified_text = llm_tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
-        
-        print(f"Intelligently replaced subject with '{bracketed_subject}'", color.BRIGHT_GREEN)
-        print(f"modified_text=\n{modified_text}\n\n", color.ORANGE)
-
-        return modified_text
-    
+        else:
+            print("Using custom formatting for combined prompt", color.YELLOW)
+            formatted_text = format_chat_messages(messages, add_generation_prompt=True)
     except Exception as e:
-        print(f"Error during intelligent subject replacement: {str(e)}", color.RED)
-        print(f"Falling back to prepending subject: '{bracketed_subject}'", color.YELLOW)
-        return f"{bracketed_subject} {generated_text}"
+        print(f"Error formatting messages for combined prompt: {str(e)}", color.RED)
+        formatted_text = format_chat_messages(messages, add_generation_prompt=True)
+    
+    # Free memory before tokenization
+    gc.collect()
+    
+    # Get device information from model
+    device = prompt_enhancer_model.device
+    device_type = device.type if hasattr(device, 'type') else str(device)
+    print(f"Model is on device: {device_type}", color.BRIGHT_GREEN)
+    
+    # Create inputs and generate - more memory efficient
+    model_inputs = prompt_enhancer_tokenizer([formatted_text], return_tensors="pt")
+    model_inputs = {k: v.to(device) for k, v in model_inputs.items()}
+    
+    # Apply platform-specific optimizations
+    try:
+        if is_apple_silicon() and device_type == "mps":
+            print("Using Apple Silicon MPS optimizations", color.BRIGHT_GREEN)
+            with torch.inference_mode(), torch.autocast("mps"):
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+        elif device_type == "cuda":
+            print("Using CUDA optimizations", color.BRIGHT_GREEN)
+            with torch.inference_mode(), torch.amp.autocast(device_type="cuda"):
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+        else:
+            print(f"Using standard inference on {device_type}", color.YELLOW)
+            with torch.inference_mode():
+                outputs = prompt_enhancer_model.generate(
+                    **model_inputs, 
+                    max_new_tokens=max_new_tokens,
+                    do_sample=True,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k
+                )
+    except Exception as e:
+        print(f"Error with optimized generation: {str(e)}, falling back to standard mode", color.YELLOW)
+        with torch.inference_mode():
+            outputs = prompt_enhancer_model.generate(
+                **model_inputs, 
+                max_new_tokens=max_new_tokens,
+                do_sample=True,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k
+            )
+    
+    # Efficiently get the generated text portion only
+    generated_ids = outputs[0][len(model_inputs["input_ids"][0]):]
+    decoded_response = prompt_enhancer_tokenizer.decode(generated_ids, skip_special_tokens=True)
+    
+    # Clean up memory explicitly
+    del model_inputs, outputs, generated_ids
+    gc.collect()
+    
+    print(f"Combined raw response:\n{decoded_response}\n", color.ORANGE)
+    
+    # Extract T5 and CLIP prompts using regex
+    import re
+    
+    # Extract T5 prompt
+    t5_match = re.search(r'\[T5\](.*?)\[/T5\]', decoded_response, re.DOTALL)
+    if t5_match:
+        t5_prompt = t5_match.group(1).strip()
+    else:
+        # Fallback extraction if tags are missing
+        print("Could not find T5 tags, attempting fallback extraction", color.YELLOW)
+        parts = decoded_response.split("[CLIP]", 1)
+        t5_prompt = parts[0].strip()
+        if t5_prompt.startswith("T5 PROMPT:"):
+            t5_prompt = t5_prompt[len("T5 PROMPT:"):].strip()
+    
+    # Extract CLIP prompt
+    clip_match = re.search(r'\[CLIP\](.*?)\[/CLIP\]', decoded_response, re.DOTALL)
+    if clip_match:
+        clip_prompt = clip_match.group(1).strip()
+    else:
+        # Fallback extraction if tags are missing
+        print("Could not find CLIP tags, attempting fallback extraction", color.YELLOW)
+        if "[CLIP]" in decoded_response:
+            clip_prompt = decoded_response.split("[CLIP]", 1)[1].strip()
+        elif "CLIP PROMPT:" in decoded_response:
+            clip_prompt = decoded_response.split("CLIP PROMPT:", 1)[1].strip()
+        else:
+            # Last resort - try to find a comma-separated list after T5
+            parts = decoded_response.split("[/T5]", 1)
+            if len(parts) > 1:
+                clip_prompt = parts[1].strip()
+            else:
+                clip_prompt = "Error: Could not extract CLIP prompt"
+    
+    # Clean up the prompts (remove any leftover tags or labels)
+    t5_prompt = t5_prompt.replace("T5 PROMPT:", "").strip()
+    clip_prompt = clip_prompt.replace("CLIP PROMPT:", "").replace("[/CLIP]", "").strip()
+    
+    # Final cleanup - remove brackets from final output
+    final_t5 = t5_prompt.replace("[", "").replace("]", "").replace("\n", "")
+    final_clip = clip_prompt.replace("[", "").replace("]", "")
+    
 
-# ==================================================================================
-# NEW SEPARATE GENERATION FUNCTIONS
-# ==================================================================================
+    print(f"Extracted T5 prompt:\n{final_t5}\n", color.YELLOW)
+    print(f"Extracted CLIP prompt:\n{final_clip}", color.BRIGHT_YELLOW)
+    
+    return final_clip, final_t5
 
 def generate_t5_prompt(
         prompt_enhancer_model, 
@@ -728,11 +837,12 @@ class Y7Nodes_PromptEnhancerFlux:
                 print(f"Model is on device: {llm_model.device}", color.BRIGHT_GREEN)
             else:
                 print(f"Model device info not available", color.YELLOW)
-                
-            # FIRST: Generate T5 prompt
-            print("Generating T5 prompt...", color.BRIGHT_BLUE)
 
-            t5xxl_prompt = generate_t5_prompt(
+            # ======================================================================    
+            # Generate both prompts in a single model call
+            print("Generating both T5 and CLIP prompts in a single call...", color.BRIGHT_BLUE)
+            
+            clip_l_prompt, t5xxl_prompt = generate_both_prompts(
                 llm_model, 
                 llm_tokenizer, 
                 prompt, 
@@ -740,26 +850,41 @@ class Y7Nodes_PromptEnhancerFlux:
                 temperature=temperature, 
                 top_p=top_p, 
                 top_k=top_k
-            )
+            )        
 
-            # Force cleanup between generations
-            gc.collect()
-            if is_cuda_available():
-                torch.cuda.empty_cache()
+            # ======================================================================
+            # # FIRST: Generate T5 prompt
+            # print("Generating T5 prompt...", color.BRIGHT_BLUE)
 
-            # THEN: Generate CLIP prompt with reference to T5 prompt
-            print("Generating CLIP prompt...", color.BRIGHT_BLUE)
-            clip_l_prompt = generate_clip_prompt(
-                llm_model, 
-                llm_tokenizer,
-                prompt,  # Original user prompt
-                t5xxl_prompt,  # Generated T5 prompt
-                seed, 
-                temperature=temperature, 
-                top_p=top_p, 
-                top_k=top_k
-            )
-            
+            # t5xxl_prompt = generate_t5_prompt(
+            #     llm_model, 
+            #     llm_tokenizer, 
+            #     prompt, 
+            #     seed, 
+            #     temperature=temperature, 
+            #     top_p=top_p, 
+            #     top_k=top_k
+            # )
+
+            # # Force cleanup between generations
+            # gc.collect()
+            # if is_cuda_available():
+            #     torch.cuda.empty_cache()
+
+            # # THEN: Generate CLIP prompt with reference to T5 prompt
+            # print("Generating CLIP prompt...", color.BRIGHT_BLUE)
+            # clip_l_prompt = generate_clip_prompt(
+            #     llm_model, 
+            #     llm_tokenizer,
+            #     prompt,  # Original user prompt
+            #     t5xxl_prompt,  # Generated T5 prompt
+            #     seed, 
+            #     temperature=temperature, 
+            #     top_p=top_p, 
+            #     top_k=top_k
+            # )
+            # ======================================================================
+
             # Memory management based on keep_model_loaded parameter
             if not keep_model_loaded:
                 print("Cleaning up model...\n", color.BRIGHT_BLUE)
@@ -805,6 +930,7 @@ class Y7Nodes_PromptEnhancerFlux:
             
             return (clip_l_prompt, t5xxl_prompt,)
         
+        # ========================================
         except Exception as e:
             print(f"❌ Error: {str(e)}", color.BRIGHT_RED)
             return (
