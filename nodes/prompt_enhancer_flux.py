@@ -139,6 +139,8 @@ Use only positive descriptions — focus on what should appear in the image.
 Avoid repetition of the subject, instead use she, he, her, his etc
 """
 
+
+
 # T5 example
 PROMPT_T5_EXAMPLE = """
 Example T5 Prompt:
