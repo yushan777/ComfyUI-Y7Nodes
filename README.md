@@ -43,12 +43,11 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 ### Y7 Show Anything
 
 > Takes input from any (most?) nodes and displays it in a readable format and provides a Copy Text button for easily copying the displayed content.
+> ![Show Anything Example 2 ](assets/show_anything.jpg)
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >   - Based on other nodes that already work just fine.  I just always wanted one with a `copy text` button for easy copying of long generated prompts (for editing or use elsewhere). It will primarily show `string, integer, float and boolean` values directly but will also (try to) display tensor data. 
 
-
->   - ![Show Anything Example 2 ](assets/show_anything.jpg)
 > </details>
 
 
