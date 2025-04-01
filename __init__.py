@@ -4,7 +4,7 @@ from .nodes.documentation import format_descriptions
 from .nodes.text import Y7Nodes_Text
 from .nodes.grid2batch import Y7Nodes_Grid2Batch
 from .nodes.show_anything import Y7Nodes_ShowAnything
-from .nodes.prompt_enhancer_flux import Y7Nodes_PromptEnhancerFlux
+from .nodes.prompt_enhancer_flux_stream import Y7Nodes_PromptEnhancerFlux
 from .nodes.t5_token_count import Y7Nodes_T5_TokenCounter
 from .nodes.clip_token_count import Y7Nodes_CLIP_TokenCounter
 
