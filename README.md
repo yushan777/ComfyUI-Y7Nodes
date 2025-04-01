@@ -95,7 +95,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >   
->   ![Prompt Enhancer (Flux) ](assets/prompt_enhancer.jpg)
+>   ![Prompt Enhancer (Flux) ](assets/prompt_enhancer_flux.jpg)
 >   
 >   Flux.1 uses two encoders: CLIP and T5 XXL. CLIP processes only the first 77 tokens (including <bos>/<eos>), and anything beyond that depends on the implementation. In ComfyUI, long prompts are split into 77-token chunks for CLIP, which are then batched and concatenated. On the other hand, T5, supports up to 512 tokens (or 256 in the "schnell" version) and works well with natural, descriptive language.
 >   
@@ -103,11 +103,11 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   
 >   Front-loading long prose too early can reduce CLIP's effectiveness, while cramming too many keywords up front may limit T5's ability to build nuance throughout the rest of the prompt.
 >   
->   For better results (possibly), a hybrid approach of starting with high-impact keywords to guide CLIP, then follow with flowing, descriptive language tailored for T5. This approach plays to the strengths of both encoders (maybe).
+>   For possibly better results, a hybrid approach of starting with high-impact keywords to guide CLIP, then follow with flowing, descriptive language tailored for T5. This approach plays to the strengths of both encoders (again, possibly).
 >   
 >   **Token/Trigger words** are handled by enclosing them inside square brackets `[ohwx woman]`, but occasionally it might not work.
 >
->   Two LLM models are available here, offering the ideal balance of knowledge, instruction-following, and minimal censorship.
+>   Two LLM models are available here, offering a balance of knowledge, instruction-following, and minimal censorship.
 >
 >   The node will attempt to download the selected model (approx 14.5GB) if it can't be found.  
 >
