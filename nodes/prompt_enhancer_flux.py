@@ -10,9 +10,10 @@ import comfy.model_management
 import comfy.model_patcher
 import folder_paths
 import torch
-from transformers import AutoModelForCausalLM, AutoProcessor, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoProcessor, AutoTokenizer, TextIteratorStreamer
 from huggingface_hub import snapshot_download
 import numpy as np
+from threading import Thread
 
 # Y7Nodes_PromptEnhancerFlux
 
@@ -145,7 +146,7 @@ This must be a **very rich and highly detailed** natural language description (u
 - Subject Details: **Thoroughly describe** physical appearance, pose, action, expression, attire, including textures and materials.
 - Scene Description: **Paint a vivid picture** of the overall setting, environment, background details, and visual style.
 - Time & Place: Specify time of day, season, location with **atmospheric details**.
-- Lighting and color palette: Detail the light sources, intensity, direction, color temperature, shadows, and **how light interacts with surfaces**.
+- Lighting and colors: Detail the light sources, intensity, direction, color temperature, shadows, and **how light interacts with surfaces**.
 - Composition: Explain the layout of elements, focal points, and camera angle/perspective.
 - Mood & Atmosphere: Convey the emotional tone using **evocative and descriptive language**.
 - Do not start with, "in this image..." or similar assume that we know it is an image, go straight to the point!
@@ -203,21 +204,27 @@ When a user's prompt contains a phrase inside square brackets like "[agg woman]"
 2. NEVER add adjectives or descriptions to the bracketed phrase itself
 3. NEVER change "[agg woman]" into "agg-inspired woman" or any variation
 4. The bracketed phrase MUST appear EXACTLY as written at the beginning of your description
+5. NEVER use any part of the bracketed phrase as a descriptor or adjective ANYWHERE in the text
+6. NEVER refer to the style, aesthetic, or features of the bracketed phrase
 
 CORRECT EXAMPLE:
 User input: "[agg woman] in a cafe"
 Correct T5 start: "agg woman sits in a dimly lit cafe..."
 INCORRECT: "A woman with an agg-inspired look sits in a cafe..."
+INCORRECT: "agg woman sits in a cafe. Her features reflect the agg style..."
 
 User input: "[ohwx man] smoking"
 Correct T5 start: "ohwx man smoking a cigarette..."
 INCORRECT: "A man with ohwx-style features smoking..."
+INCORRECT: "ohwx man smoking a cigarette. His appearance has the ohwx aesthetic..."
 
 User input: "[ohwx woman] sitting"
-Correct T5 start: "ohwx mwoman sitting..."
-INCORRECT: "A woman with the ohwx aesthetic"
+Correct T5 start: "ohwx woman sitting..."
+INCORRECT: "A woman with an ohwx aesthetic sitting..."
+INCORRECT: "A woman with a distinct ohwx style..." 
+INCORRECT: "ohwx woman sitting... with features inspired by the ohwx style..."
 
-If you see a bracketed subject, preserve it EXACTLY as provided as the subject - think of it as the subject's name.
+If you see a bracketed subject, preserve it EXACTLY as provided as the subject - think of it as the subject's name. DO NOT reference the bracketed term anywhere else in the description.
 """
 
 # ==================================================================================
@@ -269,6 +276,9 @@ I need you to create two different prompts for the same image:
 1. T5 PROMPT:
 {PROMPT_T5_INSTRUCTIONS_LONGER}
 
+SPECIAL PROMPT OVERRID REMINDER:
+{PROMPT_SPECIAL_OVERRIDE}
+
 2. CLIP PROMPT:
 {PROMPT_CLIP_INSTRUCTIONS}
 
@@ -284,8 +294,6 @@ Your concise CLIP prompt here...
 The START AND END TAGS ARE IMPORTANT!
 """
     
-    
-
     # Create messages with combined instructions
     messages = [
         {"role": "system", "content": combined_instruction},
@@ -314,65 +322,77 @@ The START AND END TAGS ARE IMPORTANT!
     device_type = device.type if hasattr(device, 'type') else str(device)
     # print(f"Model is on device: {device_type}", color.BRIGHT_GREEN)
     
-    # Create inputs and generate - more memory efficient
+    # Create inputs - more memory efficient
     model_inputs = prompt_enhancer_tokenizer([formatted_text], return_tensors="pt")
     model_inputs = {k: v.to(device) for k, v in model_inputs.items()}
-    
+
+    # Create a streamer, skip the input prompt (instructions)
+    streamer = TextIteratorStreamer(prompt_enhancer_tokenizer, skip_prompt=True, skip_special_tokens=True, stream_every=2)
+
+    # Set up generation kwargs
+    generation_kwargs = {
+        "input_ids": model_inputs["input_ids"],
+        "attention_mask": model_inputs.get("attention_mask", None),
+        "max_new_tokens": max_new_tokens,
+        "do_sample": True,
+        "temperature": temperature,
+        "top_p": top_p,
+        "top_k": top_k,
+        "streamer": streamer,
+    }
+
+    # Start generation in a separate thread
+    print("🔄 Starting prompt generation...", color.BRIGHT_BLUE)
+    thread = None # Initialize thread to None
+
     # Apply platform-specific optimizations
     try:
         if is_apple_silicon() and device_type == "mps":
-            
             with torch.inference_mode(), torch.autocast("mps"):
-                outputs = prompt_enhancer_model.generate(
-                    **model_inputs, 
-                    max_new_tokens=max_new_tokens,
-                    do_sample=True,
-                    temperature=temperature,
-                    top_p=top_p,
-                    top_k=top_k
-                )
+                thread = Thread(target=prompt_enhancer_model.generate, kwargs=generation_kwargs)
+                thread.start()
         elif device_type == "cuda":
-            
             with torch.inference_mode(), torch.amp.autocast(device_type="cuda"):
-                outputs = prompt_enhancer_model.generate(
-                    **model_inputs, 
-                    max_new_tokens=max_new_tokens,
-                    do_sample=True,
-                    temperature=temperature,
-                    top_p=top_p,
-                    top_k=top_k
-                )
+                thread = Thread(target=prompt_enhancer_model.generate, kwargs=generation_kwargs)
+                thread.start()
         else:
-                        
             with torch.inference_mode():
-                outputs = prompt_enhancer_model.generate(
-                    **model_inputs, 
-                    max_new_tokens=max_new_tokens,
-                    do_sample=True,
-                    temperature=temperature,
-                    top_p=top_p,
-                    top_k=top_k
-                )
+                thread = Thread(target=prompt_enhancer_model.generate, kwargs=generation_kwargs)
+                thread.start()
     except Exception as e:
         print(f"Error with optimized generation: {str(e)}, falling back to standard mode", color.YELLOW)
         with torch.inference_mode():
-            outputs = prompt_enhancer_model.generate(
-                **model_inputs, 
-                max_new_tokens=max_new_tokens,
-                do_sample=True,
-                temperature=temperature,
-                top_p=top_p,
-                top_k=top_k
-            )
-    
-    # Efficiently get the generated text portion only
-    generated_ids = outputs[0][len(model_inputs["input_ids"][0]):]
-    decoded_response = prompt_enhancer_tokenizer.decode(generated_ids, skip_special_tokens=True)
-    
+            thread = Thread(target=prompt_enhancer_model.generate, kwargs=generation_kwargs)
+            thread.start()
+
+    # Process the streamed tokens
+    decoded_response = ""
+    print("📝 Generating: ", end="", flush=True)
+    token_count = 0
+    printed_something = False # Flag to track if we've started printing actual content
+
+    if thread: # Check if thread was successfully created and started
+        for token in streamer:
+            decoded_response += token
+            if token: # Only print non-empty tokens
+                print(token, end="", flush=True)
+                printed_something = True
+                token_count += 1 # Only count printed tokens
+                if token_count > 0 and token_count % 50 == 0:  # Add a newline every 50 *printed* tokens for readability
+                    print() # Use print() for newline, flush is handled
+
+        thread.join() # Wait for the generation thread to finish
+        if printed_something: # Add a final newline only if something was printed
+             print() # Ensure the completion message is on a new line
+        print("✅ Generation complete.  Post-processing...", color.BRIGHT_GREEN)
+    else:
+        print("\n❌ Generation thread failed to start.", color.BRIGHT_RED)
+        return "Error: Generation failed", "Error: Generation failed"
+
     # Clean up memory explicitly
-    del model_inputs, outputs, generated_ids
+    del model_inputs, generation_kwargs, streamer, thread
     gc.collect()
-    
+
     # print(f"Combined raw response:\n{decoded_response}\n", color.ORANGE)
     
     # ==============================================================================
@@ -431,18 +451,12 @@ The START AND END TAGS ARE IMPORTANT!
 
 # ==================================================================================
 def T5_PostProcess(user_prompt, t5_prompt):
-    """
-    Post-Process the T5 prompt based on the user's prompt.
-    Ensures bracketed subjects from the user prompt appear at the beginning of the T5 prompt.
-    And replaces subject where bracketed_subject does not appear in the T5 text (it happens)
-    
-    Args:
-        user_prompt (str): The original user prompt
-        t5_prompt (str): The generated T5 prompt
-        
-    Returns:
-        str: The processed T5 prompt
-    """
+    # Post-Process the T5 prompt response:
+    # Ensures bracketed subjects from the user prompt appear at the beginning of the T5 prompt.
+    # Args:
+    #     user_prompt (str): The original user prompt
+    #     t5_prompt (str): The generated T5 prompt        
+
     # Check if user_prompt contains a bracketed subject
     bracketed_subject = extract_square_brackets(user_prompt)
     
@@ -452,7 +466,7 @@ def T5_PostProcess(user_prompt, t5_prompt):
         
         # Check if the clean subject appears in t5_prompt
         if non_bracketed_subject.lower() in t5_prompt.lower():            
-            print(f"Bracketed subject '{non_bracketed_subject}' found in T5 prompt, checking for articles", color.BRIGHT_GREEN)
+            # Bracketed subject found in T5 prompt, checking for indefinite/definite articles
 
             # Match articles "A", "An", or "The" only if it's directly before the bracketed subject anywhere in the string
             pattern = rf'\b(?:A|An|The)\s+(?={re.escape(non_bracketed_subject)})'
@@ -464,7 +478,8 @@ def T5_PostProcess(user_prompt, t5_prompt):
             return t5_prompt
         else:
             # Check if t5_prompt starts with common generic subjects
-            common_starts = ["a woman", "a man", "a girl", "a boy"]
+            # common_starts = ["a woman", "a man", "a girl", "a boy"]
+            common_starts = ["a woman", "a man", "a girl", "a boy", "the woman", "the man", "the girl", "the boy"]
             t5_prompt_lower = t5_prompt.lower()
             
             for start in common_starts:
@@ -857,3 +872,4 @@ class Y7Nodes_PromptEnhancerFlux:
             print(f"   and places the files to: {model_path}", color.YELLOW)
             
             raise RuntimeError(f"Model at {model_path} is incomplete or corrupted. Please delete this directory and try again.")
+
