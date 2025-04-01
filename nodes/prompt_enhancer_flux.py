@@ -96,7 +96,7 @@ hermes_trismegistus_mistral_7b_req_files = [
     "tokenizer_config.json"
 ]
 
-_MAX_NEW_TOKENS = 2048
+_MAX_NEW_TOKENS = 1280
 MODELS_PATH_KEY = "LLM"
 DEFAULT_PROMPT = ""
 
@@ -295,12 +295,12 @@ The START AND END TAGS ARE IMPORTANT!
     # Format messages
     try:
         if hasattr(prompt_enhancer_tokenizer, 'chat_template') and prompt_enhancer_tokenizer.chat_template is not None:
-            print("Using tokenizer's built-in chat template for combined prompt", color.BRIGHT_GREEN)
+            # print("Using tokenizer's built-in chat template for combined prompt", color.BRIGHT_GREEN)
             formatted_text = prompt_enhancer_tokenizer.apply_chat_template(
                 messages, tokenize=False, add_generation_prompt=True
             )
         else:
-            print("Using custom formatting for combined prompt", color.YELLOW)
+            # print("Using custom formatting for combined prompt", color.YELLOW)
             formatted_text = format_chat_messages(messages, add_generation_prompt=True)
     except Exception as e:
         print(f"Error formatting messages for combined prompt: {str(e)}", color.RED)
@@ -312,7 +312,7 @@ The START AND END TAGS ARE IMPORTANT!
     # Get device information from model
     device = prompt_enhancer_model.device
     device_type = device.type if hasattr(device, 'type') else str(device)
-    print(f"Model is on device: {device_type}", color.BRIGHT_GREEN)
+    # print(f"Model is on device: {device_type}", color.BRIGHT_GREEN)
     
     # Create inputs and generate - more memory efficient
     model_inputs = prompt_enhancer_tokenizer([formatted_text], return_tensors="pt")
@@ -321,7 +321,7 @@ The START AND END TAGS ARE IMPORTANT!
     # Apply platform-specific optimizations
     try:
         if is_apple_silicon() and device_type == "mps":
-            print("Using Apple Silicon MPS optimizations", color.BRIGHT_GREEN)
+            
             with torch.inference_mode(), torch.autocast("mps"):
                 outputs = prompt_enhancer_model.generate(
                     **model_inputs, 
@@ -332,7 +332,7 @@ The START AND END TAGS ARE IMPORTANT!
                     top_k=top_k
                 )
         elif device_type == "cuda":
-            print("Using CUDA optimizations", color.BRIGHT_GREEN)
+            
             with torch.inference_mode(), torch.amp.autocast(device_type="cuda"):
                 outputs = prompt_enhancer_model.generate(
                     **model_inputs, 
@@ -343,7 +343,7 @@ The START AND END TAGS ARE IMPORTANT!
                     top_k=top_k
                 )
         else:
-            print(f"Using standard inference on {device_type}", color.YELLOW)
+                        
             with torch.inference_mode():
                 outputs = prompt_enhancer_model.generate(
                     **model_inputs, 
@@ -373,7 +373,7 @@ The START AND END TAGS ARE IMPORTANT!
     del model_inputs, outputs, generated_ids
     gc.collect()
     
-    print(f"Combined raw response:\n{decoded_response}\n", color.ORANGE)
+    # print(f"Combined raw response:\n{decoded_response}\n", color.ORANGE)
     
     # ==============================================================================
     # T5 PROMPT
@@ -424,8 +424,8 @@ The START AND END TAGS ARE IMPORTANT!
     final_clip = clip_prompt.replace("[", "").replace("]", "")
     
 
-    print(f"Extracted T5 prompt:\n{final_t5}\n", color.YELLOW)
-    print(f"Extracted CLIP prompt:\n{final_clip}", color.BRIGHT_YELLOW)
+    # print(f"Extracted T5 prompt:\n{final_t5}\n", color.YELLOW)
+    # print(f"Extracted CLIP prompt:\n{final_clip}", color.BRIGHT_YELLOW)
     
     return final_clip, final_t5
 
@@ -478,7 +478,7 @@ def T5_PostProcess(user_prompt, t5_prompt):
                     return t5_prompt.replace(original_start, non_bracketed_subject, 1)  # Replace only the first occurrence
             
             # If no common generic beginning found, just prepend the clean subject
-            print(f"Adding bracketed subject '{non_bracketed_subject}' to beginning of T5 prompt", color.YELLOW)
+            # print(f"Adding bracketed subject '{non_bracketed_subject}' to beginning of T5 prompt", color.YELLOW)
             return f"{non_bracketed_subject} {t5_prompt}"
     
     # If no bracketed subject or it's already in the prompt, return the original
@@ -613,7 +613,7 @@ class Y7Nodes_PromptEnhancerFlux:
                 print("Using MPS (Metal Performance Shaders) for Apple Silicon", color.BRIGHT_GREEN)
                 load_device = "mps"
             elif is_cuda_available():
-                print("Using CUDA device for NVIDIA GPU", color.BRIGHT_GREEN)
+                print("Using CUDA device", color.BRIGHT_GREEN)
                 load_device = comfy.model_management.get_torch_device()
                 offload_device = comfy.model_management.unet_offload_device()                
             else:
@@ -643,7 +643,7 @@ class Y7Nodes_PromptEnhancerFlux:
 
             # ======================================================================    
             # Generate both prompts in a single model call
-            print("Generating both T5 and CLIP prompts in a single call...", color.BRIGHT_BLUE)
+            print("Generating both T5 and CLIP prompts...", color.BRIGHT_BLUE)
             
             clip_l_prompt, t5xxl_prompt = generate_both_prompts(
                                                             llm_model, 
@@ -696,7 +696,7 @@ class Y7Nodes_PromptEnhancerFlux:
                         del ModelCache.loaded_tokenizers[llm_display_name]
                     gc.collect()
             else:
-                print("Keeping model loaded for future use.", color.BRIGHT_BLUE)
+                print("Keeping model loaded.", color.BRIGHT_BLUE)
                 ModelCache.loaded_models[llm_display_name] = llm_model
                 ModelCache.loaded_tokenizers[llm_display_name] = llm_tokenizer
             
@@ -793,8 +793,9 @@ class Y7Nodes_PromptEnhancerFlux:
             
             # Apply optimizations for Apple Silicon
             if is_apple_silicon():
-                print(f"Detected Apple Silicon, applying optimizations...", color.BRIGHT_GREEN)
-                torch_dtype = torch.float16  # Use float16 instead of bfloat16 for Apple Silicon
+                 # "Detected Apple Silicon...
+                 # Use float16 instead of bfloat16 for Apple Silicon
+                torch_dtype = torch.float16  
                 
                 # Load model with Apple-specific optimizations but DON'T use device_map="auto"
                 llm_model = AutoModelForCausalLM.from_pretrained(
@@ -812,11 +813,9 @@ class Y7Nodes_PromptEnhancerFlux:
                     llm_model = llm_model.to("cpu")
 
             elif is_cuda_available():
-                print(f"Detected CUDA device, using NVIDIA GPU optimizations...", color.BRIGHT_GREEN)
-                
+                # Detected CUDA device...                
                 # Use native CUDA device from comfy
                 cuda_device = comfy.model_management.get_torch_device()
-                print(f"Using CUDA device: {cuda_device}", color.BRIGHT_GREEN)
                 
                 # Load model with CUDA optimizations
                 llm_model = AutoModelForCausalLM.from_pretrained(
@@ -829,7 +828,8 @@ class Y7Nodes_PromptEnhancerFlux:
                 llm_model = llm_model.to(cuda_device)
             else:
                 # Fallback for other devices
-                print(f"No GPU detected, using CPU (this will be very slow)", color.YELLOW)                
+                # "No GPU detected, using CPU (this will be very slow)
+
                 # Load model
                 llm_model = AutoModelForCausalLM.from_pretrained(
                     model_path,
