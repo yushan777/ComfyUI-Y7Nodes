@@ -570,10 +570,6 @@ class Y7Nodes_PromptEnhancerFlux:
                 "seed": (
                     "INT", 
                     {"default": 0, "min": 0, "max": 0xffffffffffffffff}
-                ),                
-                "keep_model_loaded": (
-                    "BOOLEAN",
-                    {"default": False, "tooltip": "If enabled, keeps the model loaded in VRAM for faster subsequent runs"}
                 ),
             }, 
             "hidden":{}
@@ -611,7 +607,6 @@ class Y7Nodes_PromptEnhancerFlux:
         temperature = kwargs.get("temperature")
         top_p = kwargs.get("top_p")
         top_k = kwargs.get("top_k")
-        keep_model_loaded = kwargs.get("keep_model_loaded")
 
         # Default prompt if empty
         if not prompt.strip():
@@ -672,48 +667,47 @@ class Y7Nodes_PromptEnhancerFlux:
 
             # ======================================================================
 
-            # Memory management based on keep_model_loaded parameter
-            if not keep_model_loaded:
-                print("Cleaning up model...\n", color.BRIGHT_BLUE)
-                
-                # Platform-specific cleanup
-                if is_apple_silicon():
-                    # For Apple Silicon, just delete references and let GC handle it
-                    if llm_display_name in ModelCache.loaded_models:
-                        del ModelCache.loaded_models[llm_display_name]
-                        del ModelCache.loaded_tokenizers[llm_display_name]
-                    
-                    # Force garbage collection
-                    gc.collect()
-                    if hasattr(torch.mps, 'empty_cache'):
-                        torch.mps.empty_cache()
-                
-                elif is_cuda_available():
-                    # For NVIDIA GPUs, we can safely move to CPU then clean up
-                    try:
-                        llm_model.to("cpu")
-                    except Exception as e:
-                        print(f"Warning: Could not move model to CPU: {str(e)}", color.YELLOW)
-                    
-                    if llm_display_name in ModelCache.loaded_models:
-                        del ModelCache.loaded_models[llm_display_name]
-                        del ModelCache.loaded_tokenizers[llm_display_name]
-                    
-                    # Force garbage collection and CUDA cache cleanup
-                    gc.collect()
-                    torch.cuda.empty_cache()
-                    comfy.model_management.soft_empty_cache()
-                
-                else:
-                    # CPU fallback
-                    if llm_display_name in ModelCache.loaded_models:
-                        del ModelCache.loaded_models[llm_display_name]
-                        del ModelCache.loaded_tokenizers[llm_display_name]
-                    gc.collect()
+            # Always clean up model to prevent memory issues
+            print("Cleaning up model...\n", color.BRIGHT_BLUE)
+            
+            # First, try to move model to CPU regardless of platform
+            try:
+                llm_model.to("cpu")
+            except Exception as e:
+                print(f"Warning: Could not move model to CPU: {str(e)}", color.YELLOW)
+            
+            # Clear model from cache
+            if llm_display_name in ModelCache.loaded_models:
+                del ModelCache.loaded_models[llm_display_name]
+            
+            if llm_display_name in ModelCache.loaded_tokenizers:
+                del ModelCache.loaded_tokenizers[llm_display_name]
+            
+            # Clear any references to the model and tokenizer
+            del llm_model
+            del llm_tokenizer
+            
+            # Platform-specific cleanup
+            if is_apple_silicon():
+                # For Apple Silicon
+                gc.collect()
+                if hasattr(torch.mps, 'empty_cache'):
+                    torch.mps.empty_cache()
+            
+            elif is_cuda_available():
+                # For NVIDIA GPUs
+                gc.collect()
+                torch.cuda.empty_cache()
+                comfy.model_management.soft_empty_cache()
+                # More aggressive CUDA cleanup
+                comfy.model_management.cleanup_models()
+            
             else:
-                print("Keeping model loaded.", color.BRIGHT_BLUE)
-                ModelCache.loaded_models[llm_display_name] = llm_model
-                ModelCache.loaded_tokenizers[llm_display_name] = llm_tokenizer
+                # CPU fallback
+                gc.collect()
+            
+            # Final garbage collection pass
+            gc.collect()
             
             return (clip_l_prompt, t5xxl_prompt,)
         
@@ -872,4 +866,3 @@ class Y7Nodes_PromptEnhancerFlux:
             print(f"   and places the files to: {model_path}", color.YELLOW)
             
             raise RuntimeError(f"Model at {model_path} is incomplete or corrupted. Please delete this directory and try again.")
-
