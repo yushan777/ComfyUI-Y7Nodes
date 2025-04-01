@@ -96,7 +96,7 @@ hermes_trismegistus_mistral_7b_req_files = [
     "tokenizer_config.json"
 ]
 
-_MAX_NEW_TOKENS = 1024
+_MAX_NEW_TOKENS = 2048
 MODELS_PATH_KEY = "LLM"
 DEFAULT_PROMPT = ""
 
@@ -110,12 +110,44 @@ You are a Generative AI assistant specialized in generating comprehensive text-t
 the Flux image generation model. I'm going to ask you to create a prompt in two parts.
 """
 
-# T5 Prompt instructions
-PROMPT_T5_INSTRUCTIONS = """
+# T5 Prompt instructions (Shorter)
+# PROMPT_T5_INSTRUCTIONS_SHORTER = """
+# First, I need you to create a T5 Prompt:
+
+# This should be a highly detailed natural language description (up to 512 T5 tokens - aiming for closer to 450-500 words) with:
+
+# - Subject always comes first: Start with the main subject(s): determined by the input prompt. this can be a person, object or scene or something else.
+# - Subject Details: When applicable, describe physical appearance, pose, action, expression, attire
+# - Scene Description: Overall setting, environment, background, visual style
+# - Time & Place: Time of day, season, location
+# - Lighting and color palette: Sources, intensity, direction, color temperature, shadows
+# - Composition: Layout of elements and focal points
+# - Mood & Atmosphere: Emotional tone using evocative language (but not too much of this!)
+# - Do not start with, "in this image..." or similar assume that we know it is an image, go straight to the point!
+# Bad:
+# "In this image, a woman stands in..."
+# "The image shows a woman who is..."
+
+# Good:
+# "A woman stands in..."
+
+# - Use only positive descriptions — focus on what should appear in the image.
+# - Avoid repetition of the subject, instead use she, he, her, his etc
+# """
+
+# T5 Prompt instructions (Longer)
+PROMPT_T5_INSTRUCTIONS_LONGER = """
 First, I need you to create a T5 Prompt:
 
-This should be a detailed natural language description (up to 512 T5 tokens - approximately 400 or more words) with:
+This must be a **very rich and highly detailed** natural language description (up to 512 T5 tokens - aiming for closer to 450-500 words). **Elaborate significantly** on each aspect:
 
+- Subject always comes first: Start with the main subject(s): determined by the input prompt. this can be a person, object or scene or something else.
+- Subject Details: **Thoroughly describe** physical appearance, pose, action, expression, attire, including textures and materials.
+- Scene Description: **Paint a vivid picture** of the overall setting, environment, background details, and visual style.
+- Time & Place: Specify time of day, season, location with **atmospheric details**.
+- Lighting and color palette: Detail the light sources, intensity, direction, color temperature, shadows, and **how light interacts with surfaces**.
+- Composition: Explain the layout of elements, focal points, and camera angle/perspective.
+- Mood & Atmosphere: Convey the emotional tone using **evocative and descriptive language**.
 - Do not start with, "in this image..." or similar assume that we know it is an image, go straight to the point!
 Bad:
 "In this image, a woman stands in..."
@@ -124,17 +156,9 @@ Bad:
 Good:
 "A woman stands in..."
 
-- Subject always comes first: Start with the main subject(s): determined by the input prompt. this can be a person, object or scene or something else. 
-- Subject Details: When applicable, describe physical appearance, pose, action, expression, attire
-- Scene Description: Overall setting, environment, background, visual style
-- Time & Place: Time of day, season, location
-- Lighting and color palette: Sources, intensity, direction, color temperature, shadows
-- Composition: Layout of elements and focal points
-- Mood & Atmosphere: Emotional tone using evocative language (but not too much of this!)
-Use only positive descriptions — focus on what should appear in the image.
-Avoid repetition of the subject, instead use she, he, her, his etc
+- Use only positive descriptions — focus on what should appear in the image.
+- Avoid repetition of the subject, instead use she, he, her, his etc
 """
-
 
 
 # T5 example
@@ -152,15 +176,15 @@ creating deep shadows that frame the woman in dramatic contrast.
 PROMPT_CLIP_INSTRUCTIONS = """
 Next, I need you to create a CLIP Prompt:
 
-This must be a concise, short, less verbose keyword list (up to 70 CLIP TOKENS which roughly equates to 40-50 words):
-- Prioritized, comma-separated list of essential keywords, but word limit priority is crucial.
+This should be a keyword-focused list (up to 70 CLIP TOKENS, aiming for roughly 45-55 words):
+- Prioritized, comma-separated list of essential keywords. Aim for the target word count.
 - Subject(s) MUST come first
 - Include: subject(s), art style, setting, major visual features, mood, lighting, color scheme
 - Include specific artistic terms if relevant (e.g., "soft focus," "cinematic lighting")
-- Ensure alignment with the T5 prompt, but remove any extraneous details - it does not need to be exhaustive.
-- Avoid words that describe sounds or smells if they add nothing to the visuals. 
+- Ensure alignment with the T5 prompt, focusing on the most impactful keywords but including secondary relevant details if space allows within the target word count.
+- Avoid words that describe sounds or smells if they add nothing to the visuals.
 - Do not start with the words 'CLIP Prompt:' - go straight to the keywords
-- Remember to keep the word count under 40. - remove keywords if they go over the limit
+- Aim for the target word count of 40-55 words. Add or remove keywords as needed to meet this range.
 """
 
 # CLIP example
@@ -243,7 +267,7 @@ SPECIAL PROMPT OVERRIDE:
 I need you to create two different prompts for the same image:
 
 1. T5 PROMPT:
-{PROMPT_T5_INSTRUCTIONS}
+{PROMPT_T5_INSTRUCTIONS_LONGER}
 
 2. CLIP PROMPT:
 {PROMPT_CLIP_INSTRUCTIONS}
@@ -366,6 +390,7 @@ The START AND END TAGS ARE IMPORTANT!
         if t5_prompt.startswith("T5 PROMPT:"):
             t5_prompt = t5_prompt[len("T5 PROMPT:"):].strip()
     
+    # post process (remove articles if bracketed subject is used)
     t5_prompt = T5_PostProcess(user_prompt, t5_prompt)
 
     # ==============================================================================
@@ -395,7 +420,7 @@ The START AND END TAGS ARE IMPORTANT!
     clip_prompt = clip_prompt.replace("CLIP PROMPT:", "").replace("[/CLIP]", "").strip()
     
     # Final cleanup - remove brackets from final output
-    final_t5 = t5_prompt.replace("[", "").replace("]", "").replace("\n", "")
+    final_t5 = t5_prompt.replace("[", "").replace("]", "").replace("\n\n", " ")
     final_clip = clip_prompt.replace("[", "").replace("]", "")
     
 
@@ -423,13 +448,19 @@ def T5_PostProcess(user_prompt, t5_prompt):
     
     if bracketed_subject:
         # Remove square brackets from the extracted subject
-        clean_subject = bracketed_subject.strip()
+        non_bracketed_subject = bracketed_subject.strip()
         
-
-
         # Check if the clean subject appears in t5_prompt
-        if clean_subject.lower() in t5_prompt.lower():            
-            print(f"Bracketed subject '{clean_subject}' already in T5 prompt, leaving as is", color.BRIGHT_GREEN)
+        if non_bracketed_subject.lower() in t5_prompt.lower():            
+            print(f"Bracketed subject '{non_bracketed_subject}' found in T5 prompt, checking for articles", color.BRIGHT_GREEN)
+
+            # Match articles "A", "An", or "The" only if it's directly before the bracketed subject anywhere in the string
+            pattern = rf'\b(?:A|An|The)\s+(?={re.escape(non_bracketed_subject)})'
+            t5_prompt = re.sub(pattern, '', t5_prompt, flags=re.IGNORECASE)
+        
+            # remove  from the start ("A", "An", "The")
+            # t5_prompt = re.sub(r'^(?:A|An|The)\s+', '', t5_prompt, flags=re.IGNORECASE)
+
             return t5_prompt
         else:
             # Check if t5_prompt starts with common generic subjects
@@ -443,12 +474,12 @@ def T5_PostProcess(user_prompt, t5_prompt):
                     original_start = t5_prompt[:start_length]
                     
                     # Replace the generic beginning with the bracketed subject
-                    print(f"Replacing '{original_start}' with '{clean_subject}' at beginning of T5 prompt", color.YELLOW)
-                    return t5_prompt.replace(original_start, clean_subject, 1)  # Replace only the first occurrence
+                    print(f"Replacing '{original_start}' with '{non_bracketed_subject}' at beginning of T5 prompt", color.YELLOW)
+                    return t5_prompt.replace(original_start, non_bracketed_subject, 1)  # Replace only the first occurrence
             
             # If no common generic beginning found, just prepend the clean subject
-            print(f"Adding bracketed subject '{clean_subject}' to beginning of T5 prompt", color.YELLOW)
-            return f"{clean_subject} {t5_prompt}"
+            print(f"Adding bracketed subject '{non_bracketed_subject}' to beginning of T5 prompt", color.YELLOW)
+            return f"{non_bracketed_subject} {t5_prompt}"
     
     # If no bracketed subject or it's already in the prompt, return the original
     return t5_prompt
