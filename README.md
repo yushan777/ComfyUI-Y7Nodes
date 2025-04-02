@@ -108,6 +108,8 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   **Token/Trigger words** are handled by enclosing them inside square brackets `[ohwx man]`, but occasionally it might not work.
 >
 >   It's not perfect, and there can be quirks, but it will get you most of the way in producing prompts in both formats very quickly and you can always edit them afterwards (in your own editor). 
+>   
+>   There is an option to unload all models before each run, this might be needed if it is used in heavy workflows with other large models. Alternativel, you can always use [SeanScripts's Unload Model custom nodes](https://github.com/SeanScripts/ComfyUI-Unload-Model).
 
 >   Two LLM models are available here, offering a balance of knowledge, instruction-following, and minimal censorship.
 >
