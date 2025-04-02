@@ -15,32 +15,35 @@ from huggingface_hub import snapshot_download
 import numpy as np
 from threading import Thread
 
+# function call sequence
 # Y7Nodes_PromptEnhancerFlux
-
 # .enhance()
 # │
+# ├── [Optional VRAM Cleanup]
+# │   └── unload models, clear cache, clear internal cache
+# │
 # ├── down_load_llm_model()
-# │   ├── model_path_download_if_needed() [if model not cached]
-# │   │   └── snapshot_download() [if model files missing]
-# │   └── AutoModelForCausalLM.from_pretrained() + AutoTokenizer.from_pretrained()
+# │   ├── Check cache (self._loaded_models)
+# │   ├── [If cache miss]:
+# │   │   ├── model_path_download_if_needed() -> snapshot_download()
+# │   │   ├── AutoModelForCausalLM.from_pretrained() -> .to(device)
+# │   │   ├── AutoTokenizer.from_pretrained()
+# │   │   └── Store in cache
+# │   └── Return model, tokenizer
 # │
-# ├── generate_t5_prompt()
-# │   ├── get_t5_prompt_instruction()
-# │   ├── format_chat_messages() or tokenizer.apply_chat_template()
-# │   ├── model.generate() [with torch.inference_mode()]
-# │   ├── tokenizer.decode()
-# │   └── process_subject_override() [if square brackets present]
-# │       └── extract_square_brackets()
+# ├── [Memory Management]
+# │   └── get_model_size(), comfy.model_management.free_memory()
 # │
-# ├── generate_clip_prompt()
-# │   ├── get_clip_prompt_instruction()
-# │   ├── format_chat_messages() or tokenizer.apply_chat_template()
-# │   ├── model.generate() [with torch.inference_mode()]
-# │   ├── tokenizer.decode()
-# │   └── extract_square_brackets() [to check for subject override]
+# ├── generate_both_prompts()
+# │   ├── Format input (apply_chat_template/format_chat_messages)
+# │   ├── Tokenize input
+# │   ├── model.generate() [via Thread + TextIteratorStreamer]
+# │   ├── Decode streamed response
+# │   ├── Extract T5/CLIP prompts
+# │   ├── T5_PostProcess() -> extract_square_brackets()
+# │   └── Return cleaned (clip_prompt, t5_prompt)
 # │
-# └── [Memory Management]
-#     └── Offload model or keep loaded based on keep_model_loaded parameter
+# └── Return (clip_l_prompt, t5xxl_prompt)
 
 # function to detect Apple Silicon
 def is_apple_silicon():    
@@ -531,7 +534,6 @@ class Y7Nodes_PromptEnhancerFlux:
     # Class variable to cache loaded models and tokenizers, so they aren't needed to be loaded
     # from disk each time.  these are cleared if unload_models_before_run is true
     _loaded_models: Dict[str, Tuple[Any, Any]] = {}
-    _current_device: Optional[torch.device] = None # Track the device models are loaded on
 
     @classmethod
     def INPUT_TYPES(s):
@@ -620,7 +622,9 @@ class Y7Nodes_PromptEnhancerFlux:
             return (clip_l_prompt, t5xxl_prompt,)
         
         try:
-            # --- VRAM Cleanup ---
+            # ================= VRAM Cleanup =================
+            # if unload_models_before_run is on, then flush the vram and cache
+            # this helps if this node is used in a larger workflow that contains other model loaders.
             if unload_models_before_run == True:
                 # If FREE_VRAM_BEFORE_RUNNING is True
                 print("unloading models and clearing cache...", color.YELLOW)
@@ -643,7 +647,7 @@ class Y7Nodes_PromptEnhancerFlux:
                     print("✅ VRAM cleanup attempt finished.", color.YELLOW)
                 except Exception as cleanup_error:
                     print(f"⚠️ Warning during VRAM cleanup: {str(cleanup_error)}", color.YELLOW)
-            # --- End VRAM Cleanup ---
+            # =============== End VRAM Cleanup ===============
 
             # Force garbage collection before starting (kept original gc.collect)
             gc.collect()
@@ -654,13 +658,11 @@ class Y7Nodes_PromptEnhancerFlux:
                 load_device = "mps"
             elif is_cuda_available():
                 print("Using CUDA device", color.BRIGHT_GREEN)
-                load_device = comfy.model_management.get_torch_device()
-                offload_device = comfy.model_management.unet_offload_device()                
+                load_device = comfy.model_management.get_torch_device()                
             else:
                 print("No GPU detected, using CPU (this will be slow)", color.YELLOW)
                 load_device = "cpu"
-                offload_device = "cpu"
-            
+                            
             # Load/download the model - it will be placed on the correct device by down_load_llm_model
             llm_model, llm_tokenizer = self.down_load_llm_model(llm_display_name, load_device)
             
@@ -820,82 +822,6 @@ class Y7Nodes_PromptEnhancerFlux:
         return full_model_path
 
     # ==============================================================================================
-    def down_load_llm_model(self, model_display_name, load_device):
-        repo_path = get_repo_info(model_display_name)
-            
-        # Download if needed
-        model_path = self.model_path_download_if_needed(model_display_name)
-                
-        try:
-            print(f"Loading model {model_display_name}", color.BRIGHT_BLUE)
-            
-            # Force garbage collection before loading model
-            gc.collect()
-            torch.cuda.empty_cache() if hasattr(torch.cuda, 'empty_cache') else None
-            
-            # Apply optimizations for Apple Silicon
-            if is_apple_silicon():
-                 # "Detected Apple Silicon...
-                 # Use float16 instead of bfloat16 for Apple Silicon
-                torch_dtype = torch.float16  
-                
-                # Load model with Apple-specific optimizations but DON'T use device_map="auto"
-                llm_model = AutoModelForCausalLM.from_pretrained(
-                    model_path,
-                    torch_dtype=torch_dtype,
-                    low_cpu_mem_usage=True,
-                )
-                
-                # Explicitly move to the correct device
-                if torch.backends.mps.is_available():
-                    print("Using MPS backend for model", color.BRIGHT_GREEN)
-                    llm_model = llm_model.to("mps")
-                else:
-                    print("MPS not available, using CPU", color.YELLOW)
-                    llm_model = llm_model.to("cpu")
-
-            elif is_cuda_available():
-                # Detected CUDA device...                
-                # Use native CUDA device from comfy
-                cuda_device = comfy.model_management.get_torch_device()
-                
-                # Load model with CUDA optimizations
-                llm_model = AutoModelForCausalLM.from_pretrained(
-                    model_path,
-                    torch_dtype=torch.bfloat16,
-                    low_cpu_mem_usage=True,
-                )
-                
-                # Explicitly move to CUDA device
-                llm_model = llm_model.to(cuda_device)
-            else:
-                # Fallback for other devices
-                # "No GPU detected, using CPU (this will be very slow)
-
-                # Load model
-                llm_model = AutoModelForCausalLM.from_pretrained(
-                    model_path,
-                    torch_dtype=torch.bfloat16,
-                )
-                
-
-            # llm_tokenizer
-            llm_tokenizer = AutoTokenizer.from_pretrained(
-                model_path,
-            )
-            
-            return llm_model, llm_tokenizer
-            
-        except (FileNotFoundError, ValueError) as e:
-            print(f"❌ Error: Model files are incomplete or corrupted: {str(e)}", color.RED)
-            print(f"🔄 Please manually delete the directory : {model_path}", color.YELLOW)
-            print(f"🔄 Then re-launch the workflow to attempt downloading again.", color.YELLOW)
-            print(f"🔄 Alternatively you can manually download the model from: \nhttps://huggingface.co/{repo_path}", color.YELLOW)                
-            print(f"   and places the files to: {model_path}", color.YELLOW)
-            
-            raise RuntimeError(f"Model at {model_path} is incomplete or corrupted. Please delete this directory and try again.")
-
-    # ==============================================================================================
     # down_load_llm_model (or load from Cache)
     # ==============================================================================================
     def down_load_llm_model(self, model_display_name, load_device):
@@ -945,10 +871,9 @@ class Y7Nodes_PromptEnhancerFlux:
                 low_cpu_mem_usage=True, # Helps especially when loading large models
             )
 
-            # Explicitly move to the target device
-            print(f"   Moving model to target device: {load_device}...", color.BLUE)
+            # load model to device
             llm_model = llm_model.to(load_device)
-            print(f"   Model moved to {llm_model.device}", color.GREEN)
+            print(f"   Model loaded on {llm_model.device}", color.GREEN)
 
             # Load tokenizer
             llm_tokenizer = AutoTokenizer.from_pretrained(model_path)
@@ -956,7 +881,6 @@ class Y7Nodes_PromptEnhancerFlux:
             # Store in cache
             print(f"   Caching model {model_display_name} for device {load_device}", color.BLUE)
             self._loaded_models[cache_key] = (llm_model, llm_tokenizer)
-            self._current_device = torch.device(load_device) # Update the current device tracker
 
             return llm_model, llm_tokenizer
 
