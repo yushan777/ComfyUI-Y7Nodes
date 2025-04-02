@@ -528,6 +528,11 @@ def get_model_size(model):
 # MAIN NODE CLASS
 # ==================================================================================
 class Y7Nodes_PromptEnhancerFlux:
+    # Class variable to cache loaded models and tokenizers, so they aren't needed to be loaded
+    # from disk each time.  these are cleared if unload_models_before_run is true
+    _loaded_models: Dict[str, Tuple[Any, Any]] = {}
+    _current_device: Optional[torch.device] = None # Track the device models are loaded on
+
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -568,8 +573,7 @@ class Y7Nodes_PromptEnhancerFlux:
                 "unload_models_before_run": (
                     "BOOLEAN", 
                     {"default": True, 
-                     "tooltip": "Frees up Memory (unload all models) before each run."
-                     }
+                     "tooltip": "Frees up Memory (unload all models) before each run."}
                 ),                
             }, 
             "hidden":{}
@@ -616,7 +620,7 @@ class Y7Nodes_PromptEnhancerFlux:
             return (clip_l_prompt, t5xxl_prompt,)
         
         try:
-            # --- VRAM Cleanup Logic ---
+            # --- VRAM Cleanup ---
             if unload_models_before_run == True:
                 # If FREE_VRAM_BEFORE_RUNNING is True
                 print("unloading models and clearing cache...", color.YELLOW)
@@ -632,6 +636,10 @@ class Y7Nodes_PromptEnhancerFlux:
                     elif is_apple_silicon() and hasattr(torch.mps, 'empty_cache'):
                         torch.mps.empty_cache()
                         print("   - MPS cache cleared.", color.YELLOW)
+                    # Clear the node's internal cache as well
+                    if hasattr(self, '_loaded_models'):
+                        print("   - Clearing internal node model cache.", color.YELLOW)
+                        self._loaded_models.clear()
                     print("✅ VRAM cleanup attempt finished.", color.YELLOW)
                 except Exception as cleanup_error:
                     print(f"⚠️ Warning during VRAM cleanup: {str(cleanup_error)}", color.YELLOW)
@@ -689,8 +697,8 @@ class Y7Nodes_PromptEnhancerFlux:
 
             # ======================================================================
 
-            # Always clean up model to prevent memory issues
-            print("Cleaning up model...\n", color.BRIGHT_BLUE)
+
+            # print("Cleaning up model...\n", color.BRIGHT_BLUE)
             
             # First, try to move model to CPU regardless of platform
             # try:
@@ -702,7 +710,7 @@ class Y7Nodes_PromptEnhancerFlux:
             # del llm_model
             # del llm_tokenizer
             
-            # # Platform-specific cleanup
+            # # # Platform-specific cleanup
             # if is_apple_silicon():
             #     # For Apple Silicon
             #     gc.collect()
@@ -721,7 +729,7 @@ class Y7Nodes_PromptEnhancerFlux:
             #     # CPU fallback
             #     gc.collect()
             
-            # Final garbage collection pass
+            # # Final garbage collection pass
             gc.collect()
             
             return (clip_l_prompt, t5xxl_prompt,)
@@ -886,3 +894,87 @@ class Y7Nodes_PromptEnhancerFlux:
             print(f"   and places the files to: {model_path}", color.YELLOW)
             
             raise RuntimeError(f"Model at {model_path} is incomplete or corrupted. Please delete this directory and try again.")
+
+    # ==============================================================================================
+    # down_load_llm_model (or load from Cache)
+    # ==============================================================================================
+    def down_load_llm_model(self, model_display_name, load_device):
+        repo_path = get_repo_info(model_display_name)
+        cache_key = f"{model_display_name}_{load_device}" # Cache key includes device
+
+        # Check cache first
+        if cache_key in self._loaded_models:
+            print(f"✅ Using cached model {model_display_name} on device {load_device}", color.BRIGHT_GREEN)
+            llm_model, llm_tokenizer = self._loaded_models[cache_key]
+            # Ensure model is on the requested device (might have changed if Comfy moved things)
+            if llm_model.device != torch.device(load_device):
+                 print(f"⚠️ Cached model was on {llm_model.device}, moving to {load_device}", color.YELLOW)
+                 try:
+                     llm_model = llm_model.to(load_device)
+                     self._loaded_models[cache_key] = (llm_model, llm_tokenizer) # Update cache with correct device
+                 except Exception as e:
+                     print(f"❌ Error moving cached model to {load_device}: {e}. Reloading.", color.RED)
+                     del self._loaded_models[cache_key] # Remove invalid cache entry
+                     # Proceed to load model below
+            else:
+                # Model is already on the correct device in cache
+                return llm_model, llm_tokenizer
+
+        # If not in cache or moved device failed, load it
+        print(f"🔄 Loading model {model_display_name} to device {load_device}", color.BRIGHT_BLUE)
+        model_path = self.model_path_download_if_needed(model_display_name)
+
+        try:
+            # Force garbage collection before loading model
+            gc.collect()
+            if is_cuda_available():
+                torch.cuda.empty_cache()
+            elif is_apple_silicon() and hasattr(torch.mps, 'empty_cache'):
+                torch.mps.empty_cache()
+
+            # Determine torch_dtype based on device
+            if is_apple_silicon():
+                torch_dtype = torch.float16
+            else: # CUDA or CPU
+                torch_dtype = torch.bfloat16 # Use bfloat16 for CUDA/CPU
+
+            # Load model with low_cpu_mem_usage=True to potentially reduce host RAM usage during loading
+            llm_model = AutoModelForCausalLM.from_pretrained(
+                model_path,
+                torch_dtype=torch_dtype,
+                low_cpu_mem_usage=True, # Helps especially when loading large models
+            )
+
+            # Explicitly move to the target device
+            print(f"   Moving model to target device: {load_device}...", color.BLUE)
+            llm_model = llm_model.to(load_device)
+            print(f"   Model moved to {llm_model.device}", color.GREEN)
+
+            # Load tokenizer
+            llm_tokenizer = AutoTokenizer.from_pretrained(model_path)
+
+            # Store in cache
+            print(f"   Caching model {model_display_name} for device {load_device}", color.BLUE)
+            self._loaded_models[cache_key] = (llm_model, llm_tokenizer)
+            self._current_device = torch.device(load_device) # Update the current device tracker
+
+            return llm_model, llm_tokenizer
+
+        except (FileNotFoundError, ValueError) as e:
+            print(f"❌ Error: Model files are incomplete or corrupted: {str(e)}", color.RED)
+            print(f"🔄 Please manually delete the directory : {model_path}", color.YELLOW)
+            print(f"🔄 Then re-launch the workflow to attempt downloading again.", color.YELLOW)
+            print(f"🔄 Alternatively you can manually download the model from: \nhttps://huggingface.co/{repo_path}", color.YELLOW)
+            print(f"   and places the files to: {model_path}", color.YELLOW)
+            raise RuntimeError(f"Model at {model_path} is incomplete or corrupted. Please delete this directory and try again.")
+        except Exception as e:
+            print(f"❌ Unexpected error loading model {model_display_name}: {str(e)}", color.RED)
+            # Attempt to clean up potentially partially loaded model from cache if it exists
+            if cache_key in self._loaded_models:
+                del self._loaded_models[cache_key]
+            gc.collect()
+            if is_cuda_available():
+                torch.cuda.empty_cache()
+            elif is_apple_silicon() and hasattr(torch.mps, 'empty_cache'):
+                torch.mps.empty_cache()
+            raise # Re-raise the exception after cleanup attempt
