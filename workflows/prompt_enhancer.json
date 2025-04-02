@@ -1,8 +1,8 @@
 {
   "id": "efd192c5-6790-4604-b26b-81560b59cb7e",
   "revision": 0,
-  "last_node_id": 14,
-  "last_link_id": 19,
+  "last_node_id": 16,
+  "last_link_id": 22,
   "nodes": [
     {
       "id": 2,
@@ -12,11 +12,11 @@
         144.00674438476562
       ],
       "size": [
-        210.2095184326172,
-        234.1913299560547
+        210,
+        232
       ],
       "flags": {},
-      "order": 3,
+      "order": 2,
       "mode": 0,
       "inputs": [
         {
@@ -48,9 +48,9 @@
       },
       "widgets_values": [
         "",
-        "Token Count: 183 / 512\n\nTokens\n==========================================\n[  0] ▁           [  1] a           [  2] gg          [  3] ▁woman      \n[  4] ▁A          [  5] ▁woman      [  6] ▁with       [  7] ▁tous       \n[  8] led         [  9] ,           [ 10] ▁au         [ 11] burn        \n[ 12] ▁curl       [ 13] s           [ 14] ▁and        [ 15] ▁           \n[ 16] pier        [ 17] c           [ 18] ing         [ 19] ▁green      \n[ 20] ▁eyes       [ 21] ▁is         [ 22] ▁depict     [ 23] e           \n[ 24] d           [ 25] ▁in         [ 26] ▁the        [ 27] ▁image      \n[ 28] ,           [ 29] ▁fully      [ 30] ▁nu         [ 31] de          \n[ 32] ▁and        [ 33] ▁comfortably[ 34] ▁rec        [ 35] line        \n[ 36] d           [ 37] ▁on         [ 38] ▁           [ 39] a           \n[ 40] ▁plus       [ 41] h           [ 42] ,           [ 43] ▁           \n[ 44] e           [ 45] mer         [ 46] al          [ 47] d           \n[ 48] ▁green      [ 49] ▁velvet     [ 50] ▁chaise     [ 51] ▁lounge     \n[ 52] .           [ 53] ▁She        [ 54] ▁holds      [ 55] ▁           \n[ 56] a           [ 57] ▁sleek      [ 58] ▁glass      [ 59] ▁pipe       \n[ 60] ▁in         [ 61] ▁her        [ 62] ▁right      [ 63] ▁hand       \n[ 64] ,           [ 65] ▁delicate   [ 66] ly          [ 67] ▁in         \n[ 68] hal         [ 69] ing         [ 70] ▁           [ 71] a           \n[ 72] ▁cloud      [ 73] ▁of         [ 74] ▁smoke      [ 75] ▁that       \n[ 76] ▁bill       [ 77] ow          [ 78] s           [ 79] ▁around     \n[ 80] ▁her        [ 81] ,           [ 82] ▁creating   [ 83] ▁an         \n[ 84] ▁           [ 85] e           [ 86] there       [ 87] al          \n[ 88] ▁           [ 89] haz         [ 90] e           [ 91] .           \n[ 92] ▁Her        [ 93] ▁left       [ 94] ▁hand       [ 95] ▁rest       \n[ 96] s           [ 97] ▁casual     [ 98] ly          [ 99] ▁on         \n[100] ▁her        [101] ▁abdomen    [102] ,           [103] ▁as         \n[104] ▁she        [105] ▁gaze       [106] s           [107] ▁off        \n[108] ▁into       [109] ▁the        [110] ▁distance   [111] ▁with       \n[112] ▁           [113] a           [114] ▁care       [115] free        \n[116] ,           [117] ▁slightly   [118] ▁dream      [119] y           \n[120] ▁expression [121] .           [122] ▁The        [123] ▁room       \n[124] ▁is         [125] ▁dim        [126] ly          [127] ▁lit        \n[128] ,           [129] ▁with       [130] ▁soft       [131] ▁am         \n[132] ber         [133] ▁hue        [134] s           [135] ▁emanat     \n[136] ing         [137] ▁from       [138] ▁candles    [139] ▁placed     \n[140] ▁around     [141] ▁the        [142] ▁space      [143] .           \n[144] ▁The        [145] ▁walls      [146] ▁are        [147] ▁           \n[148] adorned     [149] ▁with       [150] ▁vibrant    [151] ,           \n[152] ▁eclectic   [153] ▁artwork    [154] ,           [155] ▁adding     \n[156] ▁to         [157] ▁the        [158] ▁bo         [159] hem         \n[160] i           [161] an          [162] ▁atmosphere [163] .           \n[164] ▁The        [165] ▁scene      [166] ▁ex         [167] u           \n[168] des         [169] ▁           [170] a           [171] ▁sense      \n[172] ▁of         [173] ▁freedom    [174] ,           [175] ▁creativity \n[176] ,           [177] ▁and        [178] ▁self       [179] -           \n[180] expression  [181] .           [182] </s>        \n",
+        "Token Count: 462 / 512\n\n",
         "512",
-        true,
+        false,
         "4",
         "10",
         null
@@ -60,15 +60,15 @@
       "id": 3,
       "type": "Y7Nodes_CLIP_TokenCounter",
       "pos": [
-        227.63446044921875,
-        -122.03450775146484
+        225,
+        -105
       ],
       "size": [
-        213.5622100830078,
+        210,
         208
       ],
       "flags": {},
-      "order": 2,
+      "order": 1,
       "mode": 0,
       "inputs": [
         {
@@ -99,74 +99,169 @@
       },
       "widgets_values": [
         "",
-        "Token Count: 62 / 77\n\nTokens\n==========================================\n[ 0] <|startoftext|>[ 1] agg</w>        [ 2] woman</w>      [ 3] ,</w>          \n[ 4] tou            [ 5] sled</w>       [ 6] auburn</w>     [ 7] curls</w>      \n[ 8] ,</w>          [ 9] piercing</w>   [10] green</w>      [11] eyes</w>       \n[12] ,</w>          [13] nude</w>       [14] ,</w>          [15] plush</w>      \n[16] emerald</w>    [17] green</w>      [18] velvet</w>     [19] cha            \n[20] ise</w>        [21] lounge</w>     [22] ,</w>          [23] sleek</w>      \n[24] glass</w>      [25] pipe</w>       [26] ,</w>          [27] inhal          \n[28] ing</w>        [29] smoke</w>      [30] ,</w>          [31] ethereal</w>   \n[32] haze</w>       [33] ,</w>          [34] care           [35] free</w>       \n[36] ,</w>          [37] slightly</w>   [38] dreamy</w>     [39] expression</w> \n[40] ,</w>          [41] soft</w>       [42] amber</w>      [43] lighting</w>   \n[44] ,</w>          [45] candles</w>    [46] ,</w>          [47] vibrant</w>    \n[48] eclectic</w>   [49] artwork</w>    [50] ,</w>          [51] bohemian</w>   \n[52] atmosphere</w> [53] ,</w>          [54] freedom</w>    [55] ,</w>          \n[56] creativity</w> [57] ,</w>          [58] self</w>       [59] -</w>          \n[60] expression</w> [61] <|endoftext|>  \n",
-        true,
+        "Token Count: 42 / 77\n\n",
+        false,
         "4",
         "10",
         null
       ]
     },
     {
-      "id": 12,
-      "type": "Seed (rgthree)",
+      "id": 14,
+      "type": "Y7Nodes_ShowAnything",
       "pos": [
-        -544.0745239257812,
-        30.179296493530273
+        460,
+        65
       ],
       "size": [
-        315,
-        130
+        590,
+        310
       ],
       "flags": {},
-      "order": 0,
+      "order": 4,
       "mode": 0,
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 19
+        }
+      ],
       "outputs": [
         {
-          "dir": 4,
-          "name": "SEED",
-          "shape": 3,
-          "type": "INT",
+          "name": "output",
+          "type": "*",
           "links": [
-            17
+            21
           ]
         }
       ],
       "properties": {
-        "cnr_id": "rgthree-comfy",
-        "ver": "cb3612624037ad50d76a8caf44ed58694648e245"
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "6de017d91073793810d60f938ee8116f843607cc",
+        "Node name for S&R": "Y7Nodes_ShowAnything"
       },
       "widgets_values": [
-        123,
-        null,
-        null,
+        "A man with an ohwx aesthetic sits in a dimly lit cafe, his posture casual yet composed. He wears a well-tailored suit, the fabric a rich shade of navy blue that contrasts with the warm, honey-colored wood of the cafe's interior. The room is bathed in a soft, ambient light that filters through the venetian blinds, casting dappled patterns on the polished wooden floor. The cafe is cozy and inviting, with a few scattered tables and chairs, a well-stocked barista station, and an aromatic blend of coffee and fresh pastries wafting through the air. The ohwx man takes a drag from his cigarette, the smoke curling upwards and dissipating into the air. His expression is contemplative, his gaze distant as if lost in thought. He holds the cigarette with a practiced ease, the flicker of the flame from the lighter catching the light in his eyes, casting a warm glow on his face. The ash from the cigarette hangs precariously, a testament to his steadiness. A vintage record player in the corner hums softly, the vinyl record spinning at a leisurely pace. The music fills the room with a sultry, jazzy melody, adding to the overall atmosphere of relaxation and sophistication. The cafe is quiet, save for the occasional clinking of cups and the hum of conversation from nearby patrons. The cafe's walls are adorned with framed black and white photographs, capturing moments of old Hollywood glamour and the city's golden era. The ohwx man's attire and demeanor blend seamlessly with the cafe's ambiance, as if he were a character straight out of a classic film noir. The cafe's door swings open, admitting a gust of cool air that carries with it the scent of rain and damp pavement. The man takes another drag from his cigarette, his eyes following the new arrival as they make their way to a table in the corner.",
+        true,
+        "11",
         null
+      ]
+    },
+    {
+      "id": 13,
+      "type": "Y7Nodes_ShowAnything",
+      "pos": [
+        460,
+        -155
+      ],
+      "size": [
+        590,
+        180
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 18
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            20
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "6de017d91073793810d60f938ee8116f843607cc",
+        "Node name for S&R": "Y7Nodes_ShowAnything"
+      },
+      "widgets_values": [
+        "ohwx man, sitting, cafe, smoking, cigarette, ambient light, navy suit, wood, venetian blinds, coffee aroma, jazz music, vintage record player, black and white photographs, classic film noir",
+        true,
+        "11",
+        null
+      ]
+    },
+    {
+      "id": 15,
+      "type": "CLIPTextEncodeFlux",
+      "pos": [
+        1105,
+        -20
+      ],
+      "size": [
+        210,
+        125
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 2,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": null
+        },
+        {
+          "name": "clip_l",
+          "type": "STRING",
+          "widget": {
+            "name": "clip_l"
+          },
+          "link": 20
+        },
+        {
+          "name": "t5xxl",
+          "type": "STRING",
+          "widget": {
+            "name": "t5xxl"
+          },
+          "link": 21
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.27",
+        "Node name for S&R": "CLIPTextEncodeFlux"
+      },
+      "widgets_values": [
+        "",
+        "",
+        3.5
       ]
     },
     {
       "id": 11,
       "type": "Y7Nodes_PromptEnhancerFlux",
       "pos": [
-        -171.82177734375,
-        -78.19091796875
+        -115,
+        -80
       ],
       "size": [
-        362.2734375,
-        345.1796875
+        320,
+        285
       ],
       "flags": {},
-      "order": 1,
+      "order": 0,
       "mode": 0,
-      "inputs": [
-        {
-          "name": "seed",
-          "type": "INT",
-          "widget": {
-            "name": "seed"
-          },
-          "link": 17
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
           "name": "clip_l_prompt",
@@ -189,96 +284,14 @@
         "Node name for S&R": "Y7Nodes_PromptEnhancerFlux"
       },
       "widgets_values": [
-        "[ohwx woman] standing in the middle of a forest",
+        "[ohwx man sitting in a cafe, smoking a\ncigarette",
         "OpenHermes-2.5-Mistral-7B",
         0.7,
         0.9,
         40,
-        459741933884587,
+        1234,
         "fixed",
         false
-      ]
-    },
-    {
-      "id": 13,
-      "type": "Y7Nodes_ShowAnything",
-      "pos": [
-        497.22430419921875,
-        -330.2776184082031
-      ],
-      "size": [
-        579.432861328125,
-        217.86257934570312
-      ],
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "shape": 7,
-          "type": "*",
-          "link": 18
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-y7nodes",
-        "ver": "6de017d91073793810d60f938ee8116f843607cc",
-        "Node name for S&R": "Y7Nodes_ShowAnything"
-      },
-      "widgets_values": [
-        "",
-        true,
-        "11",
-        null
-      ]
-    },
-    {
-      "id": 14,
-      "type": "Y7Nodes_ShowAnything",
-      "pos": [
-        488.6373291015625,
-        -16.608428955078125
-      ],
-      "size": [
-        598.7361450195312,
-        449.95098876953125
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "shape": 7,
-          "type": "*",
-          "link": 19
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-y7nodes",
-        "ver": "6de017d91073793810d60f938ee8116f843607cc",
-        "Node name for S&R": "Y7Nodes_ShowAnything"
-      },
-      "widgets_values": [
-        "",
-        true,
-        "11",
-        null
       ]
     }
   ],
@@ -300,14 +313,6 @@
       "STRING"
     ],
     [
-      17,
-      12,
-      0,
-      11,
-      0,
-      "INT"
-    ],
-    [
       18,
       3,
       0,
@@ -322,16 +327,32 @@
       14,
       0,
       "*"
+    ],
+    [
+      20,
+      13,
+      0,
+      15,
+      1,
+      "STRING"
+    ],
+    [
+      21,
+      14,
+      0,
+      15,
+      2,
+      "STRING"
     ]
   ],
   "groups": [],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.8264462809917354,
+      "scale": 1.3058333026711986,
       "offset": [
-        945.126499309732,
-        717.5072205397992
+        211.08061540141324,
+        464.3838651770644
       ]
     },
     "VHS_latentpreview": false,
