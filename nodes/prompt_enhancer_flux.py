@@ -199,7 +199,7 @@ When a user's prompt contains a phrase inside square brackets like "[agg woman]"
 
 1. NEVER modify, interpret, or expand the bracketed phrase
 2. NEVER add adjectives or descriptions to the bracketed phrase itself
-3. NEVER change "[agg woman]" into "agg-inspired woman" or any variation
+3. DO NOT USE the bracketed phrase as a descriptor or an adjective
 4. The bracketed phrase MUST appear EXACTLY as written at the beginning of your description
 5. NEVER use any part of the bracketed phrase as a descriptor or adjective ANYWHERE in the text
 6. NEVER refer to the style, aesthetic, or features of the bracketed phrase
