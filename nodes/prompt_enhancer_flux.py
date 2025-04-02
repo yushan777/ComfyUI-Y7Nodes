@@ -50,12 +50,6 @@ def is_apple_silicon():
 def is_cuda_available():
     return torch.cuda.is_available()
 
-# ======================================
-# ModelCache class - unchanged
-class ModelCache:
-    loaded_models = {}
-    loaded_tokenizers = {}
-
 
 # LLM model information - unchanged
 LLM_MODELS = [
@@ -676,13 +670,6 @@ class Y7Nodes_PromptEnhancerFlux:
             except Exception as e:
                 print(f"Warning: Could not move model to CPU: {str(e)}", color.YELLOW)
             
-            # Clear model from cache
-            if llm_display_name in ModelCache.loaded_models:
-                del ModelCache.loaded_models[llm_display_name]
-            
-            if llm_display_name in ModelCache.loaded_tokenizers:
-                del ModelCache.loaded_tokenizers[llm_display_name]
-            
             # Clear any references to the model and tokenizer
             del llm_model
             del llm_tokenizer
@@ -784,11 +771,6 @@ class Y7Nodes_PromptEnhancerFlux:
     # ==============================================================================================
     def down_load_llm_model(self, model_display_name, load_device):
         repo_path = get_repo_info(model_display_name)
-        
-        # Check cache first
-        if model_display_name in ModelCache.loaded_models and model_display_name in ModelCache.loaded_tokenizers:
-            print(f"Using cached model {model_display_name} from previous run", color.BRIGHT_GREEN)
-            return ModelCache.loaded_models[model_display_name], ModelCache.loaded_tokenizers[model_display_name]
             
         # Download if needed
         model_path = self.model_path_download_if_needed(model_display_name)
@@ -850,11 +832,6 @@ class Y7Nodes_PromptEnhancerFlux:
             llm_tokenizer = AutoTokenizer.from_pretrained(
                 model_path,
             )
-
-            
-            # Cache model and tokenizer
-            ModelCache.loaded_models[model_display_name] = llm_model
-            ModelCache.loaded_tokenizers[model_display_name] = llm_tokenizer
             
             return llm_model, llm_tokenizer
             

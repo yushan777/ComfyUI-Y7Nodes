@@ -32,6 +32,6 @@ if not logger.handlers:
     logger.addHandler(handler)
 
 # Configure logger
-loglevel = logging.INFO
-# loglevel = logging.ERROR
+# loglevel = logging.INFO
+loglevel = logging.ERROR
 logger.setLevel(loglevel)
