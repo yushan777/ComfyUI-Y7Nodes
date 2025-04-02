@@ -565,6 +565,12 @@ class Y7Nodes_PromptEnhancerFlux:
                     "INT", 
                     {"default": 0, "min": 0, "max": 0xffffffffffffffff}
                 ),
+                "unload_models_before_run": (
+                    "BOOLEAN", 
+                    {"default": True, 
+                     "tooltip": "Frees up Memory (unload all models) before each run."
+                     }
+                ),                
             }, 
             "hidden":{}
         }
@@ -601,6 +607,7 @@ class Y7Nodes_PromptEnhancerFlux:
         temperature = kwargs.get("temperature")
         top_p = kwargs.get("top_p")
         top_k = kwargs.get("top_k")
+        unload_models_before_run = kwargs.get("unload_models_before_run")
 
         # Default prompt if empty
         if not prompt.strip():
@@ -609,7 +616,28 @@ class Y7Nodes_PromptEnhancerFlux:
             return (clip_l_prompt, t5xxl_prompt,)
         
         try:
-            # Force garbage collection before starting
+            # --- VRAM Cleanup Logic ---
+            if unload_models_before_run == True:
+                # If FREE_VRAM_BEFORE_RUNNING is True
+                print("unloading models and clearing cache...", color.YELLOW)
+
+                try:
+                    # Use Comfy's function to unload models potentially loaded by other nodes
+                    comfy.model_management.unload_all_models() 
+                    gc.collect() # Garbage collect first
+                    if is_cuda_available():
+                        torch.cuda.empty_cache()
+                        comfy.model_management.soft_empty_cache() # Added for good measure
+                        print("   - CUDA cache cleared.", color.YELLOW)
+                    elif is_apple_silicon() and hasattr(torch.mps, 'empty_cache'):
+                        torch.mps.empty_cache()
+                        print("   - MPS cache cleared.", color.YELLOW)
+                    print("✅ VRAM cleanup attempt finished.", color.YELLOW)
+                except Exception as cleanup_error:
+                    print(f"⚠️ Warning during VRAM cleanup: {str(cleanup_error)}", color.YELLOW)
+            # --- End VRAM Cleanup ---
+
+            # Force garbage collection before starting (kept original gc.collect)
             gc.collect()
 
             # For Apple Silicon, use MPS device if available
@@ -665,42 +693,57 @@ class Y7Nodes_PromptEnhancerFlux:
             print("Cleaning up model...\n", color.BRIGHT_BLUE)
             
             # First, try to move model to CPU regardless of platform
-            try:
-                llm_model.to("cpu")
-            except Exception as e:
-                print(f"Warning: Could not move model to CPU: {str(e)}", color.YELLOW)
+            # try:
+            #     llm_model.to("cpu")
+            # except Exception as e:
+            #     print(f"Warning: Could not move model to CPU: {str(e)}", color.YELLOW)
             
-            # Clear any references to the model and tokenizer
-            del llm_model
-            del llm_tokenizer
+            # # Clear any references to the model and tokenizer
+            # del llm_model
+            # del llm_tokenizer
             
-            # Platform-specific cleanup
-            if is_apple_silicon():
-                # For Apple Silicon
-                gc.collect()
-                if hasattr(torch.mps, 'empty_cache'):
-                    torch.mps.empty_cache()
+            # # Platform-specific cleanup
+            # if is_apple_silicon():
+            #     # For Apple Silicon
+            #     gc.collect()
+            #     if hasattr(torch.mps, 'empty_cache'):
+            #         torch.mps.empty_cache()
             
-            elif is_cuda_available():
-                # For NVIDIA GPUs
-                gc.collect()
-                torch.cuda.empty_cache()
-                comfy.model_management.soft_empty_cache()
-                # More aggressive CUDA cleanup
-                comfy.model_management.cleanup_models()
+            # elif is_cuda_available():
+            #     # For NVIDIA GPUs
+            #     gc.collect()
+            #     torch.cuda.empty_cache()
+            #     comfy.model_management.soft_empty_cache()
+            #     # More aggressive CUDA cleanup
+            #     comfy.model_management.cleanup_models()
             
-            else:
-                # CPU fallback
-                gc.collect()
+            # else:
+            #     # CPU fallback
+            #     gc.collect()
             
             # Final garbage collection pass
             gc.collect()
             
             return (clip_l_prompt, t5xxl_prompt,)
-        
+
         # ========================================
+        except RuntimeError as runtime_e:
+            # Catch specific allocation errors first
+            error_message = str(runtime_e)
+            if "Allocation on device" in error_message:
+                print(f"❌ Critical Error: Device Allocation Failed: {error_message}", color.BRIGHT_RED)
+                # Re-raise the exception to stop ComfyUI workflow execution
+                raise runtime_e
+            else:
+                # Re-raise other RuntimeErrors to be caught by the general Exception handler below
+                # or propagate up if not caught later.
+                raise runtime_e
         except Exception as e:
+            # General exception handler
             print(f"❌ Error: {str(e)}", color.BRIGHT_RED)
+            # This return allows the workflow to continue, which might be undesirable
+            # depending on the error. Consider re-raising 'e' here too if errors
+            # should generally halt the workflow.
             return (
                 f"Error: {str(e)}",
                 f"Error: Please check the model output format"

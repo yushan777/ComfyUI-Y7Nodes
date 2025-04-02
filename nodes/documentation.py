@@ -115,13 +115,12 @@ descriptions = {
         normal("- `temperature`: Controls randomness (0.1-2.0, default 0.7). Higher values produce more diverse outputs", 1),
         normal("- `top_p`: Nucleus sampling parameter (0.8-1.0, default 0.9). Limits tokens to the most probable ones", 1),
         normal("- `top_k`: Limits token selection (22-100, default 40). Restricts to the k most likely next tokens", 1),
-        normal("- `keep_model_loaded`: Keep model in VRAM for faster subsequent runs", 1),
+        normal("- `unload_models_before_run`: Frees up memory by unloading models and clearing cache before running.  Useful for heavy workflows.", 1),
         normal("Outputs:"),
         normal("- `t5_prompt`: Enhanced detailed natural language description", 1),
         normal("- `clip_prompt`: Enhanced concise keyword list", 1),
         normal("LLM Model:"),
-        normal("- uses unsloth's version of Meta-Llama's Llama-3.2-3B-Instruct: Context window of 8192 tokens", 1),
-        normal("Note: First-time use will download the model if it does not exist. (~6.5GB)")
+        normal("Note: First-time use will download the model if it does not exist.")
     ],
 
     # Add more node descriptions here

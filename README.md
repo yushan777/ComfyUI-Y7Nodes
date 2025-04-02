@@ -105,7 +105,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   
 >   For (possibly) better results, a hybrid approach of starting with high-impact keywords to guide CLIP, then follow with flowing, descriptive language tailored for T5. This approach plays to the strengths of both encoders (again, possibly).
 >   
->   **Token/Trigger words** are handled by enclosing them inside square brackets `[ohwx woman]`, but occasionally it might not work.
+>   **Token/Trigger words** are handled by enclosing them inside square brackets `[ohwx man]`, but occasionally it might not work.
 >
 >   It's not perfect, and there can be quirks, but it will get you most of the way in producing prompts in both formats very quickly and you can always edit them afterwards (in your own editor). 
 
