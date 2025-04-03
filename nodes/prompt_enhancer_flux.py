@@ -55,7 +55,7 @@ def is_cuda_available():
 
 
 # LLM model information - unchanged
-LLM_MODELS = [
+LLM_MODELS = [    
     ("OpenHermes-2.5-Mistral-7B", "teknium/OpenHermes-2.5-Mistral-7B"),
     ("Hermes-Trismegistus-Mistral-7B", "teknium/Hermes-Trismegistus-Mistral-7B"),
     ("Dolphin3.0-Llama3.1-8B", "cognitivecomputations/Dolphin3.0-Llama3.1-8B")
