@@ -596,7 +596,7 @@ class Y7Nodes_PromptEnhancerFlux:
                 ),
                 "quantization": ( # highest prec. to lowest
                     ["none", "8bit", "4bit"],
-                    {"default": "none", "tooltip": "Select quantization level (requires bitsandbytes)."}
+                    {"default": "none", "tooltip": "Select quantization level (requires bitsandbytes - primarily Linux only)."}
                 ),
                 "temperature": (
                     "FLOAT",
