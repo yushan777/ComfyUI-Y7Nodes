@@ -554,6 +554,7 @@ class Y7Nodes_PromptEnhancerFlux:
     # Class variable to cache loaded models and tokenizers, so they aren't needed to be loaded
     # from disk each time.  these are cleared if unload_models_before_run is true
     _loaded_models: Dict[str, Tuple[Any, Any]] = {}
+    _last_used_model_name: Optional[str] = None # Stores the name of the last used model - used to know when to flush cache
 
     @classmethod
     def INPUT_TYPES(s):
@@ -635,6 +636,14 @@ class Y7Nodes_PromptEnhancerFlux:
         top_k = kwargs.get("top_k")
         unload_models_before_run = kwargs.get("unload_models_before_run")
 
+        # === Check if model changed from the one last used and clear cache if needed ===
+        if self._last_used_model_name is not None and self._last_used_model_name != llm_display_name:
+            print(f"ℹ️ Model changed from '{self._last_used_model_name}' to '{llm_display_name}'. Clearing internal cache to prevent OOM.", color.YELLOW)
+            if hasattr(self, '_loaded_models'):
+                self._loaded_models.clear()
+            gc.collect() # Force garbage collection after clearing cache
+        
+
         # Default prompt if empty
         if not prompt.strip():
             t5xxl_prompt = 'Please provide a prompt, no matter how basic. If you wish to use a token or trigger words enclose them in square brackets.\nExamples:\n\n"A man sitting in a cafe".\n"[ohwx woman] standing in the middle of a busy street"'
@@ -685,6 +694,7 @@ class Y7Nodes_PromptEnhancerFlux:
                             
             # Load/download the model - it will be placed on the correct device by down_load_llm_model
             llm_model, llm_tokenizer = self.down_load_llm_model(llm_display_name, load_device)
+            self._last_used_model_name = llm_display_name # Update the last used model name
             
             # Calculate model size for memory management
             model_size = get_model_size(llm_model) 
