@@ -61,7 +61,8 @@ def is_cuda_available():
 LLM_MODELS = [    
     ("OpenHermes-2.5-Mistral-7B", "teknium/OpenHermes-2.5-Mistral-7B"),
     ("Hermes-Trismegistus-Mistral-7B", "teknium/Hermes-Trismegistus-Mistral-7B"),
-    ("Dolphin3.0-Llama3.1-8B", "cognitivecomputations/Dolphin3.0-Llama3.1-8B")
+    ("Dolphin3.0-Llama3.1-8B", "cognitivecomputations/Dolphin3.0-Llama3.1-8B"),
+    ("Qwen2.5-7B-Instruct", "Qwen/Qwen2.5-7B-Instruct")
 ]
 
 # display names for the input drop-down list 
@@ -111,6 +112,21 @@ dolphin3_0_llama3_1_8b_req_files = [
     "tokenizer_config.json",
     "tokenizer.json",
     "trainer_state.json"
+]
+
+qwen2_5_7b_instruct_req_files = [
+	"config.json",
+	"generation_config.json",
+	"merges.txt",
+	"model-00001-of-00004.safetensors",
+	"model-00002-of-00004.safetensors",
+	"model-00003-of-00004.safetensors",
+	"model-00004-of-00004.safetensors",
+	"model.safetensors.index.json",
+	"tokenizer.json",
+	"tokenizer_config (1).json",
+	"tokenizer_config.json",
+	"vocab.json"
 ]
 
 _MAX_NEW_TOKENS = 1280
@@ -842,6 +858,9 @@ class Y7Nodes_PromptEnhancerFlux:
                     # Note: Add estimated size if known, otherwise omit or estimate
                     print(f"ℹ️ Downloading {repo_path} (≈16.1GB)", color.BRIGHT_BLUE)
                     allow_patterns = dolphin3_0_llama3_1_8b_req_files
+                elif "Qwen/Qwen2.5-7B-Instruct" in repo_path:
+                    print(f"ℹ️ Downloading {repo_path} (≈15.2GB)", color.BRIGHT_BLUE)
+                    allow_patterns = qwen2_5_7b_instruct_req_files
                 # <<< ADDED BLOCK END >>>
 
                 snapshot_download(
@@ -864,6 +883,8 @@ class Y7Nodes_PromptEnhancerFlux:
                 required_files = hermes_trismegistus_mistral_7b_req_files
             elif model_display_name == "Dolphin3.0-Llama3.1-8B":
                  required_files = dolphin3_0_llama3_1_8b_req_files
+            elif model_display_name == "Qwen2.5-7B-Instruct":
+                required_files = qwen2_5_7b_instruct_req_files
 
 
             for file in required_files:

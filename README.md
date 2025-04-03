@@ -107,12 +107,11 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   
 >   **Token/Trigger words** are handled by enclosing them inside square brackets `[ohwx man]`, but occasionally it might not work.
 >
->   It's not perfect, and there can be quirks, but it will get you most of the way in producing prompts in both formats very quickly and you can always edit them afterwards (in your own editor). 
+>  There can be quirks in some of the responses generated, but it will get you most of the way in producing prompts in both formats very quickly and you can always edit them afterwards (in your own editor). 
 >   
->   There is an option to unload all models before each run, this might be needed if it is used in heavy workflows with other large models. Alternativel, you can always use [SeanScripts's Unload Model custom nodes](https://github.com/SeanScripts/ComfyUI-Unload-Model).
->
->   Three LLM models are available, offering a balance of knowledge, instruction-following, and minimal censorship.
->   Switch to 8 or 4bit quantization to reduce vram usage. 
+>   Four LLM models are available, offering a balance of knowledge, instruction-following, and minimal censorship.
+>   If you're using GPUs with limited VRAM, consider switching to 8-bit or 4-bit quantization to reduce memory usage as needed (at the cost of quality). But to be honest, you may not notice much difference for this use case. 
+>   Additionally, you can choose to unload all models before each run — helpful for workflows involving other large models that remain cached. Alternatively, you can always use [SeanScripts's Unload Model custom nodes](https://github.com/SeanScripts/ComfyUI-Unload-Model) which provide a convenient way to handle this dynamically.
 >
 >   The node will attempt to download the selected model (approx 14.5GB) if it can't be found.  
 >
@@ -172,6 +171,27 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >           |   ├── tokenizer.json
 >           |   ├── trainer_state.json
 >   ```
+
+>   For https://huggingface.co/Qwen/Qwen2.5-7B-Instruct (approx. 15.2GB)
+>   ```
+>   ComfyUI
+>   └── models
+>       └── LLM        
+>           └── Qwen2.5-7B-Instruct      
+>           |   ├── config.json
+>           |   ├── generation_config.json
+>           |   ├── merges.txt
+>           |   ├── model-00001-of-00004.safetensors
+>           |   ├── model-00002-of-00004.safetensors
+>           |   ├── model-00003-of-00004.safetensors
+>           |   ├── model-00004-of-00004.safetensors
+>           |   ├── model.safetensors.index.json
+>           |   ├── tokenizer.json
+>           |   ├── tokenizer_config (1).json
+>           |   ├── tokenizer_config.json
+>           |   ├── vocab.json
+>   ```
+
 
 > </details>
 
