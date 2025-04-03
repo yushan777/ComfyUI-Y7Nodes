@@ -110,7 +110,11 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >  There can be quirks in some of the responses generated, but it will get you most of the way in producing prompts in both formats very quickly and you can always edit them afterwards (in your own editor). 
 >   
 >   Four LLM models are available, offering a balance of knowledge, instruction-following, and minimal censorship.
->   If you're using GPUs with limited VRAM, consider switching to 8-bit or 4-bit quantization to reduce memory usage as needed (at the cost of quality). But to be honest, you may not notice much difference for this use case. 
+> 
+>   If you're using a GPU with limited VRAM, consider switching to 8-bit or 4-bit quantization to reduce memory usage (with some trade-offs in quality).
+**Note: This requires BitsandBytes** which is primarily Linux-focused. Support for Windows and macOS can be tricky — and there might be workarounds, but they’re beyond the scope of this note.
+If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should be fine
+>
 >   Additionally, you can choose to unload all models before each run — helpful for workflows involving other large models that remain cached. Alternatively, you can always use [SeanScripts's Unload Model custom nodes](https://github.com/SeanScripts/ComfyUI-Unload-Model) which provide a convenient way to handle this dynamically.
 >
 >   The node will attempt to download the selected model (approx 14.5GB) if it can't be found.  
