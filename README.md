@@ -115,8 +115,8 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >
 >   The node will attempt to download the selected model (approx 14.5GB) if it can't be found.  
 >
->   If you wish to download the model(s) manually then you can get the files from 
->   https://huggingface.co/teknium/OpenHermes-2.5-Mistral-7B and place them under the directory path show below:
+>   If you wish to download the model(s) manually, links and paths shown below:
+>   https://huggingface.co/teknium/OpenHermes-2.5-Mistral-7B 
 >   
 >   ```
 >   ComfyUI
@@ -135,7 +135,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >           |   ├── transformers_inference.py>           
 >   ```
 >   
->   Likewise for https://huggingface.co/teknium/Hermes-Trismegistus-Mistral-7B (also approx. 14.5GB)
+>   For https://huggingface.co/teknium/Hermes-Trismegistus-Mistral-7B (approx. 14.5GB)
 >   
 >   ```
 >   ComfyUI
@@ -152,6 +152,26 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >           |   ├── tokenizer.model
 >           |   ├── tokenizer_config.json
 >   ```
+>
+>   For https://huggingface.co/cognitivecomputations/Dolphin3.0-Llama3.1-8B (approx. 16GB)
+>   ```
+>   ComfyUI
+>   └── models
+>       └── LLM        
+>           └── Dolphin3.0-Llama3.1-8B        
+>           |   ├── config.json
+>           |   ├── generation_config.json
+>           |   ├── model-00001-of-00004.safetensors
+>           |   ├── model-00002-of-00004.safetensors
+>           |   ├── model-00003-of-00004.safetensors
+>           |   ├── model-00004-of-00004.safetensors
+>           |   ├── model.safetensors.index.json
+>           |   ├── special_tokens_map.json
+>           |   ├── tokenizer_config.json
+>           |   ├── tokenizer.json
+>           |   ├── trainer_state.json
+>   ```
+
 > </details>
 
 ------
