@@ -58,6 +58,7 @@ def is_cuda_available():
 LLM_MODELS = [
     ("OpenHermes-2.5-Mistral-7B", "teknium/OpenHermes-2.5-Mistral-7B"),
     ("Hermes-Trismegistus-Mistral-7B", "teknium/Hermes-Trismegistus-Mistral-7B"),
+    ("Dolphin3.0-Llama3.1-8B", "cognitivecomputations/Dolphin3.0-Llama3.1-8B")
 ]
 
 LLM_DISPLAY_NAMES = [model[0] for model in LLM_MODELS]
@@ -92,6 +93,20 @@ hermes_trismegistus_mistral_7b_req_files = [
     "special_tokens_map.json",
     "tokenizer.model",
     "tokenizer_config.json"
+]
+
+dolphin3_0_llama3_1_8b_req_files = [
+    "config.json",
+    "generation_config.json",
+    "model-00001-of-00004.safetensors",
+    "model-00002-of-00004.safetensors",
+    "model-00003-of-00004.safetensors",
+    "model-00004-of-00004.safetensors",
+    "model.safetensors.index.json",
+    "special_tokens_map.json",
+    "tokenizer_config.json",
+    "tokenizer.json",
+    "trainer_state.json"
 ]
 
 _MAX_NEW_TOKENS = 1280
@@ -279,7 +294,9 @@ SPECIAL PROMPT OVERRID REMINDER:
 2. CLIP PROMPT:
 {PROMPT_CLIP_INSTRUCTIONS}
 
-Respond in the following format:
+**CRITICAL: You MUST provide BOTH a T5 and a CLIP prompt, enclosed in their respective tags.** Failure to provide both sections will result in an error.
+
+Respond **EXACTLY** in the following format, including the tags:
 [T5]
 Your detailed T5 prompt here...
 [/T5]
@@ -288,7 +305,7 @@ Your detailed T5 prompt here...
 Your concise CLIP prompt here...
 [/CLIP]
 
-The START AND END TAGS ARE IMPORTANT!
+**REMINDER: Both [T5]...[/T5] and [CLIP]...[/CLIP] sections are mandatory.**
 """
     
     # Create messages with combined instructions
@@ -319,9 +336,18 @@ The START AND END TAGS ARE IMPORTANT!
     device_type = device.type if hasattr(device, 'type') else str(device)
     # print(f"Model is on device: {device_type}", color.BRIGHT_GREEN)
     
-    # Create inputs - more memory efficient
+    # Create inputs 
     model_inputs = prompt_enhancer_tokenizer([formatted_text], return_tensors="pt")
     model_inputs = {k: v.to(device) for k, v in model_inputs.items()}
+
+    # === Print token count and context window size ===
+    input_token_count = model_inputs["input_ids"].shape[-1]
+    context_window_size = prompt_enhancer_model.config.max_position_embeddings # Use model config for accurate context window
+    print(f"\n--- Prompt Enhancer Token Info ---", color.BRIGHT_MAGENTA)
+    print(f"Input Prompt Token Count: {input_token_count}", color.BRIGHT_MAGENTA)
+    print(f"Model Context Window: {context_window_size}", color.BRIGHT_MAGENTA)
+    print(f"----------------------------------\n", color.BRIGHT_MAGENTA)
+
 
     # Create a streamer, skip the input prompt (instructions)
     streamer = TextIteratorStreamer(prompt_enhancer_tokenizer, skip_prompt=True, skip_special_tokens=True, stream_every=2)
@@ -393,48 +419,42 @@ The START AND END TAGS ARE IMPORTANT!
     # print(f"Combined raw response:\n{decoded_response}\n", color.ORANGE)
     
     # ==============================================================================
-    # T5 PROMPT
+    # T5 PROMPT EXTRACTION (Robust)
     # ==============================================================================
-    # Extract T5 prompt
-    t5_match = re.search(r'\[T5\](.*?)\[/T5\]', decoded_response, re.DOTALL)
+    # Regex to find [T5] and capture content until [/T5], [CLIP], or end of string
+    t5_match = re.search(r'\[T5\](.*?)(?:\[/T5\]|\[CLIP\]|$)', decoded_response, re.DOTALL)
     if t5_match:
         t5_prompt = t5_match.group(1).strip()
+        # Remove potential leading "T5 PROMPT:" label if present
+        if t5_prompt.upper().startswith("T5 PROMPT:"):
+             t5_prompt = t5_prompt[len("T5 PROMPT:"):].strip()
     else:
-        # Fallback extraction if tags are missing
-        print("Could not find T5 tags, attempting fallback extraction", color.YELLOW)
-        parts = decoded_response.split("[CLIP]", 1)
-        t5_prompt = parts[0].strip()
-        if t5_prompt.startswith("T5 PROMPT:"):
-            t5_prompt = t5_prompt[len("T5 PROMPT:"):].strip()
-    
-    # post process (remove articles if bracketed subject is used)
-    t5_prompt = T5_PostProcess(user_prompt, t5_prompt)
+        print("Could not find [T5] tag. T5 prompt extraction failed.", color.YELLOW)
+        t5_prompt = "Error: Could not extract T5 prompt" # Set error message
+
+    # Post process (remove articles if bracketed subject is used)
+    if not t5_prompt.startswith("Error:"): # Only post-process if extraction was successful
+        t5_prompt = T5_PostProcess(user_prompt, t5_prompt)
 
     # ==============================================================================
-    # CLIP PROMPT
+    # CLIP PROMPT EXTRACTION (Robust)
     # ==============================================================================
-    # Extract CLIP prompt
-    clip_match = re.search(r'\[CLIP\](.*?)\[/CLIP\]', decoded_response, re.DOTALL)
+    # Regex to find [CLIP] and capture content until [/CLIP] or end of string
+    clip_match = re.search(r'\[CLIP\](.*?)(?:\[/CLIP\]|$)', decoded_response, re.DOTALL)
     if clip_match:
         clip_prompt = clip_match.group(1).strip()
+        # Remove potential leading "CLIP PROMPT:" label if present
+        if clip_prompt.upper().startswith("CLIP PROMPT:"):
+            clip_prompt = clip_prompt[len("CLIP PROMPT:"):].strip()
     else:
-        # Fallback extraction if tags are missing
-        print("Could not find CLIP tags, attempting fallback extraction", color.YELLOW)
-        if "[CLIP]" in decoded_response:
-            clip_prompt = decoded_response.split("[CLIP]", 1)[1].strip()
-        elif "CLIP PROMPT:" in decoded_response:
-            clip_prompt = decoded_response.split("CLIP PROMPT:", 1)[1].strip()
-        else:
-            # Last resort - try to find a comma-separated list after T5
-            parts = decoded_response.split("[/T5]", 1)
-            if len(parts) > 1:
-                clip_prompt = parts[1].strip()
-            else:
-                clip_prompt = "Error: Could not extract CLIP prompt"
-    
-    # Clean up the prompts (remove any leftover tags or labels)
-    t5_prompt = t5_prompt.replace("T5 PROMPT:", "").strip()
-    clip_prompt = clip_prompt.replace("CLIP PROMPT:", "").replace("[/CLIP]", "").strip()
+        print("Could not find [CLIP] tag. CLIP prompt extraction failed.", color.YELLOW)
+        clip_prompt = "Error: Could not extract CLIP prompt" # Set error message
+
+    # Clean up the prompts (remove any leftover tags or labels only if not error)
+    if not t5_prompt.startswith("Error:"):
+        t5_prompt = t5_prompt.replace("[T5]", "").replace("[/T5]", "").strip() # Remove tags just in case
+    if not clip_prompt.startswith("Error:"):
+        clip_prompt = clip_prompt.replace("[CLIP]", "").replace("[/CLIP]", "").strip() # Remove tags just in case
     
     # Final cleanup - remove brackets from final output
     final_t5 = t5_prompt.replace("[", "").replace("]", "").replace("\n\n", " ")
@@ -779,6 +799,12 @@ class Y7Nodes_PromptEnhancerFlux:
                 elif "Hermes-Trismegistus-Mistral-7B" in repo_path:
                     print(f"ℹ️ Downloading {repo_path} (≈14.5GB)", color.BRIGHT_BLUE)
                     allow_patterns = hermes_trismegistus_mistral_7b_req_files
+                # <<< ADDED BLOCK START >>>
+                elif "Dolphin3.0-Llama3.1-8B" in repo_path:
+                    # Note: Add estimated size if known, otherwise omit or estimate
+                    print(f"ℹ️ Downloading {repo_path} (≈16.1GB)", color.BRIGHT_BLUE)
+                    allow_patterns = dolphin3_0_llama3_1_8b_req_files
+                # <<< ADDED BLOCK END >>>
 
                 snapshot_download(
                     repo_id=repo_path,
@@ -798,6 +824,9 @@ class Y7Nodes_PromptEnhancerFlux:
                 required_files = openhermes_2_5_mistral_7b_req_files
             elif model_display_name == "Hermes-Trismegistus-Mistral-7B":
                 required_files = hermes_trismegistus_mistral_7b_req_files
+            elif model_display_name == "Dolphin3.0-Llama3.1-8B":
+                 required_files = dolphin3_0_llama3_1_8b_req_files
+
 
             for file in required_files:
                 if not os.path.exists(os.path.join(full_model_path, file)):
