@@ -3,16 +3,16 @@ import { ComfyWidgets } from "../../../scripts/widgets.js";
 
 // Font family options
 const monospaceFonts = 'Consolas, Menlo, Monaco, "Courier New", "Lucida Console", monospace';
-const sansSerifFonts = 'Arial, Helvetica, sans-serif';
+// const sansSerifFonts = 'Arial, Helvetica, sans-serif';
 
 // Font size options
 const fontSizes = ["8", "9", "10", "11", "12", "14", "16", "18", "20"];
 
 // Widget indexes
 const TEXT_WIDGET = 0;
-const MONOSPACE_WIDGET = 1;
-const FONTSIZE_WIDGET = 2;
-const COPYBUTTON_WIDGET = 3;
+// const MONOSPACE_WIDGET = 1;
+const FONTSIZE_WIDGET = 1;
+const COPYBUTTON_WIDGET = 2;
 
 // Single global style for the text area
 const textAreaStyles = {
@@ -58,7 +58,7 @@ app.registerExtension({
                 }
                 
                 // ==========================================================
-                //  1. TEXT WIDGET
+                //  - MAIN TEXT WIDGET
                 // ==========================================================
                 // If number of widgets in the array is empty (it should be)
                 if (!this.widgets.length) {
@@ -82,20 +82,20 @@ app.registerExtension({
                     w.inputEl.readOnly = true;
                 }
 
-                // ==========================================================
-                // 2. MONOSPACE FONT TOGGLE
-                // ==========================================================
-                // Add boolean widget for monospace font toggle
-                // Default to true (monospace font)
-                const monospaceFontWidget = this.addWidget("toggle", "monospace_font", true, (value) => {
-                    // Update font family based on toggle value
-                    if (this.widgets[TEXT_WIDGET] && this.widgets[TEXT_WIDGET].inputEl) {
-                        this.widgets[TEXT_WIDGET].inputEl.style.fontFamily = value ? monospaceFonts : sansSerifFonts;
-                    }
-                }, { serialize: true });
+                // // ==========================================================
+                // // 2. MONOSPACE FONT TOGGLE
+                // // ==========================================================
+                // // Add boolean widget for monospace font toggle
+                // // Default to true (monospace font)
+                // const monospaceFontWidget = this.addWidget("toggle", "monospace_font", true, (value) => {
+                //     // Update font family based on toggle value
+                //     if (this.widgets[TEXT_WIDGET] && this.widgets[TEXT_WIDGET].inputEl) {
+                //         this.widgets[TEXT_WIDGET].inputEl.style.fontFamily = value ? monospaceFonts : sansSerifFonts;
+                //     }
+                // }, { serialize: true });
 
                 // ==========================================================
-                // 3. FONT SIZE
+                // - FONT SIZE
                 // ==========================================================
                 // Create a select element for font size
                 const fontSizeWidget = this.addWidget("combo", "font_size", "11", (value) => {
@@ -114,7 +114,7 @@ app.registerExtension({
                 }
                 
                 // ==========================================================
-                // 4. BUTTON
+                // - COPY BUTTON
                 // ==========================================================
                 // Add button - Copy button
                 // serialize: false tells ComfyUI not to save the button's state when 
@@ -200,18 +200,18 @@ app.registerExtension({
                 if (this.widgets_values?.length) {
                     populate.call(this, this.widgets_values[TEXT_WIDGET]);
                     
-                    // Apply saved monospace font setting if available
-                    // The monospace font toggle is the second widget (index 1)
-                    // But in widgets_values, it's the second value (index 1) because the button is not serialized
-                    if (this.widgets_values.length > 1 && this.widgets[MONOSPACE_WIDGET]) {
-                        const useMonospace = this.widgets_values[MONOSPACE_WIDGET];
-                        this.widgets[MONOSPACE_WIDGET].value = useMonospace;
+                    // // Apply saved monospace font setting if available
+                    // // The monospace font toggle is the second widget (index 1)
+                    // // But in widgets_values, it's the second value (index 1) because the button is not serialized
+                    // if (this.widgets_values.length > 1 && this.widgets[MONOSPACE_WIDGET]) {
+                    //     const useMonospace = this.widgets_values[MONOSPACE_WIDGET];
+                    //     this.widgets[MONOSPACE_WIDGET].value = useMonospace;
                         
-                        // Update font family based on saved value
-                        if (this.widgets[TEXT_WIDGET] && this.widgets[TEXT_WIDGET].inputEl) {
-                            this.widgets[TEXT_WIDGET].inputEl.style.fontFamily = useMonospace ? monospaceFonts : sansSerifFonts;
-                        }
-                    }
+                    //     // Update font family based on saved value
+                    //     if (this.widgets[TEXT_WIDGET] && this.widgets[TEXT_WIDGET].inputEl) {
+                    //         this.widgets[TEXT_WIDGET].inputEl.style.fontFamily = useMonospace ? monospaceFonts : sansSerifFonts;
+                    //     }
+                    // }
                     
                     // Apply saved font size setting if available
                     // The font size widget is the third widget (index 2)

@@ -57,7 +57,7 @@ descriptions = {
         normal("For IMAGE and MASK tensors: Shows shape, data type, value range, mean, and std dev."),
         normal("For other tensors: Displays shape, data type, and value range"),                
         normal("For other types: Converts to JSON or string representation"),
-        normal("Passes through the input unchanged to its output, allowing insertion anywhere in a workflow")
+        normal("Pass-through for the input.")
     ],
     
     "Y7Nodes_T5_TokenCounter": [

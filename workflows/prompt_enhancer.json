@@ -1,8 +1,8 @@
 {
   "id": "efd192c5-6790-4604-b26b-81560b59cb7e",
   "revision": 0,
-  "last_node_id": 16,
-  "last_link_id": 22,
+  "last_node_id": 17,
+  "last_link_id": 24,
   "nodes": [
     {
       "id": 2,
@@ -26,7 +26,7 @@
           "widget": {
             "name": "text_in"
           },
-          "link": 16
+          "link": 24
         }
       ],
       "outputs": [
@@ -48,7 +48,7 @@
       },
       "widgets_values": [
         "",
-        "Token Count: 462 / 512\n\n",
+        "Token Count: 177 / 512\n\n",
         "512",
         false,
         "4",
@@ -78,7 +78,7 @@
           "widget": {
             "name": "text_in"
           },
-          "link": 15
+          "link": 23
         }
       ],
       "outputs": [
@@ -99,96 +99,10 @@
       },
       "widgets_values": [
         "",
-        "Token Count: 42 / 77\n\n",
+        "Token Count: 35 / 77\n\n",
         false,
         "4",
         "10",
-        null
-      ]
-    },
-    {
-      "id": 14,
-      "type": "Y7Nodes_ShowAnything",
-      "pos": [
-        460,
-        65
-      ],
-      "size": [
-        590,
-        310
-      ],
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "shape": 7,
-          "type": "*",
-          "link": 19
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": [
-            21
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-y7nodes",
-        "ver": "6de017d91073793810d60f938ee8116f843607cc",
-        "Node name for S&R": "Y7Nodes_ShowAnything"
-      },
-      "widgets_values": [
-        "A man with an ohwx aesthetic sits in a dimly lit cafe, his posture casual yet composed. He wears a well-tailored suit, the fabric a rich shade of navy blue that contrasts with the warm, honey-colored wood of the cafe's interior. The room is bathed in a soft, ambient light that filters through the venetian blinds, casting dappled patterns on the polished wooden floor. The cafe is cozy and inviting, with a few scattered tables and chairs, a well-stocked barista station, and an aromatic blend of coffee and fresh pastries wafting through the air. The ohwx man takes a drag from his cigarette, the smoke curling upwards and dissipating into the air. His expression is contemplative, his gaze distant as if lost in thought. He holds the cigarette with a practiced ease, the flicker of the flame from the lighter catching the light in his eyes, casting a warm glow on his face. The ash from the cigarette hangs precariously, a testament to his steadiness. A vintage record player in the corner hums softly, the vinyl record spinning at a leisurely pace. The music fills the room with a sultry, jazzy melody, adding to the overall atmosphere of relaxation and sophistication. The cafe is quiet, save for the occasional clinking of cups and the hum of conversation from nearby patrons. The cafe's walls are adorned with framed black and white photographs, capturing moments of old Hollywood glamour and the city's golden era. The ohwx man's attire and demeanor blend seamlessly with the cafe's ambiance, as if he were a character straight out of a classic film noir. The cafe's door swings open, admitting a gust of cool air that carries with it the scent of rain and damp pavement. The man takes another drag from his cigarette, his eyes following the new arrival as they make their way to a table in the corner.",
-        true,
-        "11",
-        null
-      ]
-    },
-    {
-      "id": 13,
-      "type": "Y7Nodes_ShowAnything",
-      "pos": [
-        460,
-        -155
-      ],
-      "size": [
-        590,
-        180
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "shape": 7,
-          "type": "*",
-          "link": 18
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": [
-            20
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-y7nodes",
-        "ver": "6de017d91073793810d60f938ee8116f843607cc",
-        "Node name for S&R": "Y7Nodes_ShowAnything"
-      },
-      "widgets_values": [
-        "ohwx man, sitting, cafe, smoking, cigarette, ambient light, navy suit, wood, venetian blinds, coffee aroma, jazz music, vintage record player, black and white photographs, classic film noir",
-        true,
-        "11",
         null
       ]
     },
@@ -248,15 +162,99 @@
       ]
     },
     {
-      "id": 11,
+      "id": 13,
+      "type": "Y7Nodes_ShowAnything",
+      "pos": [
+        460,
+        -155
+      ],
+      "size": [
+        590,
+        180
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 18
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            20
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "6de017d91073793810d60f938ee8116f843607cc",
+        "Node name for S&R": "Y7Nodes_ShowAnything"
+      },
+      "widgets_values": [
+        "ohwx man, cafe, smoking, cigarette, vintage, leather jacket, hazy atmosphere, sunlight, warm light, cool shadows, distant gaze, coffee aroma, cigarette scent",
+        "11",
+        "11"
+      ]
+    },
+    {
+      "id": 14,
+      "type": "Y7Nodes_ShowAnything",
+      "pos": [
+        460,
+        65
+      ],
+      "size": [
+        590,
+        310
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            21
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "6de017d91073793810d60f938ee8116f843607cc",
+        "Node name for S&R": "Y7Nodes_ShowAnything"
+      },
+      "widgets_values": [
+        "ohwx man sits in a dimly lit cafe, smoking a cigarette. The cafe has a vintage feel, with worn wooden floors and a red-checkered tablecloth. The man wears a well-worn leather jacket, his hair tousled, giving him an air of casual nonchalance. A hazy atmosphere permeates the room, as if it's been smoky for years. Sunlight streams in through the windows, casting warm, golden light on the man's face, while the shadows on the wall behind him are cool and blue. The man's gaze is distant, lost in thought, as he takes a drag from his cigarette. The room is filled with the aroma of freshly brewed coffee and the faint scent of cigarette smoke.",
+        "11",
+        "11"
+      ]
+    },
+    {
+      "id": 17,
       "type": "Y7Nodes_PromptEnhancerFlux",
       "pos": [
         -115,
         -80
       ],
       "size": [
-        320,
-        285
+        300,
+        288
       ],
       "flags": {},
       "order": 0,
@@ -267,51 +265,36 @@
           "name": "clip_l_prompt",
           "type": "STRING",
           "links": [
-            15
+            23
           ]
         },
         {
           "name": "t5xxl_prompt",
           "type": "STRING",
           "links": [
-            16
+            24
           ]
         }
       ],
       "properties": {
         "cnr_id": "comfyui-y7nodes",
-        "ver": "e2f53c106601aad839e70dfcfe91ad7e4f2db8b9",
+        "ver": "eb0ad878b4dd66aa65197647c651e53ad13b01d3",
         "Node name for S&R": "Y7Nodes_PromptEnhancerFlux"
       },
       "widgets_values": [
         "[ohwx man sitting in a cafe, smoking a\ncigarette",
         "OpenHermes-2.5-Mistral-7B",
+        "none",
         0.7,
         0.9,
         40,
         1234,
-        "fixed",
-        false
+        "randomize",
+        true
       ]
     }
   ],
   "links": [
-    [
-      15,
-      11,
-      0,
-      3,
-      0,
-      "STRING"
-    ],
-    [
-      16,
-      11,
-      1,
-      2,
-      0,
-      "STRING"
-    ],
     [
       18,
       3,
@@ -343,16 +326,32 @@
       15,
       2,
       "STRING"
+    ],
+    [
+      23,
+      17,
+      0,
+      3,
+      0,
+      "STRING"
+    ],
+    [
+      24,
+      17,
+      1,
+      2,
+      0,
+      "STRING"
     ]
   ],
   "groups": [],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1.3058333026711986,
+      "scale": 1.4641000000000006,
       "offset": [
-        211.08061540141324,
-        464.3838651770644
+        161.6407058701295,
+        376.13426255235714
       ]
     },
     "VHS_latentpreview": false,

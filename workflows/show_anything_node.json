@@ -1,4 +1,6 @@
 {
+  "id": "27013f90-5137-4677-b68c-f6a42aec3dcc",
+  "revision": 0,
   "last_node_id": 65,
   "last_link_id": 60,
   "nodes": [
@@ -21,8 +23,8 @@
       "inputs": [
         {
           "name": "lora",
-          "type": "PEFTLORA",
           "shape": 7,
+          "type": "PEFTLORA",
           "link": null
         }
       ],
@@ -30,10 +32,10 @@
         {
           "name": "florence2_model",
           "type": "FL2MODEL",
+          "slot_index": 0,
           "links": [
             35
-          ],
-          "slot_index": 0
+          ]
         }
       ],
       "properties": {
@@ -56,7 +58,7 @@
       ],
       "size": [
         279.9443664550781,
-        352
+        364
       ],
       "flags": {},
       "order": 5,
@@ -87,10 +89,10 @@
         {
           "name": "caption",
           "type": "STRING",
+          "slot_index": 2,
           "links": [
             48
-          ],
-          "slot_index": 2
+          ]
         },
         {
           "name": "data",
@@ -154,10 +156,10 @@
         {
           "name": "INT",
           "type": "INT",
+          "slot_index": 0,
           "links": [
             52
-          ],
-          "slot_index": 0
+          ]
         }
       ],
       "properties": {
@@ -198,30 +200,30 @@
         {
           "name": "image",
           "type": "IMAGE",
-          "links": [],
-          "slot_index": 0
+          "slot_index": 0,
+          "links": []
         },
         {
-          "name": "width",
           "label": "768 width",
+          "name": "width",
           "type": "INT",
+          "slot_index": 1,
           "links": [
             41
-          ],
-          "slot_index": 1
+          ]
         },
         {
-          "name": "height",
           "label": "768 height",
+          "name": "height",
           "type": "INT",
+          "slot_index": 2,
           "links": [
             42
-          ],
-          "slot_index": 2
+          ]
         },
         {
-          "name": "count",
           "label": "1 count",
+          "name": "count",
           "type": "INT",
           "links": null
         }
@@ -252,11 +254,11 @@
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "slot_index": 0,
           "links": [
             33,
             39
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "MASK",
@@ -271,7 +273,8 @@
       },
       "widgets_values": [
         "example.png",
-        "image"
+        "image",
+        ""
       ]
     },
     {
@@ -293,10 +296,10 @@
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "slot_index": 0,
           "links": [
             51
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "MASK",
@@ -311,7 +314,8 @@
       },
       "widgets_values": [
         "ComfyUI_00002_.png",
-        "image"
+        "image",
+        ""
       ]
     },
     {
@@ -333,16 +337,16 @@
         {
           "name": "IMAGE",
           "type": "IMAGE",
-          "links": [],
-          "slot_index": 0
+          "slot_index": 0,
+          "links": []
         },
         {
           "name": "MASK",
           "type": "MASK",
+          "slot_index": 1,
           "links": [
             57
-          ],
-          "slot_index": 1
+          ]
         }
       ],
       "properties": {
@@ -352,50 +356,46 @@
       },
       "widgets_values": [
         "clipspace/clipspace-mask-160755.59999999776.png [input]",
-        "image"
+        "image",
+        ""
       ]
     },
     {
-      "id": 54,
-      "type": "Y7Nodes_ShowAnything",
+      "id": 64,
+      "type": "easy mathString",
       "pos": [
-        61.84785842895508,
-        -994.3162231445312
+        541.6919555664062,
+        -651.389892578125
       ],
       "size": [
-        234.48863220214844,
-        163.63571166992188
+        315,
+        130
       ],
       "flags": {},
-      "order": 12,
+      "order": 4,
       "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "type": "*",
-          "shape": 7,
-          "link": 52
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "name": "output",
-          "type": "*",
-          "links": null
+          "name": "BOOLEAN",
+          "type": "BOOLEAN",
+          "slot_index": 0,
+          "links": [
+            60
+          ]
         }
       ],
       "properties": {
-        "ver": "db15b3c66ad20c595ef2b4a790c07a6df81734c1",
-        "Node name for S&R": "Y7Nodes_ShowAnything"
+        "cnr_id": "comfyui-easy-use",
+        "ver": "f888e3d75dc09c1fc8045bf429e699ed468eda1e",
+        "Node name for S&R": "easy mathString"
       },
       "widgets_values": [
-        "589824",
-        true,
-        "16",
-        ""
-      ],
-      "color": "#223",
-      "bgcolor": "#335"
+        "10",
+        "20",
+        "a == b",
+        true
+      ]
     },
     {
       "id": 56,
@@ -414,8 +414,8 @@
       "inputs": [
         {
           "name": "anything",
-          "type": "*",
           "shape": 7,
+          "type": "*",
           "link": 57
         }
       ],
@@ -427,56 +427,14 @@
         }
       ],
       "properties": {
+        "cnr_id": "comfyui-y7nodes",
         "ver": "db15b3c66ad20c595ef2b4a790c07a6df81734c1",
         "Node name for S&R": "Y7Nodes_ShowAnything"
       },
       "widgets_values": [
         "MASK Tensor:\n  Shape: torch.Size([1, 512, 512])\n   - [Channel=1, Height=512, Width=512]\n  Data Type: torch.float32\n  Value Range: [0.0000, 1.0000]\n  Mean: 0.2981\n  Std Dev: 0.4362",
-        true,
         "11",
-        ""
-      ],
-      "color": "#223",
-      "bgcolor": "#335"
-    },
-    {
-      "id": 50,
-      "type": "Y7Nodes_ShowAnything",
-      "pos": [
-        329.978515625,
-        -1027.7750244140625
-      ],
-      "size": [
-        532.8666381835938,
-        216.99957275390625
-      ],
-      "flags": {},
-      "order": 10,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "anything",
-          "type": "*",
-          "shape": 7,
-          "link": 48
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "*",
-          "links": null
-        }
-      ],
-      "properties": {
-        "ver": "44ae8b507a01f00215dd20ac00b9c936931f4a9a",
-        "Node name for S&R": "Y7Nodes_ShowAnything"
-      },
-      "widgets_values": [
-        "A simple, colorful drawing of a cartoon character with large, expressive blue eyes and large, yellow ears, standing on a green hill with a blue sky in the background. The character has a cheerful expression and is wearing a pink dress. The drawing is done in a simple, cartoonish style with bright colors and smooth lines.",
-        false,
-        "12",
-        ""
+        "11"
       ],
       "color": "#223",
       "bgcolor": "#335"
@@ -498,8 +456,8 @@
       "inputs": [
         {
           "name": "anything",
-          "type": "*",
           "shape": 7,
+          "type": "*",
           "link": 51
         }
       ],
@@ -511,54 +469,101 @@
         }
       ],
       "properties": {
+        "cnr_id": "comfyui-y7nodes",
         "ver": "db15b3c66ad20c595ef2b4a790c07a6df81734c1",
         "Node name for S&R": "Y7Nodes_ShowAnything"
       },
       "widgets_values": [
         "IMAGE Tensor:\n  Shape: torch.Size([1, 512, 512, 3])\n   - [Batch=1, Height=512, Width=512, Channels=3]\n  Data Type: torch.float32\n  Value Range: [0.0000, 1.0000]\n  Mean: 0.4190\n  Std Dev: 0.2967",
-        true,
         "11",
-        ""
+        "11"
       ],
       "color": "#223",
       "bgcolor": "#335"
     },
     {
-      "id": 64,
-      "type": "easy mathString",
+      "id": 54,
+      "type": "Y7Nodes_ShowAnything",
       "pos": [
-        541.6919555664062,
-        -651.389892578125
+        61.84785842895508,
+        -994.3162231445312
       ],
       "size": [
-        315,
-        130
+        234.48863220214844,
+        163.63571166992188
       ],
       "flags": {},
-      "order": 4,
+      "order": 12,
       "mode": 0,
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 52
+        }
+      ],
       "outputs": [
         {
-          "name": "BOOLEAN",
-          "type": "BOOLEAN",
-          "links": [
-            60
-          ],
-          "slot_index": 0
+          "name": "output",
+          "type": "*",
+          "links": null
         }
       ],
       "properties": {
-        "cnr_id": "comfyui-easy-use",
-        "ver": "f888e3d75dc09c1fc8045bf429e699ed468eda1e",
-        "Node name for S&R": "easy mathString"
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "db15b3c66ad20c595ef2b4a790c07a6df81734c1",
+        "Node name for S&R": "Y7Nodes_ShowAnything"
       },
       "widgets_values": [
-        "10",
-        "20",
-        "a == b",
-        true
-      ]
+        "589824",
+        "11",
+        "16"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    },
+    {
+      "id": 50,
+      "type": "Y7Nodes_ShowAnything",
+      "pos": [
+        329.978515625,
+        -1027.7750244140625
+      ],
+      "size": [
+        532.8666381835938,
+        216.99957275390625
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 48
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "44ae8b507a01f00215dd20ac00b9c936931f4a9a",
+        "Node name for S&R": "Y7Nodes_ShowAnything"
+      },
+      "widgets_values": [
+        "A simple, colorful drawing of a cartoon character with large, expressive blue eyes and large, yellow ears, standing on a green hill with a blue sky in the background. The character has a cheerful expression and is wearing a pink dress. The drawing is done in a simple, cartoonish style with bright colors and smooth lines.",
+        "11",
+        "12"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
     },
     {
       "id": 65,
@@ -577,8 +582,8 @@
       "inputs": [
         {
           "name": "anything",
-          "type": "*",
           "shape": 7,
+          "type": "*",
           "link": 60
         }
       ],
@@ -590,14 +595,14 @@
         }
       ],
       "properties": {
+        "cnr_id": "comfyui-y7nodes",
         "ver": "db15b3c66ad20c595ef2b4a790c07a6df81734c1",
         "Node name for S&R": "Y7Nodes_ShowAnything"
       },
       "widgets_values": [
         "false",
-        true,
-        "20",
-        ""
+        "11",
+        "20"
       ],
       "color": "#223",
       "bgcolor": "#335"
@@ -689,10 +694,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1.1,
+      "scale": 1,
       "offset": [
-        398.4820544460113,
-        1272.0788528470528
+        640.9512992423382,
+        1472.341295076604
       ]
     },
     "VHS_latentpreview": false,
