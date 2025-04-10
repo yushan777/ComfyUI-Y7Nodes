@@ -88,6 +88,25 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ------
 
+### Catch and Edit Text (Dual)
+
+> Based on the original ![CatchEditTextNode by ImagineerNL](https://github.com/ImagineerNL/ComfyUI-IMGNR-Utils)
+> A node that catches and shows text(s) generated from a previous node and enables editing the text for subsequent runs. Using the edited text also mutes the input node.  Modified from the original to take two text inputs to work with the Prompt Enhancer (shown below) and provide two text outputs.
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   See screenshot for Prompt Enhancer below. 
+>
+>   This node acts as a receiver and editor for text sent from two sources.
+action widget:
+- use_input: pass the input text as it without modification.
+- use_edit_mute_input: pass the edited texts in the widgets and mute the source node of the input(s).
+
+If you just need one text input then I recommend using [ImagineerNL's original node](https://github.com/ImagineerNL/ComfyUI-IMGNR-Utils).
+> </details>
+
+------
+
 ### Y7 Prompt Enhancer (Flux)
 
 > Takes any basic prompt and enhances it and produces T5 and CLIP friendly variants of the enhanced prompt. token / trigger words can be used in sq. brackets
@@ -95,7 +114,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >   
->   ![Prompt Enhancer (Flux) ](assets/prompt_enhancer_flux.jpg)
+>   ![Prompt Enhancer (Flux) ](assets/prompt_enhancer_flux_with_catch_edit_text.jpg)
 >   
 >   Flux.1 uses two encoders: CLIP and T5 XXL. CLIP processes only the first 77 tokens (including <bos>/<eos>), and anything beyond that depends on the implementation. In ComfyUI, long prompts are split into 77-token chunks for CLIP, which are then batched and concatenated. On the other hand, T5, supports up to 512 tokens (or 256 in the "schnell" version) and works well with natural, descriptive language.
 >   

@@ -1,2 +1,5 @@
+1.0.18
+Added CatchEditTextDual node.
+
 1.0.17
 removed monospace_font widget from show_anything.js (defaults to monospace)
