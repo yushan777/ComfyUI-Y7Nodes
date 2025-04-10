@@ -7,6 +7,7 @@ from .nodes.show_anything import Y7Nodes_ShowAnything
 from .nodes.prompt_enhancer_flux import Y7Nodes_PromptEnhancerFlux
 from .nodes.t5_token_count import Y7Nodes_T5_TokenCounter
 from .nodes.clip_token_count import Y7Nodes_CLIP_TokenCounter
+from .nodes.catch_edit_text_dual import Y7Nodes_CatchEditTextNodeDual
 
 
 NODE_CLASS_MAPPINGS = {
@@ -16,7 +17,7 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_PromptEnhancerFlux": Y7Nodes_PromptEnhancerFlux,
     "Y7Nodes_T5_TokenCounter": Y7Nodes_T5_TokenCounter,
     "Y7Nodes_CLIP_TokenCounter": Y7Nodes_CLIP_TokenCounter,
-
+    "Y7Nodes_CatchEditTextNodeDual": Y7Nodes_CatchEditTextNodeDual,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -26,6 +27,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_PromptEnhancerFlux": "Y7 Prompt Enhancer (Flux)",
     "Y7Nodes_T5_TokenCounter": "Y7 T5 Token Counter",
     "Y7Nodes_CLIP_TokenCounter": "Y7 CLIP Token Counter",    
+    "Y7Nodes_CatchEditTextNodeDual": "Y7 Catch and Edit Text (Dual)",
 }
 
 # Apply HTML-formatted documentation to node classes

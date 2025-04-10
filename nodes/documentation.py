@@ -125,6 +125,20 @@ descriptions = {
         normal("Note: First-time use will download the model if it does not exist.")
     ],
 
+    "Y7Nodes_CatchEditTextNodeDual": [
+        "Catch and Edit Text (Dual)",
+        short_desc("Catches text from two separate inputs making them editable"),
+        normal("This node acts as a receiver and editor for text sent from two sources."),
+        normal("action widget:"),
+        normal("- use_input: pass the input text as it without modification.",1),
+        normal("- use_edit_mute_input: pass the edited text in the widget and mute the source node of the input(s).",1),
+        normal(""),
+        normal("Based on the original CatchEditTextNode by ImagineerNL"),
+        normal("https://github.com/ImagineerNL/ComfyUI-IMGNR-Utils"),
+        normal("If you just need one text input then I recommend using his original node."),
+
+    ],
+
     # Add more node descriptions here
 }
 
