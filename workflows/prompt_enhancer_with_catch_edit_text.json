@@ -1,67 +1,9 @@
 {
   "id": "efd192c5-6790-4604-b26b-81560b59cb7e",
   "revision": 0,
-  "last_node_id": 39,
-  "last_link_id": 43,
+  "last_node_id": 40,
+  "last_link_id": 47,
   "nodes": [
-    {
-      "id": 21,
-      "type": "KSampler",
-      "pos": [
-        1493.066650390625,
-        16.763816833496094
-      ],
-      "size": [
-        315,
-        262
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": null
-        },
-        {
-          "name": "positive",
-          "type": "CONDITIONING",
-          "link": null
-        },
-        {
-          "name": "negative",
-          "type": "CONDITIONING",
-          "link": null
-        },
-        {
-          "name": "latent_image",
-          "type": "LATENT",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "LATENT",
-          "type": "LATENT",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.27",
-        "Node name for S&R": "KSampler"
-      },
-      "widgets_values": [
-        231300621598101,
-        "randomize",
-        20,
-        8,
-        "euler",
-        "normal",
-        1
-      ]
-    },
     {
       "id": 30,
       "type": "Y7Nodes_CLIP_TokenCounter",
@@ -74,7 +16,7 @@
         208
       ],
       "flags": {},
-      "order": 2,
+      "order": 1,
       "mode": 0,
       "inputs": [
         {
@@ -92,7 +34,7 @@
           "name": "text_out",
           "type": "STRING",
           "links": [
-            37
+            44
           ]
         }
       ],
@@ -105,69 +47,11 @@
       },
       "widgets_values": [
         "",
-        "Token Count: 28 / 77\n\nTokens\n==========================================\n[ 0] <|startoftext|>[ 1] ohwx</w>       [ 2] man</w>        [ 3] ,</w>          \n[ 4] smoking</w>    [ 5] ,</w>          [ 6] cafe</w>       [ 7] ,</w>          \n[ 8] vintage</w>    [ 9] posters</w>    [10] ,</w>          [11] soft</w>       \n[12] focus</w>      [13] ,</w>          [14] nostalgic</w>  [15] ,</w>          \n[16] dim</w>        [17] lighting</w>   [18] ,</w>          [19] wooden</w>     \n[20] tables</w>     [21] ,</w>          [22] coffee</w>     [23] aroma</w>      \n[24] ,</w>          [25] intimate</w>   [26] setting</w>    [27] <|endoftext|>  \n\n",
+        "Token Count: 23 / 77\n\nTokens\n==========================================\n[ 0] <|startoftext|>[ 1] ohwx</w>       [ 2] man</w>        [ 3] ,</w>          \n[ 4] cafe</w>       [ 5] ,</w>          [ 6] smoking</w>    [ 7] ,</w>          \n[ 8] vintage</w>    [ 9] ,</w>          [10] warm</w>       [11] lighting</w>   \n[12] ,</w>          [13] jazz</w>       [14] ,</w>          [15] classic</w>    \n[16] attire</w>     [17] ,</w>          [18] haze</w>       [19] ,</w>          \n[20] rustic</w>     [21] decor</w>      [22] <|endoftext|>  \n",
         true,
         "4",
         "10",
         null
-      ]
-    },
-    {
-      "id": 39,
-      "type": "KSampler",
-      "pos": [
-        1414.9310302734375,
-        -7.769382953643799
-      ],
-      "size": [
-        315,
-        262
-      ],
-      "flags": {},
-      "order": 6,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": null
-        },
-        {
-          "name": "positive",
-          "type": "CONDITIONING",
-          "link": 42
-        },
-        {
-          "name": "negative",
-          "type": "CONDITIONING",
-          "link": null
-        },
-        {
-          "name": "latent_image",
-          "type": "LATENT",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "LATENT",
-          "type": "LATENT",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.27",
-        "Node name for S&R": "KSampler"
-      },
-      "widgets_values": [
-        186199239219570,
-        "randomize",
-        20,
-        8,
-        "euler",
-        "normal",
-        1
       ]
     },
     {
@@ -182,7 +66,7 @@
         300
       ],
       "flags": {},
-      "order": 1,
+      "order": 0,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -213,131 +97,9 @@
         0.7,
         0.9,
         40,
-        588072238168187,
+        4804319611662,
         "randomize",
         true
-      ]
-    },
-    {
-      "id": 35,
-      "type": "Y7Nodes_CatchEditTextNodeDual",
-      "pos": [
-        467.5584411621094,
-        -99.03718566894531
-      ],
-      "size": [
-        371.3707275390625,
-        475.3977355957031
-      ],
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "input_text_1",
-          "shape": 7,
-          "type": "STRING",
-          "widget": {
-            "name": "input_text_1"
-          },
-          "link": 37
-        },
-        {
-          "name": "input_text_2",
-          "shape": 7,
-          "type": "STRING",
-          "widget": {
-            "name": "input_text_2"
-          },
-          "link": 43
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output_text_1",
-          "type": "STRING",
-          "links": [
-            40
-          ]
-        },
-        {
-          "name": "output_text_2",
-          "type": "STRING",
-          "links": [
-            41
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-y7nodes",
-        "ver": "69bc604a1bc03e4a82ec04e0af680fa4e647bd4e",
-        "Node name for S&R": "Y7Nodes_CatchEditTextNodeDual"
-      },
-      "widgets_values": [
-        "ohwx man, smoking, cafe, vintage posters, soft focus, nostalgic, dim lighting, wooden tables, coffee aroma, intimate setting",
-        "ohwx man, smoking, cafe, vintage posters, soft focus, nostalgic, dim lighting, wooden tables, coffee aroma, intimate setting",
-        "use_input",
-        "",
-        "",
-        "copy_text_1",
-        "copy_text_2"
-      ]
-    },
-    {
-      "id": 37,
-      "type": "CLIPTextEncodeFlux",
-      "pos": [
-        866.994140625,
-        -3.4334444999694824
-      ],
-      "size": [
-        227.88352966308594,
-        134.53480529785156
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip",
-          "type": "CLIP",
-          "link": null
-        },
-        {
-          "name": "clip_l",
-          "type": "STRING",
-          "widget": {
-            "name": "clip_l"
-          },
-          "link": 40
-        },
-        {
-          "name": "t5xxl",
-          "type": "STRING",
-          "widget": {
-            "name": "t5xxl"
-          },
-          "link": 41
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "links": [
-            42
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.27",
-        "Node name for S&R": "CLIPTextEncodeFlux"
-      },
-      "widgets_values": [
-        "",
-        "",
-        3.5
       ]
     },
     {
@@ -352,7 +114,7 @@
         232
       ],
       "flags": {},
-      "order": 3,
+      "order": 2,
       "mode": 0,
       "inputs": [
         {
@@ -370,7 +132,7 @@
           "name": "text_out",
           "type": "STRING",
           "links": [
-            43
+            45
           ]
         }
       ],
@@ -384,12 +146,132 @@
       },
       "widgets_values": [
         "",
-        "Token Count: 326 / 512\n\n",
+        "Token Count: 156 / 512\n\n",
         "512",
         false,
         "4",
         "10",
         null
+      ]
+    },
+    {
+      "id": 40,
+      "type": "Y7Nodes_CatchEditTextNodeDual",
+      "pos": [
+        490,
+        -100
+      ],
+      "size": [
+        410,
+        480
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input_text_1",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "input_text_1"
+          },
+          "link": 44
+        },
+        {
+          "name": "input_text_2",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "input_text_2"
+          },
+          "link": 45
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output_text_1",
+          "type": "STRING",
+          "links": [
+            46
+          ]
+        },
+        {
+          "name": "output_text_2",
+          "type": "STRING",
+          "links": [
+            47
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "663bb351fb48cf0e0f7f7f899a6c676fade4b476",
+        "Node name for S&R": "Y7Nodes_CatchEditTextNodeDual"
+      },
+      "widgets_values": [
+        "ohwx man, cafe, smoking, vintage, warm lighting, jazz, classic attire, haze, rustic decor",
+        "ohwx man sits in a dimly lit cafe, taking a puff from a cigarette. The room is filled with a haze of smoke, casting a warm, golden glow on the man's face. His attire exudes a classic yet modern aesthetic, with a well-tailored suit and a crisp white shirt. The cafe itself is adorned with vintage-inspired decor, featuring wooden tables, leather chairs, and a rustic brick wall. The atmosphere is cozy and intimate, with soft lighting and the faint sound of jazz playing in the background. The man's expression is thoughtful, lost in the moment as he savors the taste of his cigarette.",
+        "use_input",
+        "",
+        "",
+        "copy_text_1",
+        "copy_text_2"
+      ]
+    },
+    {
+      "id": 37,
+      "type": "CLIPTextEncodeFlux",
+      "pos": [
+        960,
+        20
+      ],
+      "size": [
+        227.88352966308594,
+        134.53480529785156
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 2,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": null
+        },
+        {
+          "name": "clip_l",
+          "type": "STRING",
+          "widget": {
+            "name": "clip_l"
+          },
+          "link": 46
+        },
+        {
+          "name": "t5xxl",
+          "type": "STRING",
+          "widget": {
+            "name": "t5xxl"
+          },
+          "link": 47
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.27",
+        "Node name for S&R": "CLIPTextEncodeFlux"
+      },
+      "widgets_values": [
+        "",
+        "",
+        3.5
       ]
     }
   ],
@@ -411,43 +293,35 @@
       "STRING"
     ],
     [
-      37,
+      44,
       30,
       0,
-      35,
-      0,
-      "STRING"
-    ],
-    [
       40,
-      35,
+      0,
+      "STRING"
+    ],
+    [
+      45,
+      2,
+      0,
+      40,
+      1,
+      "STRING"
+    ],
+    [
+      46,
+      40,
       0,
       37,
       1,
       "STRING"
     ],
     [
-      41,
-      35,
+      47,
+      40,
       1,
       37,
       2,
-      "STRING"
-    ],
-    [
-      42,
-      37,
-      0,
-      39,
-      1,
-      "CONDITIONING"
-    ],
-    [
-      43,
-      2,
-      0,
-      35,
-      1,
       "STRING"
     ]
   ],
@@ -455,10 +329,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1.1,
+      "scale": 1.2574655616615957,
       "offset": [
-        318.8298841480913,
-        344.3887003506858
+        248.25213887121785,
+        203.35591742207976
       ]
     },
     "VHS_latentpreview": false,

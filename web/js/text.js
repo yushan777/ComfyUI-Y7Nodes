@@ -24,7 +24,7 @@ app.registerExtension({
                 
                 // override it with our own implementation, but still 
                 // preserve the ability to call the original method with
-                const result = onNodeCreated?.apply(this, arguments);
+                onNodeCreated?.apply(this, arguments);
                                 
                 // ==========================================================
                 // COPY BUTTON
@@ -100,7 +100,6 @@ app.registerExtension({
                     }
                 }, { serialize: false });
 
-                return result;
             };
 
             // ===========================================================================================

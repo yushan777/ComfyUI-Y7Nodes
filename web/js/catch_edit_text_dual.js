@@ -105,7 +105,7 @@ app.registerExtension({
             // ===========================================================================================
             // When a new instance of this node type is created
             // ===========================================================================================
-            nodeType.prototype.onNodeCreated = function () {
+            nodeType.prototype.onNodeCreated = function () {                
                 onNodeCreated?.apply(this, arguments);
 
                 // === Apply Text Widget Styles ===

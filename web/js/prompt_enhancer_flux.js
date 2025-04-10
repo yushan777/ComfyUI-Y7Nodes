@@ -22,11 +22,10 @@ app.registerExtension({
         
             // When a new instance of this node type is created....
             nodeType.prototype.onNodeCreated = function() {
-                
-                
+                                
                 // override it with our own implementation, but still 
                 // preserve the ability to call the original method with
-                const result = onNodeCreated?.apply(this, arguments);
+                onNodeCreated?.apply(this, arguments);
                 
                 // ==========================================================
                 // SET INITIAL NODE SIZE
@@ -44,9 +43,7 @@ app.registerExtension({
                     // Tell ComfyUI to redraw
                     app.graph.setDirtyCanvas(true, false);
                 }
-
-
-                return result;
+                
             };
 
             // ===========================================================================================
