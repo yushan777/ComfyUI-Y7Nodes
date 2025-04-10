@@ -54,7 +54,7 @@ class Y7Nodes_CatchEditTextNodeDual:
         }
 
     RETURN_TYPES = ("STRING", "STRING",)
-    RETURN_TYPES = ("output_text_1", "output_text_2",)
+    RETURN_NAMES = ("output_text_1", "output_text_2",)
     FUNCTION = "process_text"
     CATEGORY = "Y7Nodes/utils"
     OUTPUT_NODE = True
