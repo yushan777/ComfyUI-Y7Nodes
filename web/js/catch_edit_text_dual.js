@@ -3,6 +3,10 @@
 
 import { app } from "../../../scripts/app.js";
 
+// Default node size
+const DEFAULT_NODE_WIDTH = 350;
+const DEFAULT_NODE_HEIGHT = 350;
+
 app.registerExtension({
     name: "Comfy.Y7Nodes_CatchEditTextNodeDual.JS",
 
@@ -47,6 +51,21 @@ app.registerExtension({
 
              nodeType.prototype.onNodeCreated = function () {
                  onNodeCreated?.apply(this, arguments);
+
+                 // Set initial node size if it's the default computed size
+                 // This aims to only resize newly created nodes, not ones loaded from a workflow
+                 const computedSize = this.computeSize();
+                 // Check if size exists and if it matches the initial computed size
+                 if (!this.size || (computedSize && this.size[0] === computedSize[0] && this.size[1] === computedSize[1])) {
+                    this.size = [DEFAULT_NODE_WIDTH, DEFAULT_NODE_HEIGHT];
+                    // Apply the resize explicitly if needed
+                    if (this.onResize) {
+                        this.onResize(this.size);
+                    }
+                    app.graph.setDirtyCanvas(true, false); // Redraw needed after size change
+                    console.log(`[Y7Nodes_CatchEditTextNodeDual.JS] Set initial size for node ${this.id} to ${this.size}`);
+                 }
+
 
                  // --- Existing action widget logic ---
                  const actionWidget = this.widgets.find(w => w.name === "action");

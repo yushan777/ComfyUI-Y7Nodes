@@ -228,7 +228,7 @@ app.registerExtension({
                 // ==========================================================
                 // SET INITIAL NODE SIZE
                 // ==========================================================
-                // Set the initial size of the node
+                // Set the initial size of the node when created
                 if (this.size[0] < DEFAULT_NODE_WIDTH || this.size[1] < DEFAULT_NODE_HEIGHT) {
                     this.size[0] = DEFAULT_NODE_WIDTH;
                     this.size[1] = DEFAULT_NODE_HEIGHT;

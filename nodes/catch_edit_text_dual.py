@@ -7,7 +7,7 @@
 class Y7Nodes_CatchEditTextNodeDual:
     """
     Catches up to two text inputs, displays them in editable widgets.
-    'Use Input': Outputs inputs, attempts to update widget displays.
+    'Use Input': Outputs the original inputs, attempts to update widget displays.
     'Use Edit & Mute Input': Outputs widget texts, mutes upstream nodes providing inputs.
     Inputs are optional to allow upstream muting without validation errors.
     """
@@ -44,8 +44,8 @@ class Y7Nodes_CatchEditTextNodeDual:
                 )
             },
             "optional": {
-                 "input_text_1": ("STRING", {"forceInput": True, "default": ""}), # forceInput ensures it appears as an input slot
-                 "input_text_2": ("STRING", {"forceInput": True, "default": ""})  # forceInput ensures it appears as an input slot
+                 "input_text_1": ("STRING", {"forceInput": True, "default": ""}),
+                 "input_text_2": ("STRING", {"forceInput": True, "default": ""}) 
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID",
