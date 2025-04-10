@@ -12,8 +12,7 @@ const DEFAULT_NODE_HEIGHT = 350;
 const TEXT_WIDGET_1_NAME = "editable_text_widget_1";
 const TEXT_WIDGET_2_NAME = "editable_text_widget_2";
 const ACTION_WIDGET_NAME = "action";
-const COPY_BUTTON_1_NAME = "copy_text_1";
-const COPY_BUTTON_2_NAME = "copy_text_2";
+const COPY_BUTTON_NAME = "copy_both_texts";
 
 const LOG_PREFIX = "[Y7Nodes_CatchEditTextNodeDual]";
 
@@ -142,19 +141,16 @@ app.registerExtension({
                     console.warn(`${LOG_PREFIX} Could not find '${ACTION_WIDGET_NAME}' widget to attach callback.`);
                 }
 
-                // === Add Copy Buttons ===
-                // Widgets already found above for styling, no need to find again
-                // const textWidget1 = this.widgets.find(w => w.name === TEXT_WIDGET_1_NAME);
-                // const textWidget2 = this.widgets.find(w => w.name === TEXT_WIDGET_2_NAME);
-
-                if (textWidget1) {
-                    const copyButton1 = this.addWidget("button", "📋 Copy Text 1", COPY_BUTTON_1_NAME, () => {
-                        const textToCopy = textWidget1.value;
-                        const button = copyButton1; // Reference the button widget itself
+                // === Add Single Copy Button for Both Texts ===
+                if (textWidget1 && textWidget2) {
+                    const copyButton = this.addWidget("button", "📋 Copy Texts", COPY_BUTTON_NAME, () => {
+                        // Concatenate both text widget values with two line breaks in between
+                        const textToCopy = textWidget1.value + "\n\n" + textWidget2.value;
+                        const button = copyButton; // Reference the button widget itself
                         const originalText = button.name;
 
                         const showSuccess = () => {
-                            button.name = "✅ Text copied.";
+                            button.name = "✅ Texts copied.";
                             setTimeout(() => {
                                 button.name = originalText;
                                 app.graph.setDirtyCanvas(true, false);
@@ -163,7 +159,7 @@ app.registerExtension({
                         };
 
                         const showError = (err) => {
-                            console.error(`${LOG_PREFIX} Failed to copy text 1:`, err);
+                            console.error(`${LOG_PREFIX} Failed to copy texts:`, err);
                             button.name = "❌ Failed to copy.";
                             setTimeout(() => {
                                 button.name = originalText;
@@ -193,56 +189,7 @@ app.registerExtension({
                         }
                     }, { serialize: false });
                 } else {
-                    console.warn(`${LOG_PREFIX} Could not find '${TEXT_WIDGET_1_NAME}' to add copy button.`);
-                }
-
-                if (textWidget2) {
-                    const copyButton2 = this.addWidget("button", "📋 Copy Text 2", COPY_BUTTON_2_NAME, () => {
-                        const textToCopy = textWidget2.value;
-                        const button = copyButton2; // Reference the button widget itself
-                        const originalText = button.name;
-
-                        const showSuccess = () => {
-                            button.name = "✅ Text copied.";
-                            setTimeout(() => {
-                                button.name = originalText;
-                                app.graph.setDirtyCanvas(true, false);
-                            }, 1000);
-                            app.graph.setDirtyCanvas(true, false);
-                        };
-
-                        const showError = (err) => {
-                            console.error(`${LOG_PREFIX} Failed to copy text 2:`, err);
-                            button.name = "❌ Failed to copy.";
-                            setTimeout(() => {
-                                button.name = originalText;
-                                app.graph.setDirtyCanvas(true, false);
-                            }, 2000);
-                            app.graph.setDirtyCanvas(true, false);
-                        };
-
-                        try {
-                            const textarea = document.createElement('textarea');
-                            textarea.value = textToCopy;
-                            textarea.style.position = 'fixed';
-                            textarea.style.left = '-999999px';
-                            textarea.style.top = '-999999px';
-                            document.body.appendChild(textarea);
-                            textarea.focus();
-                            textarea.select();
-                            const successful = document.execCommand('copy');
-                            document.body.removeChild(textarea);
-                            if (successful) {
-                                showSuccess();
-                            } else {
-                                showError(new Error("execCommand('copy') failed"));
-                            }
-                        } catch (err) {
-                            showError(err);
-                        }
-                    }, { serialize: false });
-                } else {
-                    console.warn(`${LOG_PREFIX} Could not find '${TEXT_WIDGET_2_NAME}' to add copy button.`);
+                    console.warn(`${LOG_PREFIX} Could not find text widgets to add copy button.`);
                 }
 
                 // ==========================================================
