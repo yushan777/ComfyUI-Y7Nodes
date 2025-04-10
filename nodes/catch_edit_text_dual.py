@@ -2,7 +2,7 @@
 # Based on the original CatchEditTextNode by ImagineerNL
 # https://github.com/ImagineerNL/ComfyUI-IMGNR-Utils
 # Modified to use dual inputs and ouputs
-# Version: 1.0.
+# Added copy buttons on the frontend
 
 class Y7Nodes_CatchEditTextNodeDual:
     """
@@ -59,14 +59,20 @@ class Y7Nodes_CatchEditTextNodeDual:
     CATEGORY = "Y7Nodes/utils"
     OUTPUT_NODE = True
 
-    # --- Helper functions ---
+    
+    # HELPER FUNCTIONS ================================================================
+    # =================================================================================
     def find_node_by_id(self, unique_id, workflow_info):
-        if not workflow_info or "nodes" not in workflow_info: print(f"[{self.__class__.__name__}] Helper Error: Invalid workflow_info."); return None 
+        if not workflow_info or "nodes" not in workflow_info:
+            print(f"[{self.__class__.__name__}] Helper Error: Invalid workflow_info.")
+            return None
         target_id = str(unique_id[0]) if isinstance(unique_id, list) else str(unique_id)
         for node_data in workflow_info["nodes"]:
             if str(node_data.get("id")) == target_id: return node_data
-        print(f"[{self.__class__.__name__}] Helper Error: Node ID {target_id} not found in workflow."); return None 
+        print(f"[{self.__class__.__name__}] Helper Error: Node ID {target_id} not found in workflow.")
+        return None
 
+    # =================================================================================
     def find_widget_index(self, node_data, widget_name):
         req_keys = list(self.INPUT_TYPES().get("required", {}).keys())
         opt_keys = list(self.INPUT_TYPES().get("optional", {}).keys())
@@ -79,7 +85,8 @@ class Y7Nodes_CatchEditTextNodeDual:
             print(f"[{self.__class__.__name__}] Helper Error: Widget '{widget_name}' not found in INPUT_TYPES keys: {all_keys}") 
             return None
 
-    # --- Main Processing Function ---
+    # MAIN PROCESSING FUNCTION=========================================================
+    # =================================================================================    
     def process_text(self, editable_text_widget_1: str, editable_text_widget_2: str, action: str, unique_id=None, extra_pnginfo=None, input_text_1: str = None, input_text_2: str = None):
         output_text_1 = ""
         output_text_2 = ""
@@ -111,6 +118,7 @@ class Y7Nodes_CatchEditTextNodeDual:
              output_text_1 = editable_text_widget_1
              output_text_2 = editable_text_widget_2
 
+        # =================================================================================
         # --- Attempt to update the UI widgets ---
         node_data_updated = False
         if (text_for_widget_update_1 is not None or text_for_widget_update_2 is not None) and unique_id and extra_pnginfo:
@@ -127,12 +135,18 @@ class Y7Nodes_CatchEditTextNodeDual:
                                 req_widgets = len(self.INPUT_TYPES().get("required", {}))
                                 opt_widgets = len(self.INPUT_TYPES().get("optional", {}))
                                 num_widgets = req_widgets + opt_widgets
-                                node_data["widgets_values"] = ["" for _ in range(num_widgets)]; print(f"[{class_name_log}] Initialized/Reset widgets_values.")
-                            while len(node_data["widgets_values"]) <= widget_index_1: node_data["widgets_values"].append(""); print(f"[{class_name_log}] Padded widgets_values for index {widget_index_1}.")
+                                node_data["widgets_values"] = ["" for _ in range(num_widgets)]
+                                print(f"[{class_name_log}] Initialized/Reset widgets_values.")
+                            while len(node_data["widgets_values"]) <= widget_index_1:
+                                node_data["widgets_values"].append("")
+                                print(f"[{class_name_log}] Padded widgets_values for index {widget_index_1}.")
                             current_widget_val_1 = node_data["widgets_values"][widget_index_1]
                             if current_widget_val_1 != text_for_widget_update_1:
-                                node_data["widgets_values"][widget_index_1] = text_for_widget_update_1; print(f"[{class_name_log}] ---> Set widgets_values[{widget_index_1}] (Widget 1)."); node_data_updated = True
-                            else: print(f"[{class_name_log}] Widget 1 value already matches target.")
+                                node_data["widgets_values"][widget_index_1] = text_for_widget_update_1
+                                print(f"[{class_name_log}] ---> Set widgets_values[{widget_index_1}] (Widget 1).")
+                                node_data_updated = True
+                            else:
+                                print(f"[{class_name_log}] Widget 1 value already matches target.")
                     # Update Widget 2 if needed
                     if text_for_widget_update_2 is not None:
                         widget_index_2 = self.find_widget_index(node_data, "editable_text_widget_2")
@@ -141,12 +155,18 @@ class Y7Nodes_CatchEditTextNodeDual:
                                 req_widgets = len(self.INPUT_TYPES().get("required", {}))
                                 opt_widgets = len(self.INPUT_TYPES().get("optional", {}))
                                 num_widgets = req_widgets + opt_widgets
-                                node_data["widgets_values"] = ["" for _ in range(num_widgets)]; print(f"[{class_name_log}] Initialized/Reset widgets_values.")
-                            while len(node_data["widgets_values"]) <= widget_index_2: node_data["widgets_values"].append(""); print(f"[{class_name_log}] Padded widgets_values for index {widget_index_2}.")
+                                node_data["widgets_values"] = ["" for _ in range(num_widgets)]
+                                print(f"[{class_name_log}] Initialized/Reset widgets_values.")
+                            while len(node_data["widgets_values"]) <= widget_index_2:
+                                node_data["widgets_values"].append("")
+                                print(f"[{class_name_log}] Padded widgets_values for index {widget_index_2}.")
                             current_widget_val_2 = node_data["widgets_values"][widget_index_2]
                             if current_widget_val_2 != text_for_widget_update_2:
-                                node_data["widgets_values"][widget_index_2] = text_for_widget_update_2; print(f"[{class_name_log}] ---> Set widgets_values[{widget_index_2}] (Widget 2)."); node_data_updated = True
-                            else: print(f"[{class_name_log}] Widget 2 value already matches target.")
+                                node_data["widgets_values"][widget_index_2] = text_for_widget_update_2
+                                print(f"[{class_name_log}] ---> Set widgets_values[{widget_index_2}] (Widget 2).")
+                                node_data_updated = True
+                            else:
+                                print(f"[{class_name_log}] Widget 2 value already matches target.")
             elif text_for_widget_update_1 is not None or text_for_widget_update_2 is not None: print(f"[{class_name_log}] Cannot attempt UI update - missing unique_id or extra_pnginfo.")
 
         # Determine text to show in UI (used by JS)
@@ -162,4 +182,3 @@ class Y7Nodes_CatchEditTextNodeDual:
             "result": (str(output_text_1), str(output_text_2),) # Tuple for multiple outputs
         }
         return return_dict
-
