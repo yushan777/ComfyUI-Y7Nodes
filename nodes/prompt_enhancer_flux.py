@@ -178,9 +178,9 @@ This must be a **very rich and highly detailed** natural language description (u
 - Subject Details: **Thoroughly describe** physical appearance, pose, action, expression, attire, including textures and materials.
 - Scene Description: **Paint a vivid picture** of the overall setting, environment, background details, and visual style.
 - Time & Place: Specify time of day, season, location with **atmospheric details**.
-- Lighting and colors: Detail the light sources, intensity, direction, color temperature, shadows, and **how light interacts with surfaces**.
+- Lighting and colors: Detail the light sources, intensity, direction, color temperature, shadows
 - Composition: Explain the layout of elements, focal points, and camera angle/perspective.
-- Mood & Atmosphere: Convey the emotional tone using **evocative and descriptive language**.
+- Mood & Atmosphere: Convey the emotional tone using **but do not use overly purple prose.  stick to language that can easily be visualized.**.
 - Do not start with, "in this image..." or similar assume that we know it is an image, go straight to the point!
 Bad:
 "In this image, a woman stands in..."
@@ -193,19 +193,16 @@ Good:
 - Avoid repetition of the subject, instead use she, he, her, his etc
 """
 
-
-# T5 example
 PROMPT_T5_EXAMPLE = """
 Example T5 Prompt:
 A woman with shoulder-length black hair and luminous brown eyes stands alone in a dimly lit interior hallway. She wears a sleek, 
-emerald green satin dress that catches the light with a subtle shimmer. Her posture is still, almost statuesque, as she gazes slightly 
-off-camera with a pensive expression. One hand rests gently on a weathered wooden railing, while the other clutches a small vintage clutch. 
+emerald green satin dress with a subtle shimmer. She is standing still, looking tall, as she gazes slightly 
+off-camera. One hand rests gently on a wooden railing, while the other clutches a small vintage clutch. 
 The hallway is narrow and elegant, lined with tall windows draped in sheer curtains that allow soft shafts of moonlight to filter in. 
-Dust particles drift through the air, caught in the light. Ornate wall sconces cast warm amber glows along the wallpapered walls, 
-creating deep shadows that frame the woman in dramatic contrast.
+Dust particles drift through the air, caught in the light. Ornate wall sconces cast a warm light along the wallpapered walls, 
+casting deep shadows.
 """
 
-# CLIP prompt instructions
 PROMPT_CLIP_INSTRUCTIONS = """
 Next, I need you to create a CLIP Prompt:
 
@@ -220,7 +217,6 @@ This should be a keyword-focused list (up to 70 CLIP TOKENS, aiming for roughly 
 - Aim for the target word count of 40-55 words. Add or remove keywords as needed to meet this range.
 """
 
-# CLIP example
 PROMPT_CLIP_EXAMPLE = """
 Example CLIP Prompt:
 woman, shoulder-length black hair, brown eyes, emerald satin dress, vintage clutch, hallway, dim, lighting, pensive, moonlight, 
