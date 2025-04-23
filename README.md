@@ -44,7 +44,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 > Takes input from any (most?) nodes and displays it in a readable format and provides a Copy Text button for easily copying the displayed content.
 >
-> <img src="assets/show_anything.jpg" alt="sbs image" width="100%"/>
+> <img src="assets/show_anything.jpg" alt="show anything" width="100%"/>
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >   
@@ -56,17 +56,21 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 ### Image Row
 > Takes up to 4 images and concats them together horizontally in a row with captions:
 > 
-> <img src="assets/image_row.jpg" alt="sbs image" width="100%"/>
+> <img src="assets/image_row.jpg" alt="image row" width="100%"/>
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >
 >   - Captions list will map too whatever images has been inputed
 >   - Preview mode by default, switch to save mode.
 > </details>
+
 ---
+
 ### CLIP Token Counter
 
 > Takes text (string) as input and, using the CLIP tokenizer, displays token count and more:
+> 
+> <img src="assets/clip_token_count.jpg" alt="clip token counter" width="100%"/>
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >   
@@ -77,7 +81,6 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   - Copy Text button: copies the contents displayed in the text widget
 >   - Pass-though output for original text
 >
->   ![clip_token_count](assets/clip_token_count.jpg)
 > </details>
 
 ---
@@ -85,6 +88,8 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 ### T5 Token Counter
 
 > Takes text (string) as input and, using the T5 XXL tokenizer, displays token count and more:
+> 
+> <img src="assets/t5_token_count.jpg" alt="t5 token counter" width="100%"/>
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >   
@@ -95,15 +100,15 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   - Copy Text button: copies the contents displayed in the text widget
 >   - Pass-though output for original text
 >
->   ![t5_token_count](assets/t5_token_count.jpg)
 > </details>
 
 ------
 
 ### Catch and Edit Text (Dual)
-
 > Based on the original ![CatchEditTextNode by ImagineerNL](https://github.com/ImagineerNL/ComfyUI-IMGNR-Utils)
 > A node that catches and shows text(s) generated from a previous node and enables editing the text for subsequent runs. Using the edited text also mutes the input node.  Modified from the original to take two text inputs to work with the Prompt Enhancer (shown below) and provide two text outputs.
+> 
+> <img src="assets/prompt_enhancer_flux_with_catch_edit_text.jpg.jpg" alt="catch edit text" width="100%"/>
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >
