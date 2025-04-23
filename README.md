@@ -108,7 +108,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 > Based on the original ![CatchEditTextNode by ImagineerNL](https://github.com/ImagineerNL/ComfyUI-IMGNR-Utils)
 > A node that catches and shows text(s) generated from a previous node and enables editing the text for subsequent runs. Using the edited text also mutes the input node.  Modified from the original to take two text inputs to work with the Prompt Enhancer (shown below) and provide two text outputs.
 > 
-> <img src="assets/prompt_enhancer_flux_with_catch_edit_text.jpg.jpg" alt="catch edit text" width="100%"/>
+> <img src="assets/prompt_enhancer_flux_with_catch_edit_text.jpg" alt="catch edit text" width="100%"/>
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >
