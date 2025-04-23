@@ -128,6 +128,8 @@ If you just need one text input then I recommend using [ImagineerNL's original n
 
 > Takes any basic prompt and enhances it and produces T5 and CLIP friendly variants of the enhanced prompt. token / trigger words can be used in sq. brackets
 > Example: [ohwx man], [agg woman], [sks dog]
+>
+> <img src="assets/prompt_enhancer_flux_with_catch_edit_text.jpg" alt="catch edit text" width="100%"/>
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >   
