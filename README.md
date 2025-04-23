@@ -40,7 +40,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ## Nodes
 
-### Y7 Show Anything
+### Show Anything
 
 > Takes input from any (most?) nodes and displays it in a readable format and provides a Copy Text button for easily copying the displayed content.
 > <details>
@@ -51,6 +51,15 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   ![Show Anything Example 2 ](assets/show_anything.jpg)
 > </details>
 
+---
+### Image Row
+> Takes up to 4 images and concats them together horizontally in a row:
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   - Captions list will map too whatever images has been inputed
+>   - Preview mode by default, switch to save mode.
+> </details>
 ---
 ### CLIP Token Counter
 

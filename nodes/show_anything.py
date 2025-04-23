@@ -38,7 +38,7 @@ class Y7Nodes_ShowAnything:
         return {
             "required": {}, 
             "optional": {
-                "anything": (any_type, {}),
+                "anything": (any_type, {"tooltip": "Any input type that you want to inspect or debug"}),
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID", "extra_pnginfo": "EXTRA_PNGINFO",

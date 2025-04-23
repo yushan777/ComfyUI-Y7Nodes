@@ -35,11 +35,13 @@ descriptions = {
 
     "Y7_ImageRow": [
         "Image Row Combiner",
-        short_desc("Combines up to 4 images horizontally into a single row"),
+        short_desc("Combines up to 4 images horizontally into a single row with captions"),
         normal("Takes up to 4 images and combines them horizontally into a single row image."),
         normal("All images are resized to a consistent height (the minimum height among all input images) while maintaining their aspect ratios."),
+        normal("Captions are displayed in a bar beneath the images, with each caption centered under its corresponding image."),
         normal("Inputs:"),
         normal("- `image1`, `image2`, `image3`, `image4`: Optional image inputs to combine", 1),
+        normal("- `captions`: Comma-separated list of captions for each image (e.g., \"image1, image2, image3, image4\")", 1),
         normal("- `save_image`: Toggle between saving to output directory or creating a preview only", 1),
         normal("- `save_filename`: Prefix for the saved image filename", 1),
         normal("The node displays a preview of the combined image in the ComfyUI interface."),

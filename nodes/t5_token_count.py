@@ -18,7 +18,7 @@ class Y7Nodes_T5_TokenCounter:
         return {
             "required": {}, 
             "optional": {
-                "text_in": ("STRING", {"default": "", "forceInput": True}),                   
+                "text_in": ("STRING", {"default": "", "forceInput": True, "tooltip": "Text input to count tokens for using the T5 tokenizer"}),                   
             },
             "hidden": {
                 # these are used to help restore state
@@ -435,5 +435,4 @@ class Y7Nodes_T5_TokenCounter:
                 print(f"Error saving tokenizer locally: {save_error}\nUsing cached copy.", color.ORANGE)
                 
                 # If saving fails, still return the downloaded tokenizer
-                return T5Tokenizer.from_pretrained(FALLBACK_HF_MODEL)     
-               
+                return T5Tokenizer.from_pretrained(FALLBACK_HF_MODEL)

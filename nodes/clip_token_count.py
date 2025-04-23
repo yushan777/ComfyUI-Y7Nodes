@@ -18,7 +18,7 @@ class Y7Nodes_CLIP_TokenCounter:
         return {
             "required": {}, 
             "optional": {
-                "text_in": ("STRING", {"default": "", "forceInput": True}),                   
+                "text_in": ("STRING", {"default": "", "forceInput": True, "tooltip": "Text input to count tokens for using the CLIP tokenizer"}),                   
             },
             "hidden": {
                 # these are used to help restore state

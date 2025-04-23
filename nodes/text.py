@@ -9,7 +9,7 @@ class Y7Nodes_Text:
             "required": {
             },
             "optional": {
-                "text": ("STRING", {"default": "", "multiline": True}),
+                "text": ("STRING", {"default": "", "multiline": True, "tooltip": "Text input that will be passed through to the output"}),
             },
             "hidden": {
                 # # Hidden inputs for workflow state persistence
