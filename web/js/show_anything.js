@@ -239,7 +239,7 @@ app.registerExtension({
                 // Resize node (if needed)
                 requestAnimationFrame(() => {
 
-                    console.log("=====>> requestAnimationFrame() called!!!")
+                    // console.log("=====>> requestAnimationFrame() called!!!")
                     // this function doesn't seem to do anything
 
                     // 1. Get required node dimensions based on content

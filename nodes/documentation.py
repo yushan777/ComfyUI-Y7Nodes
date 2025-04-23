@@ -33,6 +33,19 @@ descriptions = {
     #     normal("Optionally provide a `filename_prefix` to use when saving the processed image.")
     # ],
 
+    "Y7_ImageRow": [
+        "Image Row Combiner",
+        short_desc("Combines up to 4 images horizontally into a single row"),
+        normal("Takes up to 4 images and combines them horizontally into a single row image."),
+        normal("All images are resized to a consistent height (the minimum height among all input images) while maintaining their aspect ratios."),
+        normal("Inputs:"),
+        normal("- `image1`, `image2`, `image3`, `image4`: Optional image inputs to combine", 1),
+        normal("- `save_image`: Toggle between saving to output directory or creating a preview only", 1),
+        normal("- `save_filename`: Prefix for the saved image filename", 1),
+        normal("The node displays a preview of the combined image in the ComfyUI interface."),
+        normal("If no images are provided, an empty preview is returned.")
+    ],
+
     "Y7Nodes_Text":[
         "Basic Text Input With Copy Button", 
         short_desc("Basic Text Input With Copy Button"),

@@ -1,5 +1,5 @@
 import torch
-import numpy as np
+# import numpy as np
 from .documentation import descriptions, as_html
 
 # takes a grid of images (like those generated in XY-plots) and processes them into a batch. 
