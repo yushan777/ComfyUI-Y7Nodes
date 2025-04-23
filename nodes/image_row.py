@@ -76,9 +76,7 @@ class Y7_ImageRow:
             new_width = int(min_height * aspect_ratio)
             resized_img = img.resize((new_width, min_height), Image.LANCZOS)
             resized_images.append(resized_img)
-            total_width += new_width
-            
-        # print(f"total_width = {total_width}", color.ORANGE)
+            total_width += new_width        
 
         # Add captions to images - match captions to available images in order
         for i, img in enumerate(resized_images):
@@ -89,7 +87,7 @@ class Y7_ImageRow:
                 
                 try:
                     # Use a larger font size for better visibility
-                    font_size = 20
+                    font_size = 50
                     font = None
                     
                     # Try to use a TrueType font with a specific size
@@ -99,7 +97,6 @@ class Y7_ImageRow:
                         "C:\\Windows\\Fonts\\arial.ttf",  # Windows
                         "/usr/share/fonts/TTF/DejaVuSans.ttf",  # Some Linux distros
                     ]
-    # Define both font paths
             
                     for path in font_paths:
                         if os.path.exists(path):
@@ -113,15 +110,14 @@ class Y7_ImageRow:
                     # If no TrueType font is available, use the default
                     if font is None:
                         font = ImageFont.load_default()
-                    
-                    print(f"font={font}", color.ORANGE)
+                                    
 
                     # Get the caption text for this image
                     text = caption_list[i]
                     
                     # Calculate text dimensions based on available methods
                     if hasattr(font, 'getbbox'):
-                        # Modern Pillow (>=9.2.0)
+                        # Modern Pillow (>=10.0.0)
                         bbox = font.getbbox(text)
                         text_width = bbox[2] - bbox[0]
                         text_height = bbox[3] - bbox[1]
@@ -130,11 +126,6 @@ class Y7_ImageRow:
                         # Older Pillow
                         text_width, text_height = font.getsize(text)
                         print(f"Older Pillow", color.ORANGE)
-                    else:
-                        # Fallback
-                        text_width = len(text) * (font_size // 2)
-                        text_height = font_size + 4
-                        print(f"Fallback", color.ORANGE)
                     
                     # Calculate position (centered at bottom with padding)
                     padding = 10

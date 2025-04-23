@@ -4,4 +4,4 @@ protobuf>=4.25.6
 sentencepiece>=0.2.0
 huggingface_hub>=0.29.0
 accelerate>=0.26.0
-pillow>=10.4.0
+pillow>=10.0.0
