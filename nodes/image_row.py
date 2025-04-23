@@ -99,7 +99,7 @@ class Y7_ImageRow:
             if os.path.exists(path):
                 try:
                     font = ImageFont.truetype(path, font_size)
-                    print(f"TrueType Font Exists", color.ORANGE)
+                    # print(f"TrueType Font Exists", color.ORANGE)
                     break
                 except Exception:
                     continue
