@@ -1,3 +1,9 @@
+1.0.21
+renamed workflows dir to example_workflows
+
+1.0.20
+added imageRow node 
+
 1.0.18
 Added CatchEditTextDual node.
 
