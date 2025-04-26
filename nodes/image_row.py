@@ -1,7 +1,9 @@
 import torch
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL.PngImagePlugin import PngInfo
 import os
+import json
 from ..utils.colored_print import color, style
 from .documentation import descriptions, as_html
 import folder_paths
@@ -29,7 +31,11 @@ class Y7_ImageRow:
                 "image2": ("IMAGE", {"tooltip": "Second image to include in the row"}),
                 "image3": ("IMAGE", {"tooltip": "Third image to include in the row"}),
                 "image4": ("IMAGE", {"tooltip": "Fourth image to include in the row"}),
-            }
+            },
+            "hidden": {
+                "prompt": "PROMPT", 
+                "extra_pnginfo": "EXTRA_PNGINFO"
+            },
         }
 
     # we don't define RETURN_TYPES
@@ -50,7 +56,7 @@ class Y7_ImageRow:
         pil_images = [Image.fromarray(img) for img in images]
         return pil_images
 
-    def process_image_row(self, captions, caption_size=16, save_image=False, save_filename="image_row", image1=None, image2=None, image3=None, image4=None):
+    def process_image_row(self, captions, caption_size=16, save_image=False, save_filename="image_row", image1=None, image2=None, image3=None, image4=None, prompt=None, extra_pnginfo=None):
         # Parse captions
         caption_list = [cap.strip() for cap in captions.split(',')]
         
@@ -197,8 +203,16 @@ class Y7_ImageRow:
                 break
             counter += 1
 
-        # Save the image
-        combined_image.save(full_path, compress_level=4) # Save with moderate PNG compression
+        # --- Prepare metadata ---
+        metadata = PngInfo()
+        if prompt is not None:
+            metadata.add_text("prompt", json.dumps(prompt))
+        if extra_pnginfo is not None:
+            for key, value in extra_pnginfo.items():
+                metadata.add_text(key, json.dumps(value))
+
+        # Save the image with metadata
+        combined_image.save(full_path, pnginfo=metadata, compress_level=4) # Save with moderate PNG compression
 
         # --- Prepare preview data ---
         preview_data = [{
