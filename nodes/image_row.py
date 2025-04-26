@@ -182,13 +182,15 @@ class Y7_ImageRow:
                         except Exception:
                             pass
 
-        # --- Saving the image ---
+        # If selected to do so, save the image
         if save_image:
             output_dir = folder_paths.get_output_directory()
             file_prefix = save_filename
             preview_type = "output"
             subfolder = "" # Saved to root output
-        else:
+
+        # oetherwise preview the image (stored in temp)
+        else: 
             output_dir = folder_paths.get_temp_directory()
             file_prefix = save_filename + "_preview"
             preview_type = "temp"
@@ -203,7 +205,7 @@ class Y7_ImageRow:
                 break
             counter += 1
 
-        # --- Prepare metadata ---
+        # Prepare workflow metadata 
         metadata = PngInfo()
         if prompt is not None:
             metadata.add_text("prompt", json.dumps(prompt))
@@ -214,12 +216,12 @@ class Y7_ImageRow:
         # Save the image with metadata
         combined_image.save(full_path, pnginfo=metadata, compress_level=4) # Save with moderate PNG compression
 
-        # --- Prepare preview data ---
+        # Prepare preview data
         preview_data = [{
             "filename": filename,
             "subfolder": subfolder,
             "type": preview_type
         }]
 
-        # Return the preview data for the UI
+        # Return the preview data for the UI to display
         return {"ui": {"images": preview_data}}
