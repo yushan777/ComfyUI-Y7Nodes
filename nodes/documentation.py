@@ -33,7 +33,7 @@ descriptions = {
     #     normal("Optionally provide a `filename_prefix` to use when saving the processed image.")
     # ],
 
-    "Y7_ImageRow": [
+    "Y7Nodes_ImageRow": [
         "Image Row Combiner",
         short_desc("Combines up to 4 images horizontally into a single row with captions"),
         normal("Takes up to 4 images and combines them horizontally into a single row image."),

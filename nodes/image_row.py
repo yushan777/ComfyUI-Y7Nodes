@@ -9,7 +9,7 @@ from .documentation import descriptions, as_html
 import folder_paths
 
 
-class Y7_ImageRow:
+class Y7Nodes_ImageRow:
     """
     Combines up to 4 images horizontally into a single row,
     resizing them to a consistent height. Saves the result

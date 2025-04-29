@@ -1,0 +1,70 @@
+[
+  {
+    "label": "Square (1:1)",
+    "value": "1024x1024"
+  },
+  {
+    "label": "Portrait (2:3)",
+    "value": "512x768"
+  },
+  {
+    "label": "Portrait HD (2:3)",
+    "value": "720x1080"
+  },
+  {
+    "label": "Portrait 4K (9:16)",
+    "value": "2160x3840"
+  },
+  {
+    "label": "Landscape (3:2)",
+    "value": "768x512"
+  },
+  {
+    "label": "Landscape HD (16:9)",
+    "value": "1280x720"
+  },
+  {
+    "label": "Landscape Full HD (16:9)",
+    "value": "1920x1080"
+  },
+  {
+    "label": "Landscape 4K (16:9)",
+    "value": "3840x2160"
+  },
+  {
+    "label": "Widescreen (16:9)",
+    "value": "1024x576"
+  },
+  {
+    "label": "Ultrawide (12:5)",
+    "value": "1920x800"
+  },
+  {
+    "label": "Square Small (1:1)",
+    "value": "512x512"
+  },
+  {
+    "label": "Panoramic (4:1)",
+    "value": "2048x512"
+  },
+  {
+    "label": "Banner (2:1)",
+    "value": "2048x1024"
+  },
+  {
+    "label": "Instagram Story (9:16)",
+    "value": "1080x1920"
+  },
+  {
+    "label": "YouTube Thumbnail (16:9)",
+    "value": "1280x720"
+  },
+  {
+    "label": "Poster Portrait (2:3)",
+    "value": "1000x1500"
+  },
+  {
+    "label": "Poster Landscape (3:2)",
+    "value": "1500x1000"
+  }
+]
