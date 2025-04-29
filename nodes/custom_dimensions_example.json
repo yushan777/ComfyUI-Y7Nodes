@@ -1,70 +1,16 @@
 [
-  {
-    "label": "Square (1:1)",
-    "value": "1024x1024"
-  },
-  {
-    "label": "Portrait (2:3)",
-    "value": "512x768"
-  },
-  {
-    "label": "Portrait HD (2:3)",
-    "value": "720x1080"
-  },
-  {
-    "label": "Portrait 4K (9:16)",
-    "value": "2160x3840"
-  },
-  {
-    "label": "Landscape (3:2)",
-    "value": "768x512"
-  },
-  {
-    "label": "Landscape HD (16:9)",
-    "value": "1280x720"
-  },
-  {
-    "label": "Landscape Full HD (16:9)",
-    "value": "1920x1080"
-  },
-  {
-    "label": "Landscape 4K (16:9)",
-    "value": "3840x2160"
-  },
-  {
-    "label": "Widescreen (16:9)",
-    "value": "1024x576"
-  },
-  {
-    "label": "Ultrawide (12:5)",
-    "value": "1920x800"
-  },
-  {
-    "label": "Square Small (1:1)",
-    "value": "512x512"
-  },
-  {
-    "label": "Panoramic (4:1)",
-    "value": "2048x512"
-  },
-  {
-    "label": "Banner (2:1)",
-    "value": "2048x1024"
-  },
-  {
-    "label": "Instagram Story (9:16)",
-    "value": "1080x1920"
-  },
-  {
-    "label": "YouTube Thumbnail (16:9)",
-    "value": "1280x720"
-  },
-  {
-    "label": "Poster Portrait (2:3)",
-    "value": "1000x1500"
-  },
-  {
-    "label": "Poster Landscape (3:2)",
-    "value": "1500x1000"
-  }
+  { "label": "◼︎ (1:1) - 1024x1024", "value": "1024x1024" },
+  { "label": "🁢 (3:4)- 896x1152", "value": "896x1152" },
+  { "label": "🁢 (5:8)- 832x1216", "value": "832x1216" },
+  { "label": "🁢 (9:16) - 768x1344", "value": "768x1344" },
+  { "label": "🁢 (9:21) - 640x1536", "value": "640x1536" },
+  { "label": "🁢 HD (9:16) - 720x1280", "value": "720x1280" },
+  { "label": "🁢 FHD (9:16) - 1080x1920", "value": "1080x1920" },
+  { "label": "🀰 (4:3) - 1152x896", "value": "1152x896" },
+  { "label": "🀰 (3:2) - 1216x832", "value": "1216x832" },
+  { "label": "🀰 (16:9) - 1344x768", "value": "1344x768" },
+  { "label": "🀰 (21:9) - 1536x640", "value": "1536x640" },
+  { "label": "🀰 HD (16:9) - 1280x720", "value": "1280x720" },
+  { "label": "🀰 FHD (16:9) - 1920x1080", "value": "1920x1080" }
 ]
+

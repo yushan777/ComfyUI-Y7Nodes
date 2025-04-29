@@ -154,6 +154,22 @@ descriptions = {
 
     ],
 
+    "Y7Nodes_ImageSizePresets": [
+        "Image Size Presets",
+        short_desc("Simple node to provide image width and height from a preset list loaded from a customizable file."),
+        normal("The `custom_dimensions.json` file should be located in the `nodes` directory."),
+        normal("Examine custom_dimensions_example.json for expected format."),        
+        normal("If `custom_dimensions.json` is missing or invalid, a default preset is used."),
+        normal("Select 'Custom' from the dropdown to use manually entered `custom_w` and `custom_h` values."),
+        normal("Inputs:"),
+        normal("- `preset`: Dropdown list of dimension presets or 'Custom'.", 1),
+        normal("- `custom_w`: Width to use when 'Custom' is selected.", 1),
+        normal("- `custom_h`: Height to use when 'Custom' is selected.", 1),
+        normal("Outputs:"),
+        normal("- `Width`: The selected or custom width.", 1),
+        normal("- `Height`: The selected or custom height.", 1)
+    ],
+
     # Add more node descriptions here
 }
 

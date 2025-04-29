@@ -8,10 +8,12 @@ from .nodes.prompt_enhancer_flux import Y7Nodes_PromptEnhancerFlux
 from .nodes.t5_token_count import Y7Nodes_T5_TokenCounter
 from .nodes.clip_token_count import Y7Nodes_CLIP_TokenCounter
 from .nodes.catch_edit_text_dual import Y7Nodes_CatchEditTextNodeDual
-from .nodes.image_row import Y7Nodes_ImageRow # Added import
+from .nodes.image_row import Y7Nodes_ImageRow
+from .nodes.image_size_presets import Y7Nodes_ImageSizePresets
 
 NODE_CLASS_MAPPINGS = {
-    "Y7Nodes_ImageRow": Y7Nodes_ImageRow, # Added mapping
+    "Y7Nodes_ImageRow": Y7Nodes_ImageRow,
+    "Y7Nodes_ImageSizePresets": Y7Nodes_ImageSizePresets,
     "Y7Nodes_Text": Y7Nodes_Text,
     "Y7Nodes_ShowAnything": Y7Nodes_ShowAnything,
     "Y7Nodes_Grid2Batch": Y7Nodes_Grid2Batch,    
@@ -21,7 +23,8 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_CatchEditTextNodeDual": Y7Nodes_CatchEditTextNodeDual,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Y7Nodes_ImageRow": "Y7 Image Row", # Added display name
+    "Y7Nodes_ImageRow": "Y7 Image Row",
+    "Y7Nodes_ImageSizePresets" : "Y7 Image Size (Presets)",
     "Y7Nodes_Text": "Y7 Text",
     "Y7Nodes_ShowAnything": "Y7 Show Anything",
     "Y7Nodes_Grid2Batch": "Y7 Grid to Batch",
