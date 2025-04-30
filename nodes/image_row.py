@@ -21,7 +21,7 @@ class Y7Nodes_ImageRow:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                 "captions": ("STRING", {"default": "monday, tuesday, wednesday, thursday", "tooltip": "Comma-separated list of captions for each image"}), 
+                 "captions": ("STRING", {"default": "one, two, three, four", "tooltip": "Comma-separated list of captions for each image"}), 
                  "caption_size": ("INT", {"min": 12, "max": 100, "default": 16, "tooltip": "Font size for the captions"}),                 
                  "save_image": ("BOOLEAN", {"default": False, "label_on": "Save to output", "label_off": "Preview only", "tooltip": "Toggle between saving to output directory or creating a preview only"}),
                  "save_filename": ("STRING", {"default": "image_row", "tooltip": "Prefix for the saved image filename"}),

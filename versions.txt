@@ -1,3 +1,6 @@
+1.0.23
+added ImageSizePresets node
+
 1.0.22
 Workflow metadata saved in ImageRow png files
 
