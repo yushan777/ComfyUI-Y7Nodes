@@ -261,6 +261,16 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 
 ---
 
+### Y7 Image Size Presets
+> Select predefined image size/aspect ratios loaded from a custom json file. Provides width and height outputs.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>   - Provides outputs for `width` and `height` (INT).
+>   - Looks for and loads presets from `custom_dimensions.json` located in the `nodes` directory. You can edit this file to add your own presets.
+> </details>
+
+
 ## Example Workflows
 
 Example workflows can be found in the `workflows` directory. 
@@ -273,4 +283,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - ShowAnything node is based on "Show Any" from yolain's ComfyUI-Easy-Use custom nodes and "Show Any To JSON" from crystian's ComfyUI-Crystools custom nodes, with additional formatting controls and a Copy Text button.
 - Help popup system is based on the implementation from Kosinkadink's ComfyUI-VideoHelperSuite.
-
