@@ -1,3 +1,6 @@
+1.0.24
+bug fixes
+
 1.0.23
 added ImageSizePresets node
 
