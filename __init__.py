@@ -11,8 +11,10 @@ from .nodes.catch_edit_text_dual import Y7Nodes_CatchEditTextNodeDual
 from .nodes.image_row import Y7Nodes_ImageRow
 from .nodes.image_size_presets import Y7Nodes_ImageSizePresets
 from .nodes.smolvlm import Y7Nodes_SmolVLM
+from .nodes.save_image import Y7Nodes_SaveImage
 
 NODE_CLASS_MAPPINGS = {
+    "Y7Nodes_SaveImage": Y7Nodes_SaveImage, 
     "Y7Nodes_ImageRow": Y7Nodes_ImageRow,
     "Y7Nodes_ImageSizePresets": Y7Nodes_ImageSizePresets,
     "Y7Nodes_Text": Y7Nodes_Text,
@@ -25,6 +27,7 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_SmolVLM": Y7Nodes_SmolVLM
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
+    "Y7Nodes_SaveImage": "Y7 Save Image",
     "Y7Nodes_ImageRow": "Y7 Image Row",
     "Y7Nodes_ImageSizePresets" : "Y7 Image Size (Presets)",
     "Y7Nodes_Text": "Y7 Text",
