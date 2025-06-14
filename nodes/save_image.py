@@ -21,7 +21,6 @@ class Y7Nodes_SaveImage:
     counter_digits          = 4
     counter_position        = 'last'
     counter_positions_list  = ['last', 'first']
-    one_counter_per_folder  = True
     image_preview           = True
     output_ext              = '.png'
 
@@ -70,7 +69,7 @@ class Y7Nodes_SaveImage:
     
     
     # Get current counter number from file names
-    def get_latest_counter(self, one_counter_per_folder, folder_path, filename_prefix, counter_digits=counter_digits, counter_position=counter_position, output_ext=output_ext):
+    def get_latest_counter(self, folder_path, filename_prefix, counter_digits=counter_digits, counter_position=counter_position, output_ext=output_ext):
         counter = 1
         if not os.path.exists(folder_path):
             print(f"Error: Folder {folder_path} does not exist, starting counter at 1.")
@@ -84,9 +83,9 @@ class Y7Nodes_SaveImage:
                 if counter_position not in self.counter_positions_list: counter_position = self.counter_position
                 if counter_position == 'last':
                     # BUG: this works only if extension is 3 letters like png, this will break with webp and avif:
-                    counters = [int(file[-(extLen + counter_digits):-extLen]) if file[-(extLen + counter_digits):-extLen].isdecimal() else 0 for file in files if one_counter_per_folder or file.startswith(filename_prefix)]
+                    counters = [int(file[-(extLen + counter_digits):-extLen]) if file[-(extLen + counter_digits):-extLen].isdecimal() else 0 for file in files]
                 else:
-                    counters = [int(file[:counter_digits]) if file[:counter_digits].isdecimal() else 0 for file in files if one_counter_per_folder or file[counter_digits +1:].startswith(filename_prefix)]
+                    counters = [int(file[:counter_digits]) if file[:counter_digits].isdecimal() else 0 for file in files]
                 
                 if counters:
                     counter = max(counters) + 1
@@ -155,7 +154,7 @@ class Y7Nodes_SaveImage:
             # print(f"debug save_images: foldername_prefix={foldername_prefix}")
             # print(f"debug save_images: output_path={output_path}")
             os.makedirs(output_path, exist_ok=True)
-            counter = self.get_latest_counter(self.one_counter_per_folder, output_path, filename, counter_digits, counter_position, self.output_ext)
+            counter = self.get_latest_counter(output_path, filename, counter_digits, counter_position, self.output_ext)
             # print(f"debug save_images: counter for {self.output_ext}: {counter}")
         
             results = list()
