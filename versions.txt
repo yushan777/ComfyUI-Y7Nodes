@@ -1,3 +1,9 @@
+1.0.26
+replaced deprecated torch_dtype to dtype in prompt_enhancer_flux
+
+1.0.25
+image_size_presets: increased custom width/height min/max range to support lower and higher video resolutions.
+
 1.0.24
 bug fixes
 
