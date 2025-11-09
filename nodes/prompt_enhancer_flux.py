@@ -998,7 +998,7 @@ class Y7Nodes_PromptEnhancerFlux:
             # Load model with quantization config and device_map
             llm_model = AutoModelForCausalLM.from_pretrained(
                 model_path,
-                torch_dtype=torch_dtype,
+                dtype=torch_dtype,
                 low_cpu_mem_usage=True,
                 quantization_config=quantization_config, # Pass the config
                 device_map="auto" # Let transformers handle device placement
