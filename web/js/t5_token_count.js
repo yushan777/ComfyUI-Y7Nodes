@@ -14,16 +14,17 @@ const tokensPerLine = ["2", "3", "4", "5", "6", "7", "8", "9", "10"];
 const DEFAULT_NODE_WIDTH = 500;
 const DEFAULT_NODE_HEIGHT = 300;
 
-// Widget indexes
-// if a widget of basic data type (like "STRING") is used in the backend with forceInput=True or a COMFYUI widget of type like "MODEL" 
-// then its widget index is counted. Only time it does not is when a widget with custom data type is used
-// in the backend with forceInput=True then it is not counted in the widget array (don't know why)
-const TEXT_WIDGET = 1;
-const TOKEN_LIMIT_WIDGET = 2;
-const SHOW_TOKENS_WIDGET = 3;
-const TOKENS_PER_LINE_WIDGET = 4;
-const FONTSIZE_WIDGET = 5;
-const COPYBUTTON_WIDGET = 6;
+// Widget indexes for this node
+// Note: Backend inputs with forceInput=True become input slots, not widgets (but they used to be),
+// so they don't occupy a position in the widgets array.
+// Index 0 is the first widget created in this JS file (the TEXT widget).
+
+const TEXT_WIDGET = 0;
+const TOKEN_LIMIT_WIDGET = 1;
+const SHOW_TOKENS_WIDGET = 2;
+const TOKENS_PER_LINE_WIDGET = 3;
+const FONTSIZE_WIDGET = 4;
+const COPYBUTTON_WIDGET = 5;
 
 // Single global style for the text area
 const textAreaStyles = {
@@ -87,6 +88,7 @@ app.registerExtension({
                 // ADD TEXT WIDGET
                 // ==========================================================
                 console.log("creating text widget")
+                
                 // create text widget - this will be the first widget on the node. 
 
                 // const w = ComfyWidgets["STRING"](this, "text", ["STRING", { multiline: true }], app).widget;
@@ -105,6 +107,7 @@ app.registerExtension({
                 // apply styles and make readonly               
                 Object.assign(w.inputEl.style, textAreaStyles);
                 w.inputEl.readOnly = true;
+                console.log("===> widgets array length = " + this.widgets.length);
 
                 // ==========================================================
                 // TOKEN LIMIT WIDGET
@@ -120,6 +123,7 @@ app.registerExtension({
                 // Store the widget index in properties so Python can access it
                 this.properties = this.properties || {};
                 this.properties.token_limit_index = TOKEN_LIMIT_WIDGET;                
+                console.log("===> widgets array length = " + this.widgets.length);
 
                 // ==========================================================
                 // SHOW TOKENS WIDGET (BOOLEAN)
