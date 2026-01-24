@@ -10,6 +10,7 @@ const fontSizes = ["8", "9", "10", "11", "12", "14", "16", "18", "20"];
 
 // Widget indexes
 const TEXT_WIDGET = 0;
+
 // const MONOSPACE_WIDGET = 1;
 const FONTSIZE_WIDGET = 1;
 const COPYBUTTON_WIDGET = 2;

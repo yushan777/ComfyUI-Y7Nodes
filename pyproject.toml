@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-y7nodes"
 description = "A collection of utility, quality-of-life nodes for ComfyUI. Probably only useful to me."
-version = "1.0.26"
+version = "1.0.27"
 license = {file = "LICENSE"}
 # classifiers = [
 #     # For OS-independent nodes (works on all operating systems)
@@ -25,8 +25,8 @@ dependencies = ["torch", "transformers>=4.49.0", "protobuf>=4.25.6", "sentencepi
 [project.urls]
 Repository = "https://github.com/yushan777/ComfyUI-Y7Nodes"
 #  Used by Comfy Registry https://registry.comfy.org
-Documentation = "https://github.com/comfyanonymous/ComfyUI/wiki"
-"Bug Tracker" = "https://github.com/comfyanonymous/ComfyUI/issues"
+Documentation = "https://github.com/Comfy-Org/ComfyUI/wiki"
+"Bug Tracker" = "https://github.com/Comfy-Org/ComfyUI/issues"
 
 [tool.comfy]
 PublisherId = "yushan777"
