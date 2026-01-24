@@ -1,3 +1,6 @@
+1.0.28
+Fixed Prompt Enhancer (Flux) bug
+
 1.0.27
 Fixed T5 and CLIP Token Counter nodes not showing tokenized output in the text box. 
 
