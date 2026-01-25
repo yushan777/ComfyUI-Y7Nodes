@@ -120,7 +120,7 @@ descriptions = {
     ],
 
     "Y7Nodes_PromptEnhancerFlux":[
-        "Prompt Enhancer (Flux)",
+        "Prompt Enhancer (Flux1)",
         short_desc("Takes a basic prompt and enhances it, and separates response into T5 and CLIP prompts optimized for Flux.1 image generation"),        
         normal("1. T5 Prompt: A detailed natural language description (up to ~512 tokens)", 1),
         normal("2. CLIP Prompt: A concise keyword list (up to ~75 tokens)", 1),
@@ -138,6 +138,27 @@ descriptions = {
         normal("- `clip_prompt`: Enhanced concise keyword list", 1),
         normal("LLM Model:"),
         normal("Note: First-time use will download the model if it does not exist.")
+    ],
+
+    "Y7Nodes_PromptEnhancerFlux2Klein":[
+        "Prompt Enhancer (Flux2-Klein)",
+        short_desc("Takes a basic prompt and enhances it using Qwen3-8B with optional thinking mode"),
+        normal("Uses the Qwen3-8B model to enhance prompts with support for thinking mode."),
+        normal("Inputs:"),
+        normal("- `prompt`: Your basic text prompt to enhance", 1),
+        normal("- `llm_name`: LLM model to use (currently only Qwen3-8B, more to be added)", 1),
+        normal("- `quantization`: Model precision. Lower precision saves memory and speeds up inference at the cost of quality:", 1),
+        normal("-  `none` = ~16GB, `8bit` = ~8GB, `4bit` = ~4GB", 2),
+        normal("- `enable_thinking`: Enable Qwen3's thinking mode to show the model's reasoning process", 1),
+        normal("- `temperature`: Controls randomness (0.1-2.0, default 0.7). Higher values produce more diverse outputs", 1),
+        normal("- `top_p`: Nucleus sampling parameter (0.8-1.0, default 0.9). Limits tokens to the most probable ones", 1),
+        normal("- `top_k`: Limits token selection (22-100, default 50). Restricts to the k most likely next tokens", 1),
+        normal("- `seed`: Random seed for reproducible results", 1),
+        normal("Outputs:"),
+        normal("- `thinking_output`: The model's reasoning process (only populated if `enable_thinking` is True)", 1),
+        normal("- `enhanced_prompt`: The enhanced prompt output", 1),
+        normal("LLM Model:"),
+        normal("Note: First-time use will download the model (~16GB) if it does not exist. The model uses `trust_remote_code=True` for custom model code.")
     ],
 
     "Y7Nodes_CatchEditTextNodeDual": [
