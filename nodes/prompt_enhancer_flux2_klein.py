@@ -452,6 +452,10 @@ class Y7Nodes_PromptEnhancerFlux2Klein:
                     "INT", 
                     {"default": 0, "min": 0, "max": 0xffffffffffffffff}
                 ),
+                "keep_model_loaded": (
+                    "BOOLEAN",
+                    {"default": False, "tooltip": "Keep the model loaded in memory after generation. Useful for batch processing."}
+                ),
             }, 
             "hidden":{}
         }
@@ -468,13 +472,14 @@ class Y7Nodes_PromptEnhancerFlux2Klein:
         llm_display_name = kwargs.get("llm_name", "")
         quantization = kwargs.get("quantization", "none")
         enable_thinking = kwargs.get("enable_thinking", False)
+        keep_model_loaded = kwargs.get("keep_model_loaded", False)
         max_new_tokens = kwargs.get("max_new_tokens", 4096)
         seed = kwargs.get("seed", 0)
         temperature = kwargs.get("temperature", 0.7)
         top_p = kwargs.get("top_p", 0.9)
         top_k = kwargs.get("top_k", 50)
 
-        input_string = f"{prompt}_{llm_display_name}_{quantization}_{enable_thinking}_{max_new_tokens}_{seed}_{temperature}_{top_p}_{top_k}"
+        input_string = f"{prompt}_{llm_display_name}_{quantization}_{enable_thinking}_{keep_model_loaded}_{max_new_tokens}_{seed}_{temperature}_{top_p}_{top_k}"
         hash_object = hashlib.md5(input_string.encode())
         hash_hex = hash_object.hexdigest()
         
@@ -488,6 +493,7 @@ class Y7Nodes_PromptEnhancerFlux2Klein:
         llm_display_name = kwargs.get("llm_name")
         quantization = kwargs.get("quantization", "none")
         enable_thinking = kwargs.get("enable_thinking", False)
+        keep_model_loaded = kwargs.get("keep_model_loaded", False)
         max_new_tokens = kwargs.get("max_new_tokens", 4096)
         seed = kwargs.get("seed")
         temperature = kwargs.get("temperature")
@@ -571,6 +577,27 @@ class Y7Nodes_PromptEnhancerFlux2Klein:
                     peak_vram_bytes = torch.cuda.max_memory_allocated(load_device)
                     peak_vram_mb = peak_vram_bytes / (1024 * 1024)
                     print(f"[PromptEnhancerFlux2Klein DEBUG] Peak VRAM allocated during generation: {peak_vram_mb:.2f} MB", color.ORANGE)
+
+            # Handle model unloading based on keep_model_loaded setting
+            if not keep_model_loaded:
+                print(f"Unloading model from memory (keep_model_loaded=False)...", color.YELLOW)
+                cache_key = f"{llm_display_name}_{load_device}_{quantization}"
+                if cache_key in self._loaded_models:
+                    del self._loaded_models[cache_key]
+                    print(f"Model removed from cache", color.YELLOW)
+                
+                # Delete model and tokenizer references
+                del llm_model, llm_tokenizer
+                
+                # Clear CUDA/MPS cache
+                if is_cuda_available():
+                    torch.cuda.empty_cache()
+                    print(f"CUDA cache cleared", color.YELLOW)
+                elif is_apple_silicon() and hasattr(torch.mps, 'empty_cache'):
+                    torch.mps.empty_cache()
+                    print(f"MPS cache cleared", color.YELLOW)
+            else:
+                print(f"Model kept in memory for faster subsequent generations (keep_model_loaded=True)", color.BRIGHT_GREEN)
 
             # Final garbage collection
             gc.collect()

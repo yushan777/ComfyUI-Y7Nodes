@@ -239,6 +239,83 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 
 ------
 
+### Y7 Prompt Enhancer (Flux2 Klein)
+
+> Takes any basic prompt and enhances it specifically for FLUX.2 [klein] using the Qwen3-8B LLM model. Features include customizable prompt instructions, thinking mode, and advanced generation parameters.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>   
+>   This node is designed specifically for FLUX.2 [klein] image generation and uses the Qwen3-8B model to transform basic prompts into detailed, high-quality prompts.
+>   
+>   **Key Features:**
+>   
+>   - **Qwen3-8B Model**: Uses advanced LLM for prompt enhancement with ~40K token context window
+>   - **Thinking Mode**: Enable/disable the model's reasoning process output
+>   - **Customizable Instructions**: Load custom prompt enhancement instructions from `prompt_instructions/prompt_instruction_flux2_klein.txt`
+>   - **Quantization Support**: Choose between none, 8-bit, or 4-bit quantization (requires bitsandbytes - primarily Linux)
+>   - **Platform Support**: Works on CUDA, Apple Silicon (MPS), and CPU
+>   - **Advanced Parameters**: Control temperature, top_p, top_k, and max_new_tokens for fine-tuned generation
+>   - **Memory Management**: Option to keep model loaded for faster batch processing
+>   - **Numerical Stability**: Built-in handling for numerical edge cases during generation
+>   
+>   **Outputs:**
+>   - `thinking_output`: The model's reasoning process (when thinking mode is enabled)
+>   - `enhanced_prompt`: The final enhanced prompt for FLUX.2 [klein]
+>   
+>   **Customizing Prompt Instructions:**
+>   
+>   To customize how the model enhances prompts:
+>   1. Copy `prompt_instructions/example_prompt_instruction_flux2_klein.txt`
+>   2. Rename it to `prompt_instructions/prompt_instruction_flux2_klein.txt`
+>   3. Edit the file with your custom instructions
+>   4. The node will automatically load your custom version
+>   
+>   **Model Information:**
+>   
+>   Dependency Note: HuggingFace transformers Qwen3-8B Required>   
+
+>   This node requires the HuggingFace transformers implementation of Qwen3-8B and cannot use the Comfy-Org packaged version.
+
+>   This node performs runtime text generation for prompt enhancement and reasoning using AutoModelForCausalLM and AutoTokenizer. These capabilities—tokenizer access, generation control, and model.generate()—are only available through the HuggingFace transformers API.
+
+>   Comfy-Org’s Qwen models are optimized for inference-only graph execution inside ComfyUI and do not expose the full language-model interfaces required for programmatic text generation outside the standard sampling flow.
+
+>   If Qwen3-8B is not found locally, the node will automatically download it (~16GB) from HuggingFace to models/LLM/Qwen3-8B.
+
+>   
+>   Manual download location (if needed):
+>   https://huggingface.co/Qwen/Qwen3-8B
+>   
+>   ```
+>   ComfyUI
+>   └── models
+>       └── LLM
+>           └── Qwen3-8B
+>               ├── config.json
+>               ├── generation_config.json
+>               ├── merges.txt
+>               ├── model.safetensors.index.json
+>               ├── model-00001-of-00004.safetensors
+>               ├── model-00002-of-00004.safetensors
+>               ├── model-00003-of-00004.safetensors
+>               ├── model-00004-of-00004.safetensors
+>               ├── tokenizer.json
+>               ├── tokenizer_config.json
+>               └── vocab.json
+>   ```
+>   
+>   **Performance Tips:**
+>   
+>   - Use quantization (8-bit or 4-bit) if you have limited VRAM
+>   - Enable "keep_model_loaded" when processing multiple prompts in succession
+>   - Lower temperature values (0.4-0.7) produce more consistent results
+>   - Adjust max_new_tokens based on desired prompt length
+>
+> </details>
+
+------
+
 ### Y7 Grid 2 Batch
 
 > Takes a grid of images (like those generated in XY-plots) and processes it into a batch of individual images.
