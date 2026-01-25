@@ -150,6 +150,7 @@ descriptions = {
         normal("- `quantization`: Model precision. Lower precision saves memory and speeds up inference at the cost of quality:", 1),
         normal("-  `none` = ~16GB, `8bit` = ~8GB, `4bit` = ~4GB", 2),
         normal("- `enable_thinking`: Enable Qwen3's thinking mode to show the model's reasoning process", 1),
+        normal("- `max_new_tokens`: Maximum tokens to generate (256-40960, default 1024). Model context is 40960 total including input", 1),
         normal("- `temperature`: Controls randomness (0.1-2.0, default 0.7). Higher values produce more diverse outputs", 1),
         normal("- `top_p`: Nucleus sampling parameter (0.8-1.0, default 0.9). Limits tokens to the most probable ones", 1),
         normal("- `top_k`: Limits token selection (22-100, default 50). Restricts to the k most likely next tokens", 1),

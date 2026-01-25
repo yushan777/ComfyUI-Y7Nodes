@@ -45,7 +45,11 @@ qwen3_8b_req_files = [
     "config.json",
     "generation_config.json",
     "merges.txt",
-    "model.safetensors",
+    "model.safetensors.index.json",
+    "model-00001-of-00004.safetensors",
+    "model-00002-of-00004.safetensors",
+    "model-00003-of-00004.safetensors",
+    "model-00004-of-00004.safetensors",
     "tokenizer.json",
     "tokenizer_config.json",
     "vocab.json"
@@ -165,7 +169,7 @@ class NumericalStabilityLogitsProcessor:
         if nan_mask.any():
             self.nan_count += 1
             if not self.nan_warned:
-                print("⚠️ NaN values detected in logits, replacing with safe values...", color.YELLOW)
+                print("NaN values detected in logits, replacing with safe values...", color.YELLOW)
                 self.nan_warned = True
             scores = torch.where(nan_mask, torch.tensor(self.replace_value, device=scores.device, dtype=scores.dtype), scores)
         
@@ -174,7 +178,7 @@ class NumericalStabilityLogitsProcessor:
         if inf_mask.any():
             self.inf_count += 1
             if not self.inf_warned:
-                print("⚠️ Inf values detected in logits, replacing with safe values...", color.YELLOW)
+                print("Inf values detected in logits, replacing with safe values...", color.YELLOW)
                 self.inf_warned = True
             # Replace positive inf with max finite value, negative inf with replace_value
             pos_inf_mask = scores == float('inf')
@@ -426,7 +430,7 @@ class Y7Nodes_PromptEnhancerFlux2Klein:
                 ),
                 "max_new_tokens": (
                     "INT",
-                    {"default": 4096, "min": 256, "max": 40960, "step": 256,
+                    {"default": 1024, "min": 256, "max": 40960, "step": 256,
                      "tooltip": "Maximum number of tokens to generate in the response (model context: 40960 total including input)"}
                 ),
                 "temperature": (
