@@ -273,14 +273,9 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 >   
 >   **Model Information:**
 >   
->   Dependency Note: HuggingFace transformers Qwen3-8B Required>   
-
->   This node requires the HuggingFace transformers implementation of Qwen3-8B and cannot use the Comfy-Org packaged version.
-
+>   The HuggingFace transformers version of Qwen3-8B is Required and cannot use the Comfy-Org packaged version.
 >   This node performs runtime text generation for prompt enhancement and reasoning using AutoModelForCausalLM and AutoTokenizer. These capabilities—tokenizer access, generation control, and model.generate()—are only available through the HuggingFace transformers API.
-
 >   Comfy-Org’s Qwen models are optimized for inference-only graph execution inside ComfyUI and do not expose the full language-model interfaces required for programmatic text generation outside the standard sampling flow.
-
 >   If Qwen3-8B is not found locally, the node will automatically download it (~16GB) from HuggingFace to models/LLM/Qwen3-8B.
 
 >   
