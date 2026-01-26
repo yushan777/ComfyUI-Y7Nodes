@@ -241,7 +241,7 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 
 ### Y7 Prompt Enhancer (Flux2 Klein)
 
-> Takes any basic prompt and enhances it specifically for FLUX.2 [klein] using the Qwen3-8B LLM model. Features include customizable prompt instructions, thinking mode, and advanced generation parameters.
+> Takes any basic prompt and enhances it specifically for FLUX.2 [klein] using the Qwen3-8B LLM model or an abliterated version. Features include customizable prompt instructions, thinking mode, and advanced generation parameters.
 >
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
@@ -250,7 +250,8 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 >   
 >   **Key Features:**
 >   
->   - **Qwen3-8B Model**: Uses advanced LLM for prompt enhancement with ~40K token context window
+>   - **Qwen3-8B Model**: Uses advanced LLM for prompt enhancement
+>   - **Josiefied-Qwen3-8B-abliterated Model**: Abliterated variant of the Qwen3-8B Model
 >   - **Thinking Mode**: Enable/disable the model's reasoning process output
 >   - **Customizable Instructions**: Load custom prompt enhancement instructions from `prompt_instructions/prompt_instruction_flux2_klein.txt`
 >   - **Quantization Support**: Choose between none, 8-bit, or 4-bit quantization (requires bitsandbytes - primarily Linux)
@@ -280,7 +281,8 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 
 >   
 >   Manual download location (if needed):
->   https://huggingface.co/Qwen/Qwen3-8B
+>   https://huggingface.co/Qwen/Qwen3-8B  
+>   https://huggingface.co/Goekdeniz-Guelmez/Josiefied-Qwen3-8B-abliterated-v1
 >   
 >   ```
 >   ComfyUI
@@ -297,6 +299,21 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 >               ├── model-00004-of-00004.safetensors
 >               ├── tokenizer.json
 >               ├── tokenizer_config.json
+>               └── vocab.json
+>
+>           └── Josiefied-Qwen3-8B-abliterated-v1
+>               ├── added_tokens.json
+>               ├── config.json
+>               ├── generation_config.json
+>               ├── merges.txt
+>               ├── model-00001-of-00004.safetensors
+>               ├── model-00002-of-00004.safetensors
+>               ├── model-00003-of-00004.safetensors
+>               ├── model-00004-of-00004.safetensors
+>               ├── model.safetensors.index.json
+>               ├── special_tokens_map.json
+>               ├── tokenizer_config.json
+>               ├── tokenizer.json
 >               └── vocab.json
 >   ```
 >   
