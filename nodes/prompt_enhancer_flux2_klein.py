@@ -47,10 +47,11 @@ qwen3_8b_req_files = [
     "generation_config.json",
     "merges.txt",
     "model.safetensors.index.json",
-    "model-00001-of-00004.safetensors",
-    "model-00002-of-00004.safetensors",
-    "model-00003-of-00004.safetensors",
-    "model-00004-of-00004.safetensors",
+    "model-00001-of-00005.safetensors",
+    "model-00002-of-00005.safetensors",
+    "model-00003-of-00005.safetensors",
+    "model-00004-of-00005.safetensors",
+    "model-00005-of-00005.safetensors",
     "tokenizer.json",
     "tokenizer_config.json",
     "vocab.json"
@@ -674,9 +675,6 @@ class Y7Nodes_PromptEnhancerFlux2Klein:
                 if "Josiefied-Qwen3-8B-abliterated-v1" in repo_path:
                     print(f"Downloading {repo_path} (≈16GB)", color.BRIGHT_BLUE)
                     allow_patterns = josiefied_qwen3_8b_abliterated_v1_req_files
-                elif "Qwen3-8B-abliterated" in repo_path:
-                    print(f"Downloading {repo_path} (≈16GB)", color.BRIGHT_BLUE)
-                    allow_patterns = qwen3_8b_abliterated_req_files
                 elif "Qwen3-8B" in repo_path:
                     print(f"Downloading {repo_path} (≈16GB)", color.BRIGHT_BLUE)
                     allow_patterns = qwen3_8b_req_files
@@ -697,8 +695,6 @@ class Y7Nodes_PromptEnhancerFlux2Klein:
 
             if model_display_name == "Josiefied-Qwen3-8B-abliterated-v1":
                 required_files = josiefied_qwen3_8b_abliterated_v1_req_files
-            elif model_display_name == "Qwen3-8B-abliterated":
-                required_files = qwen3_8b_abliterated_req_files
             elif model_display_name == "Qwen3-8B":
                 required_files = qwen3_8b_req_files
 
