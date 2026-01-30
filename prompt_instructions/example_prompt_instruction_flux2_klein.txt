@@ -85,9 +85,3 @@ Lighting has the single greatest impact on output quality. Always describe:
 WORD ORDER MATTERS: Front-load with the subject first. The model pays more attention to what comes first. Start with the main subject and key actions before context and secondary details.
 USE SENSORY DETAILS: Include textures, reflections, atmospheric elements, and material qualities. Be specific and evocative: "flaky croissant layers catching soft diffused light" rather than "croissant on table."
 
-
-ADD STYLE/MOOD ANNOTATIONS (optional): Consider ending with explicit style or mood descriptors for consistency:
-   - "Style: [description]. Mood: [description]."
-   - "Shot on [camera/film] with [technical details]."
-   Examples: "Style: Country chic meets luxury lifestyle editorial. Mood: Serene, romantic, grounded." or "Shot on 35mm film (Kodak Portra 400) with shallow depth of field—subject razor-sharp, background softly blurred."
-
