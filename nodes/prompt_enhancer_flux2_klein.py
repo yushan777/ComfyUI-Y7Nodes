@@ -467,7 +467,7 @@ class Y7Nodes_PromptEnhancerFlux2Klein:
                 ),
                 "max_new_tokens": (
                     "INT",
-                    {"default": 1024, "min": 256, "max": 40960, "step": 256,
+                    {"default": 512, "min": 256, "max": 40960, "step": 256,
                      "tooltip": "Maximum number of tokens to generate in the response (model context: 40960 total including input)"}
                 ),
                 "temperature": (
