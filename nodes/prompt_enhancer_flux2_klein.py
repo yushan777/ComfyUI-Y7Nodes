@@ -80,88 +80,40 @@ DEFAULT_PROMPT = ""
 # ==================================================================================
 # PROMPT INSTRUCTIONS FOR FLUX.2 [KLEIN]
 # ==================================================================================
-# NOTE: To customize the prompt instruction, copy the file:
-#   prompt_instructions/example_prompt_instruction_flux2_klein.txt
-# and rename it to:
-#   prompt_instructions/prompt_instruction_flux2_klein.txt
-# The node will load your custom version if it exists.
+# System messages are loaded from example_system_messages.py
+# (as taken directly from Black Forest Labs's FLUX.2 repo demo)
+# 
+# To customize, copy example_system_messages.py to system_messages.py
+# and modify the prompts there. The node will prioritize system_messages.py
+# if it exists.
 # ==================================================================================
 
-def _read_example_prompt_instruction():
-    """
-    Helper function to read the example prompt instruction file.
-    Returns the content or a minimal fallback message.
-    """
-    try:
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        parent_dir = os.path.dirname(current_dir)
-        example_path = os.path.join(parent_dir, "prompt_instructions", "example_prompt_instruction_flux2_klein.txt")
-        
-        if os.path.exists(example_path):
-            with open(example_path, 'r', encoding='utf-8') as f:
-                content = f.read().strip()
-            # Remove comment header if present (lines starting with #)
-            lines = content.split('\n')
-            cleaned_lines = [line for line in lines if not line.strip().startswith('#')]
-            return '\n'.join(cleaned_lines).strip()
-    except Exception as e:
-        print(f"Error reading example prompt instruction: {str(e)}", color.YELLOW)
-    
-    # Minimal fallback if file can't be read
-    return """You are a professional prompt enhancement specialist for FLUX.2 [klein] image generation. Transform user prompts into detailed, high-quality prompts."""
-
-# Read from example file (no duplication)
-DEFAULT_PROMPT_INSTRUCTION = _read_example_prompt_instruction()
-
-# ==================================================================================
-# LOAD PROMPT INSTRUCTION FROM EXTERNAL FILE
-# ==================================================================================
 def load_prompt_instruction():
     """
-    Load prompt instruction from external file with fallback logic.
+    Load prompt instruction from system_messages module with fallback logic.
     Priority:
-    1. prompt_instructions/prompt_instruction_flux2_klein.txt (user's custom version)
-    2. prompt_instructions/example_prompt_instruction_flux2_klein.txt (default)
-    3. DEFAULT_PROMPT_INSTRUCTION (which also reads from example file)
+    1. system_messages.py (user's custom version)
+    2. example_system_messages.py (default from Black Forest Labs)
     """
-    # Get the directory where this script is located
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    parent_dir = os.path.dirname(current_dir)
-    prompt_instructions_dir = os.path.join(parent_dir, "prompt_instructions")
+    try:
+        # Try to import custom system_messages first
+        from . import system_messages
+        print(f"Loaded custom system message from: system_messages.py", color.BRIGHT_GREEN)
+        return system_messages.SYSTEM_MESSAGE_UPSAMPLING_T2I
+    except ImportError:
+        pass
     
-    # Try to load custom version first
-    custom_path = os.path.join(prompt_instructions_dir, "prompt_instruction_flux2_klein.txt")
-    if os.path.exists(custom_path):
-        try:
-            with open(custom_path, 'r', encoding='utf-8') as f:
-                content = f.read().strip()
-            # Remove comment header if present (lines starting with #)
-            lines = content.split('\n')
-            cleaned_lines = [line for line in lines if not line.strip().startswith('#')]
-            instruction = '\n'.join(cleaned_lines).strip()
-            print(f"Loaded custom prompt instruction from: prompt_instructions/prompt_instruction_flux2_klein.txt", color.BRIGHT_GREEN)
-            return instruction
-        except Exception as e:
-            print(f"Error loading custom prompt instruction: {str(e)}", color.YELLOW)
+    try:
+        # Fall back to example_system_messages
+        from . import example_system_messages
+        print(f"Loaded default system message from: example_system_messages.py", color.BRIGHT_BLUE)
+        return example_system_messages.SYSTEM_MESSAGE_UPSAMPLING_T2I
+    except ImportError as e:
+        print(f"Error loading system messages: {str(e)}", color.YELLOW)
     
-    # Fall back to example version
-    example_path = os.path.join(prompt_instructions_dir, "example_prompt_instruction_flux2_klein.txt")
-    if os.path.exists(example_path):
-        try:
-            with open(example_path, 'r', encoding='utf-8') as f:
-                content = f.read().strip()
-            # Remove comment header if present
-            lines = content.split('\n')
-            cleaned_lines = [line for line in lines if not line.strip().startswith('#')]
-            instruction = '\n'.join(cleaned_lines).strip()
-            print(f"Loaded default prompt instruction from: prompt_instructions/example_prompt_instruction_flux2_klein.txt", color.BRIGHT_BLUE)
-            return instruction
-        except Exception as e:
-            print(f"Error loading example prompt instruction: {str(e)}", color.YELLOW)
-    
-    # Final fallback to DEFAULT_PROMPT_INSTRUCTION (which also reads from example file)
-    print(f"No external prompt instruction file found. Using DEFAULT_PROMPT_INSTRUCTION.", color.YELLOW)
-    return DEFAULT_PROMPT_INSTRUCTION
+    # Final fallback
+    print(f"No system_messages module found. Using minimal fallback.", color.YELLOW)
+    return """You are an expert prompt engineer for FLUX.2 by Black Forest Labs. Rewrite user prompts to be more descriptive while strictly preserving their core subject and intent."""
 
 # Load the prompt instruction at module initialization
 PROMPT_INSTRUCTION = load_prompt_instruction()
