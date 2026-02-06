@@ -386,7 +386,7 @@ def get_model_size(model):
 # ==================================================================================
 # MAIN NODE CLASS
 # ==================================================================================
-class Y7Nodes_PromptEnhancerFlux2Klein:
+class Y7Nodes_PromptEnhancerFlux2:
     # Class variable to cache loaded models and tokenizers
     _loaded_models: Dict[str, Tuple[Any, Any]] = {}
     _last_used_model_name: Optional[str] = None

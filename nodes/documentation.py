@@ -140,10 +140,10 @@ descriptions = {
         normal("Note: First-time use will download the model if it does not exist.")
     ],
 
-    "Y7Nodes_PromptEnhancerFlux2Klein":[
-        "Prompt Enhancer (Flux2-Klein)",
-        short_desc("Takes a basic prompt and enhances it using Qwen3-8B with optional thinking mode"),
-        normal("Uses the Qwen3-8B model to enhance prompts with support for thinking mode."),
+    "Y7Nodes_PromptEnhancerFlux2":[
+        "Prompt Enhancer (Flux2)",
+        short_desc("Takes a basic prompt and enhances (upsamples) it for Flux.2"),
+        normal("ComfyUI's Flux.2 workflows do not implement any prompt upsampling that is seen and used in some of Black Forest Lab demos, so what you write is what you get. This uses the Qwen3-8B model to enhance prompts with support for thinking mode."),
         normal("Inputs:"),
         normal("- `prompt`: Your basic text prompt to enhance", 1),
         normal("- `llm_name`: LLM model to use (currently only Qwen3-8B, more to be added)", 1),

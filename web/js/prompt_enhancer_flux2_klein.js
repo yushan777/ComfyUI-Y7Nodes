@@ -10,12 +10,12 @@ const DEFAULT_NODE_HEIGHT = 250;
 app.registerExtension({
     // name: a unique identifier used by CUI to register and track this extension
     // It can be any string but it's good practice to namespace it with your prefix (Y7)    
-    name: "Y7Nodes.PromptEnhancerFlux2Klein",
+    name: "Y7Nodes.PromptEnhancerFlux2",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
 
         // check if the node being registered is our target node
         // this must match the class mapping name in __init__.py
-        if (nodeData.name === "Y7Nodes_PromptEnhancerFlux2Klein") {
+        if (nodeData.name === "Y7Nodes_PromptEnhancerFlux2") {
 
             // store the original onNodeCreated method
             const onNodeCreated = nodeType.prototype.onNodeCreated;
