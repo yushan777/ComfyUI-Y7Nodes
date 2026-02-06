@@ -18,11 +18,11 @@ class Y7Nodes_CropToResolution:
                     "step": 1,
                     "tooltip": "Image dimensions must be divisible by (or be multiples of) this value"
                 }),
-                "horizontal_crop": (["center", "left", "right", "none"], {
+                "h_crop": (["center", "left", "right", "none"], {
                     "default": "center",
                     "tooltip": "Horizontal crop position: where to keep content when width needs adjustment (none = no cropping)"
                 }),
-                "vertical_crop": (["center", "top", "bottom", "none"], {
+                "v_crop": (["center", "top", "bottom", "none"], {
                     "default": "center",
                     "tooltip": "Vertical crop position: where to keep content when height needs adjustment (none = no cropping)"
                 }),
@@ -35,7 +35,7 @@ class Y7Nodes_CropToResolution:
     FUNCTION = "check_dimensions"
     CATEGORY = "Y7Nodes"
     
-    def check_dimensions(self, image, divisible_by, horizontal_crop, vertical_crop):
+    def check_dimensions(self, image, divisible_by, h_crop, v_crop):
         """
         Check image dimensions and process accordingly
         """
@@ -67,8 +67,8 @@ class Y7Nodes_CropToResolution:
                 suggestions.append(f"Height {height} → {target_height}")
             
             # Determine if cropping should be performed
-            should_crop = (horizontal_crop != "none" and not width_is_multiple) or \
-                         (vertical_crop != "none" and not height_is_multiple)
+            should_crop = (h_crop != "none" and not width_is_multiple) or \
+                         (v_crop != "none" and not height_is_multiple)
             
             if should_crop:
                 # Calculate crop offsets based on separate horizontal and vertical settings
@@ -80,24 +80,24 @@ class Y7Nodes_CropToResolution:
                 # Example: width=721, target=720, diff=1 -> left=0 (removes 1px from right only)
                 # Example: width=723, target=720, diff=3 -> left=1 (removes 1px left, 2px right)
                 # This is standard behavior in image processing - the slight bias is minimal (max 1px difference)
-                if not width_is_multiple and horizontal_crop != "none":
-                    if horizontal_crop == "center":
+                if not width_is_multiple and h_crop != "none":
+                    if h_crop == "center":
                         left = width_diff // 2
-                    elif horizontal_crop == "left":
+                    elif h_crop == "left":
                         left = 0
-                    elif horizontal_crop == "right":
+                    elif h_crop == "right":
                         left = width_diff
                 else:
                     left = 0  # No horizontal cropping needed
                 
                 # Determine vertical crop position
                 # Same rounding behavior applies to vertical cropping
-                if not height_is_multiple and vertical_crop != "none":
-                    if vertical_crop == "center":
+                if not height_is_multiple and v_crop != "none":
+                    if v_crop == "center":
                         top = height_diff // 2
-                    elif vertical_crop == "top":
+                    elif v_crop == "top":
                         top = 0
-                    elif vertical_crop == "bottom":
+                    elif v_crop == "bottom":
                         top = height_diff
                 else:
                     top = 0  # No vertical cropping needed
@@ -130,14 +130,14 @@ class Y7Nodes_CropToResolution:
                 output_image = image[:, top:bottom, left:right, :]
                 
                 crop_info = []
-                if not width_is_multiple and horizontal_crop != "none":
-                    crop_info.append(f"horizontal: {horizontal_crop}")
-                if not height_is_multiple and vertical_crop != "none":
-                    crop_info.append(f"vertical: {vertical_crop}")
+                if not width_is_multiple and h_crop != "none":
+                    crop_info.append(f"horizontal: {h_crop}")
+                if not height_is_multiple and v_crop != "none":
+                    crop_info.append(f"vertical: {v_crop}")
                 
                 info = f"✓ Image cropped from {width}x{height} to {target_width}x{target_height} ({', '.join(crop_info)})"
             else:
-                info = f"✗ Dimensions not divisible by {divisible_by}: {width}x{height}\n" + "\n".join(suggestions) + "\nSet horizontal_crop/vertical_crop to enable automatic cropping"
+                info = f"✗ Dimensions not divisible by {divisible_by}: {width}x{height}\n" + "\n".join(suggestions) + "\nSet h_crop/v_crop to enable automatic cropping"
         
         print(info)
         
