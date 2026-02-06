@@ -359,6 +359,52 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 >   - Looks for and loads presets from `custom_dimensions.json` located in the `nodes` directory. You can edit this file to add your own presets.
 > </details>
 
+---
+
+### Y7 Crop to Resolution
+> Automatically crops images to ensure dimensions are divisible by a specified value (e.g., 8 or 16), with visual preview of crop areas and independent horizontal/vertical control.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>   
+>   Many AI models require image dimensions to be divisible by specific values (typically 8 or 16) for proper processing. This node automatically checks image dimensions and crops them to meet these requirements while giving you precise control over where the crop occurs.
+>   
+>   **Key Features:**
+>   
+>   - **Visual Preview**: Shows original image with semi-transparent red overlay indicating areas that will be cropped
+>   - **Independent Control**: Separate horizontal and vertical crop position settings
+>   - **Smart Logic**: Only crops dimensions that need adjustment, ignoring dimensions that are already aligned
+>   - **Flexible Positioning**: Choose `center`, `left`, `right`, `top`, `bottom`, or `none` for each axis
+>   - **Informative Output**: Provides detailed status messages about dimensions and any cropping performed
+>   
+>   **Inputs:**
+>   
+>   - `divisible_by`: The value dimensions must be divisible by (default: 16). Common values are 8 or 16 for most AI models
+>   - `horizontal_crop`: Where to keep content when width needs adjustment - `center`, `left`, `right`, or `none`
+>   - `vertical_crop`: Where to keep content when height needs adjustment - `center`, `top`, `bottom`, or `none`
+>   
+>   **Outputs:**
+>   
+>   - `crop_preview`: Original image with red overlay showing what will be cropped (useful for previewing before committing)
+>   - `image`: The cropped result (or original if no cropping needed)
+>   - `info`: Status message with dimension details and cropping information
+>   
+>   **Behavior Notes:**
+>   
+>   - Crops to the nearest multiple down (e.g., 721 → 720 with divisible_by=16)
+>   - Setting a crop position to `none` disables cropping for that dimension
+>   - When using `center` with odd-numbered pixel differences, integer division rounds down (e.g., width=721 removes 1px from right only)
+>   - This slight bias is standard in image processing and is minimal (max 1 pixel difference)
+>   
+>   **Use Cases:**
+>   
+>   - Preparing images for models that require specific dimension constraints
+>   - Cropping images from one dimension while keeping the other intact
+>   - Quick visual verification of crop areas before applying
+>
+> </details>
+
+---
 
 ## Example Workflows
 

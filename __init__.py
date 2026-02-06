@@ -12,6 +12,7 @@ from .nodes.catch_edit_text_dual import Y7Nodes_CatchEditTextNodeDual
 from .nodes.image_row import Y7Nodes_ImageRow
 from .nodes.image_size_presets import Y7Nodes_ImageSizePresets
 from .nodes.smolvlm import Y7Nodes_SmolVLM
+from .nodes.crop_to_resolution import Y7Nodes_CropToResolution
 
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageRow": Y7Nodes_ImageRow,
@@ -24,7 +25,8 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_T5_TokenCounter": Y7Nodes_T5_TokenCounter,
     "Y7Nodes_CLIP_TokenCounter": Y7Nodes_CLIP_TokenCounter,
     "Y7Nodes_CatchEditTextNodeDual": Y7Nodes_CatchEditTextNodeDual,
-    "Y7Nodes_SmolVLM": Y7Nodes_SmolVLM
+    "Y7Nodes_SmolVLM": Y7Nodes_SmolVLM,
+    "Y7Nodes_CropToResolution": Y7Nodes_CropToResolution
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageRow": "Y7 Image Row",
@@ -37,7 +39,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_T5_TokenCounter": "Y7 T5 Token Counter",
     "Y7Nodes_CLIP_TokenCounter": "Y7 CLIP Token Counter",    
     "Y7Nodes_CatchEditTextNodeDual": "Y7 Catch and Edit Text (Dual)",
-    "Y7Nodes_SmolVLM": "Y7 SmolVLM"
+    "Y7Nodes_SmolVLM": "Y7 SmolVLM",
+    "Y7Nodes_CropToResolution": "Y7 Crop to Resolution"
 }
 
 # Apply HTML-formatted documentation to node classes

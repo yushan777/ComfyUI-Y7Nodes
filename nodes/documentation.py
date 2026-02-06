@@ -192,6 +192,32 @@ descriptions = {
         normal("- `Height`: The selected or custom height.", 1)
     ],
 
+    "Y7Nodes_CropToResolution": [
+        "Crop to Resolution",
+        short_desc("Crops images to ensure dimensions are divisible by a specified value, with a visual preview of crop areas."),
+        normal("Many AI models require image dimensions to be divisible by specific values (e.g., 8 or 16). This node automatically checks and crops images to meet these requirements."),
+        normal("The node provides independent control over horizontal and vertical cropping, making it ideal for situations where only one dimension needs adjustment."),
+        normal("Inputs:"),
+        normal("- `image`: The input image to check and optionally crop", 1),
+        normal("- `divisible_by`: The value that dimensions must be divisible by (default: 16). Common values are 8 or 16 for most AI models", 1),
+        normal("- `horizontal_crop`: Crop position for width adjustment - `center`, `left`, `right`, or `none`", 1),
+        normal("- `vertical_crop`: Crop position for height adjustment - `center`, `top`, `bottom`, or `none`", 1),
+        normal("Outputs:"),
+        normal("- `crop_preview`: Original image with semi-transparent red overlay showing areas that will be cropped", 1),
+        normal("- `image`: The cropped image (or original if no cropping needed)", 1),
+        normal("- `info`: Status message with dimension information and cropping details", 1),
+        normal("Behavior:"),
+        normal("- If both dimensions are already divisible by the specified value, no cropping occurs", 1),
+        normal("- Crops to the nearest multiple down (e.g., 721 → 720 with divisible_by=16)", 1),
+        normal("- Setting crop position to `none` disables cropping for that dimension", 1),
+        normal("- Smart logic only applies crop settings to dimensions that need adjustment", 1),
+        normal("Note on 'center' cropping:"),
+        normal("When using `center` with odd-numbered pixel differences, integer division rounds down, causing a slight bias (max 1px).", 1),
+        normal("Example: width=721, target=720, diff=1 → removes 1px from right only", 2),
+        normal("Example: width=723, target=720, diff=3 → removes 1px from left, 2px from right", 2),
+        normal("This is standard behavior in image processing and the bias is minimal.", 1)
+    ],
+
     # Add more node descriptions here
 }
 
