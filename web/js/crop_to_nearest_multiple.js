@@ -6,11 +6,11 @@ const DEFAULT_NODE_HEIGHT = 150;
 
 
 app.registerExtension({
-    name: "Y7Nodes.CropToResolution",
+    name: "Y7Nodes.CropToNearestMultiple",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         // Check if the node being registered is our target node
         // This must match the class mapping name in __init__.py
-        if (nodeData.name === "Y7Nodes_CropToResolution") {
+        if (nodeData.name === "Y7Nodes_CropToNearestMultiple") {
             // Store the original onNodeCreated method
             const onNodeCreated = nodeType.prototype.onNodeCreated;
 

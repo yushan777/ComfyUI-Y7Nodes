@@ -1,9 +1,9 @@
 import torch
 
 
-class Y7Nodes_CropToResolution:
+class Y7Nodes_CropToNearestMultiple:
     """
-    A node to crop images to align with resolution step multiples
+    A node to crop images to align dimensions with the nearest multiple of a specified value
     """
     
     @classmethod

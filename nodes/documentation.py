@@ -192,18 +192,17 @@ descriptions = {
         normal("- `Height`: The selected or custom height.", 1)
     ],
 
-    "Y7Nodes_CropToResolution": [
-        "Crop to Resolution",
-        short_desc("Crops images to ensure dimensions are divisible by a specified value, with a visual preview of crop areas."),
-        normal("Many AI models require image dimensions to be divisible by specific values (e.g., 8 or 16). This node automatically checks and crops images to meet these requirements."),
-        normal("The node provides independent control over horizontal and vertical cropping, making it ideal for situations where only one dimension needs adjustment."),
+    "Y7Nodes_CropToNearestMultiple": [
+        "Crop to Nearest Multiple",
+        short_desc("Crops images to ensure dimensions are divisible by a specified value - default 16px. You can always use a calculator if you prefer."),
+        normal("Control over horizontal and vertical cropping, making it ideal for situations where only one dimension needs adjustment."),
         normal("Inputs:"),
         normal("- `image`: The input image to check and optionally crop", 1),
-        normal("- `divisible_by`: The value that dimensions must be divisible by (default: 16). Common values are 8 or 16 for most AI models", 1),
+        normal("- `divisible_by`: The value that dimensions must be divisible by (default: 16). Common values are 8, 16, 32", 1),
         normal("- `horizontal_crop`: Crop position for width adjustment - `center`, `left`, `right`, or `none`", 1),
         normal("- `vertical_crop`: Crop position for height adjustment - `center`, `top`, `bottom`, or `none`", 1),
         normal("Outputs:"),
-        normal("- `crop_preview`: Original image with semi-transparent red overlay showing areas that will be cropped", 1),
+        normal("- `crop_preview`: Original image with a red overlay showing the areas that will be cropped and removed", 1),
         normal("- `image`: The cropped image (or original if no cropping needed)", 1),
         normal("- `info`: Status message with dimension information and cropping details", 1),
         normal("Behavior:"),
