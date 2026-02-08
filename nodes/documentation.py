@@ -194,7 +194,7 @@ descriptions = {
 
     "Y7Nodes_CropToNearestMultiple": [
         "Crop to Nearest Multiple",
-        short_desc("Crops images to ensure dimensions are divisible by a specified value - default 16px. You can always use a calculator if you prefer."),
+        short_desc("Crops images to ensure dimensions are divisible by a specified multiple value - default 16px. You can always use a calculator if you prefer."),
         normal("Control over horizontal and vertical cropping, making it ideal for situations where only one dimension needs adjustment."),
         normal("Inputs:"),
         normal("- `image`: The input image to check and optionally crop", 1),
