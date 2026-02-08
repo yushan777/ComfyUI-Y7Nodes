@@ -203,7 +203,7 @@ descriptions = {
         normal("- `vertical_crop`: Crop position for height adjustment - `center`, `top`, `bottom`, or `none`", 1),
         normal("Outputs:"),
         normal("- `crop_preview`: Original image with a red overlay showing the areas that will be cropped and removed", 1),
-        normal("- `image`: The cropped image (or original if no cropping needed)", 1),
+        normal("- `cropped_image`: The cropped image (or original if no cropping needed)", 1),
         normal("- `info`: Status message with dimension information and cropping details", 1),
         normal("Behavior:"),
         normal("- If both dimensions are already divisible by the specified value, no cropping occurs", 1),
