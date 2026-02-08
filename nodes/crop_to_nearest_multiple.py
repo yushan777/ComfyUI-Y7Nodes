@@ -30,7 +30,7 @@ class Y7Nodes_CropToNearestMultiple:
         }
     
     RETURN_TYPES = ("IMAGE", "IMAGE", "STRING")
-    RETURN_NAMES = ("crop_preview", "image", "info")
+    RETURN_NAMES = ("crop_preview", "cropped_image", "info")
     
     FUNCTION = "check_dimensions"
     CATEGORY = "Y7Nodes"
