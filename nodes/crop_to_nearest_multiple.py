@@ -11,12 +11,12 @@ class Y7Nodes_CropToNearestMultiple:
         return {
             "required": {
                 "image": ("IMAGE",),
-                "divisible_by": ("INT", {
+                "multiple": ("INT", {
                     "default": 16, 
                     "min": 1, 
                     "max": 1024, 
                     "step": 1,
-                    "tooltip": "Image dimensions must be divisible by (or be multiples of) this value"
+                    "tooltip": "Image dimensions must be multiples of this value"
                 }),
                 "h_crop": (["center", "left", "right", "none"], {
                     "default": "center",
@@ -35,7 +35,7 @@ class Y7Nodes_CropToNearestMultiple:
     FUNCTION = "check_dimensions"
     CATEGORY = "Y7Nodes"
     
-    def check_dimensions(self, image, divisible_by, h_crop, v_crop):
+    def check_dimensions(self, image, multiple, h_crop, v_crop):
         """
         Check image dimensions and process accordingly
         """
@@ -44,9 +44,9 @@ class Y7Nodes_CropToNearestMultiple:
         height = image.shape[1]
         width = image.shape[2]
         
-        # Check if dimensions are even multiples of divisible_by
-        width_is_multiple = (width % divisible_by) == 0
-        height_is_multiple = (height % divisible_by) == 0
+        # Check if dimensions are even multiples of multiple
+        width_is_multiple = (width % multiple) == 0
+        height_is_multiple = (height % multiple) == 0
         
         # Start with original image
         output_image = image
@@ -54,11 +54,11 @@ class Y7Nodes_CropToNearestMultiple:
         crop_preview = image.clone()
         
         if width_is_multiple and height_is_multiple:
-            info = f"✓ Dimensions are valid: {width}x{height} (divisible by {divisible_by}). No cropping necessary."
+            info = f"✓ Dimensions are valid: {width}x{height} (multiple of {multiple}). No cropping necessary."
         else:
             # Calculate target dimensions (nearest multiples down)
-            target_width = (width // divisible_by) * divisible_by
-            target_height = (height // divisible_by) * divisible_by
+            target_width = (width // multiple) * multiple
+            target_height = (height // multiple) * multiple
             
             suggestions = []
             if not width_is_multiple:
@@ -137,7 +137,7 @@ class Y7Nodes_CropToNearestMultiple:
                 
                 info = f"✓ Image cropped from {width}x{height} to {target_width}x{target_height} ({', '.join(crop_info)})"
             else:
-                info = f"✗ Dimensions not divisible by {divisible_by}: {width}x{height}\n" + "\n".join(suggestions) + "\nSet h_crop/v_crop to enable automatic cropping"
+                info = f"✗ Dimensions not a multiple of {multiple}: {width}x{height}\n" + "\n".join(suggestions) + "\nSet h_crop/v_crop to enable automatic cropping"
         
         print(info)
         

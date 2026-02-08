@@ -379,7 +379,7 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 >   
 >   **Inputs:**
 >   
->   - `divisible_by`: The value dimensions must be divisible by (default: 16). Common values are 8 or 16 for most AI models
+>   - `multiple`: The value dimensions must be a multiple of (default: 16). Common values are 8 or 16 for most AI models
 >   - `horizontal_crop`: Where to keep content when width needs adjustment - `center`, `left`, `right`, or `none`
 >   - `vertical_crop`: Where to keep content when height needs adjustment - `center`, `top`, `bottom`, or `none`
 >   
@@ -391,7 +391,7 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 >   
 >   **Behavior Notes:**
 >   
->   - Crops to the nearest multiple down (e.g., 721 → 720 with divisible_by=16)
+>   - Crops to the nearest multiple down (e.g., 721 → 720 with multiple=16)
 >   - Setting a crop position to `none` disables cropping for that dimension
 >   - When using `center` with odd-numbered pixel differences, integer division rounds down (e.g., width=721 removes 1px from right only)
 >   - This slight bias is standard in image processing and is minimal (max 1 pixel difference)
