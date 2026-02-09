@@ -376,6 +376,7 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 >   - **Smart Logic**: Only crops dimensions that need adjustment, ignoring dimensions that are already aligned
 >   - **Flexible Positioning**: Choose `center`, `left`, `right`, `top`, `bottom`, or `none` for each axis
 >   - **Informative Output**: Provides detailed status messages about dimensions and any cropping performed
+>   - **On-Node Display**: Shows the cropped dimensions (e.g., '1024 x 768') directly on the node after execution
 >   
 >   **Inputs:**
 >   

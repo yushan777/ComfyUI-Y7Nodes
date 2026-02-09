@@ -34,6 +34,7 @@ class Y7Nodes_CropToNearestMultiple:
     
     FUNCTION = "check_dimensions"
     CATEGORY = "Y7Nodes"
+    OUTPUT_NODE = True  # Required to display UI data (dimensions) on the node
     
     def check_dimensions(self, image, multiple, h_crop, v_crop):
         """
@@ -141,4 +142,8 @@ class Y7Nodes_CropToNearestMultiple:
         
         print(info)
         
-        return (crop_preview, output_image, info)
+        # Get final dimensions for UI display
+        final_height = output_image.shape[1]
+        final_width = output_image.shape[2]
+        
+        return {"ui": {"text": [f"{final_width} x {final_height}"]}, "result": (crop_preview, output_image, info)}

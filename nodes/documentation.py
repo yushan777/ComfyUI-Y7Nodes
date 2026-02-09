@@ -210,6 +210,7 @@ descriptions = {
         normal("- Crops to the nearest multiple down (e.g., 721 → 720 with multiple=16)", 1),
         normal("- Setting crop position to `none` disables cropping for that dimension", 1),
         normal("- Smart logic only applies crop settings to dimensions that need adjustment", 1),
+        normal("- The node displays the cropped dimensions (e.g., '1024 x 768') directly on the node after execution", 1),
         normal("Note on 'center' cropping:"),
         normal("When using `center` with odd-numbered pixel differences, integer division rounds down, causing a slight bias (max 1px).", 1),
         normal("Example: width=721, target=720, diff=1 → removes 1px from right only", 2),
