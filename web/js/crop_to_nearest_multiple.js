@@ -1,7 +1,7 @@
 import { app } from "../../../scripts/app.js";
 
 // Default node size
-const DEFAULT_NODE_WIDTH = 230;
+const DEFAULT_NODE_WIDTH = 250;
 const DEFAULT_NODE_HEIGHT = 150;
 
 
