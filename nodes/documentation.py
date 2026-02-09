@@ -218,6 +218,23 @@ descriptions = {
         normal("This is standard behavior in image processing and the bias is minimal.", 1)
     ],
 
+    "Y7Nodes_ColorMatchMasked": [
+        "Color Match (Masked)",
+        short_desc("Color matches the target image to a reference while excluding masked regions from the calculation."),
+        normal("Ideal for correcting color shifts after inpainting. The mask excludes regions (like the inpainted area) from BOTH images during color transfer calculation, preventing the original colors from bleeding into the result."),
+        normal("Example: After changing a red car to blue via inpainting, the background may have a red tint. This node calculates color correction using only the non-masked areas, then applies it without affecting the inpainted region."),
+        normal("Inputs:"),
+        normal("- `image_ref`: Reference image (e.g., original before inpainting)", 1),
+        normal("- `image_target`: Target image to color match (e.g., result after inpainting)", 1),
+        normal("- `mask`: Mask where white (1.0) = areas to exclude from color matching", 1),
+        normal("- `method`: Color transfer algorithm - `mkl` (Monge-Kantorovich), `hm` (histogram), `reinhard`, `mvgd` (Multi-Variate Gaussian)", 1),
+        normal("- `strength`: Blend between original and color-matched result (0.0 = no change, 1.0 = full correction)", 1),
+        normal("- `feather`: Blur radius for mask edges to create smooth transitions (0-100 pixels)", 1),
+        normal("Output:"),
+        normal("- `image`: The color-matched result with masked areas preserved unchanged", 1),
+        normal("Requires the `color-matcher` library: `pip install color-matcher`")
+    ],
+
     # Add more node descriptions here
 }
 

@@ -13,6 +13,7 @@ from .nodes.image_row import Y7Nodes_ImageRow
 from .nodes.image_size_presets import Y7Nodes_ImageSizePresets
 from .nodes.smolvlm import Y7Nodes_SmolVLM
 from .nodes.crop_to_nearest_multiple import Y7Nodes_CropToNearestMultiple
+from .nodes.color_match_masked import Y7Nodes_ColorMatchMasked
 
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageRow": Y7Nodes_ImageRow,
@@ -26,7 +27,8 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_CLIP_TokenCounter": Y7Nodes_CLIP_TokenCounter,
     "Y7Nodes_CatchEditTextNodeDual": Y7Nodes_CatchEditTextNodeDual,
     "Y7Nodes_SmolVLM": Y7Nodes_SmolVLM,
-    "Y7Nodes_CropToNearestMultiple": Y7Nodes_CropToNearestMultiple
+    "Y7Nodes_CropToNearestMultiple": Y7Nodes_CropToNearestMultiple,
+    "Y7Nodes_ColorMatchMasked": Y7Nodes_ColorMatchMasked
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageRow": "Y7 Image Row",
@@ -40,7 +42,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_CLIP_TokenCounter": "Y7 CLIP Token Counter",    
     "Y7Nodes_CatchEditTextNodeDual": "Y7 Catch and Edit Text (Dual)",
     "Y7Nodes_SmolVLM": "Y7 SmolVLM",
-    "Y7Nodes_CropToNearestMultiple": "Y7 Crop to Nearest Multiple"
+    "Y7Nodes_CropToNearestMultiple": "Y7 Crop to Nearest Multiple",
+    "Y7Nodes_ColorMatchMasked": "Y7 Color Match (Masked)"
 }
 
 # Apply HTML-formatted documentation to node classes
