@@ -235,6 +235,57 @@ descriptions = {
         normal("Requires the `color-matcher` library: `pip install color-matcher`")
     ],
 
+    "Y7Nodes_LMStudioText": [
+        "LM Studio (Text)",
+        short_desc("Send text prompts to a local LM Studio server for text generation and prompt enhancement."),
+        normal("Connects to an LM Studio server to generate or enhance text using a specified LLM. Uses a system message to guide the model's behavior and a user prompt as input."),
+        normal("Inputs:"),
+        normal("- `prompt`: The text prompt to send to the LLM", 1),
+        normal("- `model_identifier`: The model name/identifier loaded in LM Studio (connect a Select LMS Model node or type manually)", 1),
+        normal("- `draft_model`: Optional speculative decoding draft model name (leave empty to disable)", 1),
+        normal("- `system_message`: System prompt that guides the LLM's behavior (default is optimized for image prompt enhancement)", 1),
+        normal("- `reasoning_tag`: Tag name used to extract reasoning blocks (e.g., `think` for `<think>...</think>`)", 1),
+        normal("- `ip` / `port`: LM Studio server address (default: localhost:1234)", 1),
+        normal("- `temperature`: Controls randomness (0.01-1.0, default 0.7)", 1),
+        normal("- `max_tokens`: Maximum tokens to generate (-1 for unlimited)", 1),
+        normal("- `unload_llm`: Unload the LLM from LM Studio after generation", 1),
+        normal("- `unload_comfy_models`: Free VRAM by unloading ComfyUI models before running the LLM", 1),
+        normal("Outputs:"),
+        normal("- `Extended Prompt`: The generated text with reasoning blocks removed", 1),
+        normal("- `Reasoning`: The extracted reasoning content (if present)", 1),
+        normal("Requires the `lmstudio` Python package: `pip install lmstudio`"),
+    ],
+
+    "Y7Nodes_LMStudioVision": [
+        "LM Studio (Vision)",
+        short_desc("Send an image to a vision-capable LLM in LM Studio for analysis and description."),
+        normal("Connects to an LM Studio server and sends an image along with an instruction to a vision-language (VL) model. The model must be vision-enabled or an error will be raised."),
+        normal("Inputs:"),
+        normal("- `image`: The image to analyze (required)", 1),
+        normal("- `model_identifier`: The VL model name/identifier loaded in LM Studio (connect a Select LMS Model node or type manually)", 1),
+        normal("- `system_message`: The instruction sent alongside the image (default describes the image in detail)", 1),
+        normal("- `reasoning_tag`: Tag name used to extract reasoning blocks (e.g., `think` for `<think>...</think>`)", 1),
+        normal("- `ip` / `port`: LM Studio server address (default: localhost:1234)", 1),
+        normal("- `temperature`: Controls randomness (0.01-1.0, default 0.7)", 1),
+        normal("- `max_tokens`: Maximum tokens to generate (-1 for unlimited)", 1),
+        normal("- `unload_llm`: Unload the LLM from LM Studio after generation", 1),
+        normal("- `unload_comfy_models`: Free VRAM by unloading ComfyUI models before running the LLM", 1),
+        normal("Outputs:"),
+        normal("- `Response`: The model's analysis/description with reasoning blocks removed", 1),
+        normal("- `Reasoning`: The extracted reasoning content (if present)", 1),
+        normal("Requires the `lmstudio` Python package: `pip install lmstudio`"),
+        normal("Note: The loaded model must support vision. Non-vision models will raise an error."),
+    ],
+
+    "Y7Nodes_SelectLMSModel": [
+        "Select LMS Model",
+        short_desc("Select an LM Studio model from a predefined list."),
+        normal("Provides a dropdown of model identifiers loaded from a `models.txt` file."),
+        normal("Add your favorite model names (one per line) to `comfyui-y7nodes/lms_config/models.txt`."),
+        normal("Output:"),
+        normal("- `model_id`: The selected model identifier string", 1),
+    ],
+
     # Add more node descriptions here
 }
 
