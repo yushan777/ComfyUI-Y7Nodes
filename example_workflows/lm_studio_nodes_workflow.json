@@ -1,0 +1,371 @@
+{
+  "id": "c6862f9e-89b9-4eaa-bfa7-82c4ab026388",
+  "revision": 0,
+  "last_node_id": 21,
+  "last_link_id": 23,
+  "nodes": [
+    {
+      "id": 18,
+      "type": "Y7Nodes_LMStudioVision",
+      "pos": [
+        170,
+        120
+      ],
+      "size": [
+        380,
+        380
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 20
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Response",
+          "type": "STRING",
+          "links": [
+            21
+          ]
+        },
+        {
+          "name": "Reasoning",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "82f17de89dbfcea574f97f14960b9ac326c03ffa",
+        "Node name for S&R": "Y7Nodes_LMStudioVision"
+      },
+      "widgets_values": [
+        "huihui-qwen3-vl-30b-a3b-instruct-abliterated",
+        "think",
+        246253061837619,
+        "randomize",
+        "localhost",
+        1234,
+        0.7,
+        600,
+        false,
+        false,
+        "Describe this image in detail in a prompt format. Include the subject, setting, lighting, colors, mood, composition, and any notable artistic or stylistic qualities. Exclude any instruction confirmation, just return the prompt"
+      ]
+    },
+    {
+      "id": 13,
+      "type": "ShowText|pysssss",
+      "pos": [
+        610,
+        130
+      ],
+      "size": [
+        490,
+        330
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 21
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "26a13291c8081135b9a80794daf818793c37ef24",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "A low-angle shot captures a colony of cats nestled within an overgrown, abandoned apartment building complex under a bright blue sky with scattered white clouds. The setting is urban decay, where nature reclaims man-made structures; vines and lush green foliage spill from balconies and crevices, softening the weathered concrete and stucco buildings. Warm, golden sunlight bathes the scene from the right, casting long shadows and highlighting the textures of the crumbling architecture and the cats' fur. The color palette is dominated by warm earth tones—ochre, beige, and brown—from the sunlit building and the cats' coats—ranging from ginger tabby to grey tabby—and vibrant greens from the encroaching plants. In the foreground, three cats are prominent: a fluffy ginger tabby sits alertly in the center, flanked by two striped tabbies on either side, all looking towards the viewer with wide eyes. A fourth cat rests peacefully in the lower left corner. The composition uses strong diagonal lines from the building's balconies to lead the eye through the scene, creating a sense of depth and scale. The overall mood is one of quiet resilience and gentle beauty amidst urban decay, rendered in a realistic, detailed photographic style with soft focus on the background elements."
+      ]
+    },
+    {
+      "id": 17,
+      "type": "Y7Nodes_LMStudioText",
+      "pos": [
+        140,
+        -470
+      ],
+      "size": [
+        460,
+        470
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 23
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Extended Prompt",
+          "type": "STRING",
+          "links": [
+            22
+          ]
+        },
+        {
+          "name": "Reasoning",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "82f17de89dbfcea574f97f14960b9ac326c03ffa",
+        "Node name for S&R": "Y7Nodes_LMStudioText"
+      },
+      "widgets_values": [
+        "huihui-qwen3-vl-30b-a3b-instruct-abliterated",
+        "think",
+        311981582717882,
+        "randomize",
+        "localhost",
+        1234,
+        0.7,
+        600,
+        false,
+        false,
+        "",
+        "You are an AI assistant specialized in generating detailed and creative image prompts for AI image generation for Flux.2 Klein. Your task is to expand a given user prompt into a well-structured, vivid, and highly descriptive prompt while ensuring that all terms from the original prompt are included. Enhance the visual quality and artistic impact by adding relevant details including lighting details, but do not omit or alter any key elements provided by the user. Follow the given instructions or guidelines and respond only with the refined prompt."
+      ]
+    },
+    {
+      "id": 14,
+      "type": "LoadImage",
+      "pos": [
+        -250,
+        100
+      ],
+      "size": [
+        282.798828125,
+        314
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            20
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.12.3",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "01.webp",
+        "image"
+      ]
+    },
+    {
+      "id": 19,
+      "type": "ShowText|pysssss",
+      "pos": [
+        690,
+        -420
+      ],
+      "size": [
+        490,
+        330
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 22
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "26a13291c8081135b9a80794daf818793c37ef24",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "A delicate fairy with translucent, gossamer wings glimmers softly in the dim light of a dark forest. She stands amidst ancient, gnarled trees whose twisted roots wind through moss-covered earth. Bioluminescent fungi dot the underbrush, casting a gentle emerald glow that dances across her silver gown and golden hair. Moonlight filters through the dense canopy above, creating shifting patterns of light and shadow around her. The air is still and hushed, filled with the faint rustle of leaves and distant whispers of wind. Her eyes sparkle like starlight as she gently touches a glowing firefly, sending a trail of tiny, shimmering sparks into the twilight. The atmosphere is enchanting, mysterious, and alive with quiet magic."
+      ]
+    },
+    {
+      "id": 12,
+      "type": "ttN text",
+      "pos": [
+        -410,
+        -220
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            23
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui_tinyterranodes",
+        "ver": "2.0.10",
+        "Node name for S&R": "ttN text",
+        "ttNnodeVersion": "1.0.0"
+      },
+      "widgets_values": [
+        "a fairy in a dark forest"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "MarkdownNote",
+      "pos": [
+        -1100,
+        -350
+      ],
+      "size": [
+        640,
+        500
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "The **LM Studio (Text)**, **LM Studio (Vision)**, and **Select LMS Model** nodes all require a running [LM Studio](https://lmstudio.ai/) server. LM Studio is a free desktop application for running LLMs locally.\n\n\nLM Studio Server Setup\n  \n  **Local Setup (same machine as ComfyUI):**\n  \n  1. Download and install [LM Studio](https://lmstudio.ai/)\n  2. Download a model through the LM Studio interface (for vision nodes, ensure you pick a VL model, e.g. Qwen2.5-VL, Gemma3, etc.)\n  3. Load the model in LM Studio\n  4. Start the local server: go to the **Developer** tab (or **Local Server** in older versions) and click **Start Server**\n  5. By default, the server runs on `localhost:1234` — this matches the default `ip` and `port` values in the nodes\n  \n  **Network Setup (LM Studio on a different machine):**\n  \n  If LM Studio is running on another machine on your network:\n  \n  1. In LM Studio's server settings, enable **Serve on Local Network** (this binds the server to `0.0.0.0` instead of `127.0.0.1`)\n  2. Note the IP address of the machine running LM Studio (e.g., `192.168.1.100`)\n  3. In the ComfyUI node, set the `ip` field to that machine's IP address and ensure the `port` matches (default: `1234`)\n  4. Make sure there are no firewall rules blocking the port between the two machines\n  \n  **Model Identifier:**\n  \n  The `model_identifier` should match the model name as it appears in LM Studio. You can use the **Select LMS Model** node to pick from a predefined list stored in `comfyui-y7nodes/lms_config/models.txt` (one model name per line)."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 20,
+      "type": "Y7Nodes_SelectLMSModel",
+      "pos": [
+        -350,
+        -420
+      ],
+      "size": [
+        320,
+        100
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "model_id",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "82f17de89dbfcea574f97f14960b9ac326c03ffa",
+        "Node name for S&R": "Y7Nodes_SelectLMSModel"
+      },
+      "widgets_values": [
+        "Please see tooltip."
+      ]
+    }
+  ],
+  "links": [
+    [
+      20,
+      14,
+      0,
+      18,
+      0,
+      "IMAGE"
+    ],
+    [
+      21,
+      18,
+      0,
+      13,
+      0,
+      "STRING"
+    ],
+    [
+      22,
+      17,
+      0,
+      19,
+      0,
+      "STRING"
+    ],
+    [
+      23,
+      12,
+      0,
+      17,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.8264462809917358,
+      "offset": [
+        1574.6441592611832,
+        942.6877937536918
+      ]
+    },
+    "frontendVersion": "1.38.13",
+    "VHS_latentpreview": true,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

@@ -328,6 +328,145 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 
 ------
 
+### LM Studio Nodes — Prerequisites
+
+> The **LM Studio (Text)**, **LM Studio (Vision)**, and **Select LMS Model** nodes all require a running [LM Studio](https://lmstudio.ai/) server. LM Studio is a free desktop application for running LLMs locally.
+>
+> <details>
+>   <summary>ℹ️ <i>LM Studio Server Setup</i></summary>
+>   
+>   **Local Setup (same machine as ComfyUI):**
+>   
+>   1. Download and install [LM Studio](https://lmstudio.ai/)
+>   2. Download a model through the LM Studio interface (for vision nodes, ensure you pick a VL model, e.g. Qwen2.5-VL, Gemma3, etc.)
+>   3. Load the model in LM Studio
+>   4. Start the local server: go to the **Developer** tab (or **Local Server** in older versions) and click **Start Server**
+>   5. By default, the server runs on `localhost:1234` — this matches the default `ip` and `port` values in the nodes
+>   
+>   **Network Setup (LM Studio on a different machine):**
+>   
+>   If LM Studio is running on another machine on your network:
+>   
+>   1. In LM Studio's server settings, enable **Serve on Local Network** (this binds the server to `0.0.0.0` instead of `127.0.0.1`)
+>   2. Note the IP address of the machine running LM Studio (e.g., `192.168.1.100`)
+>   3. In the ComfyUI node, set the `ip` field to that machine's IP address and ensure the `port` matches (default: `1234`)
+>   4. Make sure there are no firewall rules blocking the port between the two machines
+>   
+>   **Model Identifier:**
+>   
+>   The `model_identifier` should match the model name as it appears in LM Studio. You can use the **Select LMS Model** node to pick from a predefined list stored in `comfyui-y7nodes/lms_config/models.txt` (one model name per line).
+>   
+>   **Python Package:**
+>   
+>   These nodes require the `lmstudio` Python SDK: `pip install lmstudio`
+>
+> </details>
+
+---
+
+### Y7 LM Studio (Text)
+
+> Send text prompts to a local LM Studio server for text generation and prompt enhancement using any LLM loaded in LM Studio. Supports speculative decoding via a draft model.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>   
+>   Connects to an LM Studio server and sends a text prompt along with a system message to guide the model's behavior. The default system message is optimized for AI image prompt enhancement, but can be customized for any text generation task.
+>   
+>   **Key Features:**
+>   
+>   - **System Message**: Customizable system prompt that guides the LLM's behavior (default: image prompt enhancement)
+>   - **Draft Model**: Optional speculative decoding support for faster generation
+>   - **Reasoning Extraction**: Automatically separates thinking/reasoning blocks from the response
+>   - **Memory Management**: Options to unload the LLM after generation and/or free ComfyUI VRAM beforehand
+>   - **Fallback Handling**: Automatically retries with an alternative chat template if the first attempt fails
+>   
+>   **Inputs:**
+>   
+>   - `prompt`: The text prompt to send to the LLM (connected from another node)
+>   - `model_identifier`: The model name/identifier loaded in LM Studio (connect a Select LMS Model node or type manually)
+>   - `draft_model`: Optional speculative decoding draft model name (leave empty to disable)
+>   - `system_message`: System prompt that guides the LLM's behavior
+>   - `reasoning_tag`: Tag name used to extract reasoning blocks (e.g., `think` for `<think>...</think>`)
+>   - `ip` / `port`: LM Studio server address (default: localhost:1234)
+>   - `temperature`: Controls randomness (0.01–1.0, default 0.7)
+>   - `max_tokens`: Maximum tokens to generate (-1 for unlimited)
+>   - `unload_llm`: Unload the LLM from LM Studio after generation
+>   - `unload_comfy_models`: Free VRAM by unloading ComfyUI models before running the LLM
+>   
+>   **Outputs:**
+>   
+>   - `Extended Prompt`: The generated text with reasoning blocks removed
+>   - `Reasoning`: The extracted reasoning content (if present)
+>   
+>   **Requirements:**
+>   
+>   - LM Studio running locally (or on a network-accessible machine)
+>
+> </details>
+
+---
+
+### Y7 LM Studio (Vision)
+
+> Send an image to a vision-capable LLM (VL model) in LM Studio for analysis and description. The instruction is provided via the system message — no separate text prompt input.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>   
+>   Connects to an LM Studio server and sends an image along with an instruction to a vision-language (VL) model. The system message acts as the sole instruction for how the model should interpret the image. The model must be vision-enabled or an error will be raised.
+>   
+>   **Key Features:**
+>   
+>   - **Vision-First Design**: Image is a required input — purpose-built for VL models
+>   - **Instruction via System Message**: The system message is sent alongside the image as the user instruction (default: detailed image description)
+>   - **Model Validation**: Checks that the loaded model supports vision before proceeding
+>   - **Reasoning Extraction**: Automatically separates thinking/reasoning blocks from the response
+>   - **Memory Management**: Options to unload the LLM after generation and/or free ComfyUI VRAM beforehand
+>   
+>   **Inputs:**
+>   
+>   - `image`: The image to analyze (required)
+>   - `model_identifier`: The VL model name/identifier loaded in LM Studio (connect a Select LMS Model node or type manually)
+>   - `system_message`: The instruction sent alongside the image (default: describe the image in detail)
+>   - `reasoning_tag`: Tag name used to extract reasoning blocks (e.g., `think` for `<think>...</think>`)
+>   - `ip` / `port`: LM Studio server address (default: localhost:1234)
+>   - `temperature`: Controls randomness (0.01–1.0, default 0.7)
+>   - `max_tokens`: Maximum tokens to generate (-1 for unlimited)
+>   - `unload_llm`: Unload the LLM from LM Studio after generation
+>   - `unload_comfy_models`: Free VRAM by unloading ComfyUI models before running the LLM
+>   
+>   **Outputs:**
+>   
+>   - `Response`: The model's analysis/description with reasoning blocks removed
+>   - `Reasoning`: The extracted reasoning content (if present)
+>   
+>   **Requirements:**
+>   
+>   - LM Studio running locally (or on a network-accessible machine)
+>   - A vision-capable model loaded in LM Studio (non-vision models will raise an error)`
+>
+> </details>
+
+---
+
+### Y7 Select LMS Model
+
+> Select an LM Studio model from a predefined list stored in a text file. Outputs the model identifier string to connect to the LM Studio Text or Vision nodes.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>   
+>   Provides a dropdown of model identifiers loaded from `comfyui-y7nodes/lms_config/models.txt`. Add your favorite model names (one per line) to this file.
+>   
+>   **Output:**
+>   
+>   - `model_id`: The selected model identifier string
+>
+> </details>
+
+------
+
 ### Y7 Grid 2 Batch
 
 > Takes a grid of images (like those generated in XY-plots) and processes it into a batch of individual images.
