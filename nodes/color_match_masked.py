@@ -28,9 +28,6 @@ class Y7Nodes_ColorMatchMasked:
                 "image_target": ("IMAGE", {
                     "tooltip": "Target image to apply color correction to (e.g., result after inpainting)"
                 }),
-                "mask": ("MASK", {
-                    "tooltip": "Mask where white (1.0) = areas to exclude from color matching (e.g., inpainted region)"
-                }),
                 "method": ([
                     'mkl',
                     'hm', 
@@ -44,6 +41,9 @@ class Y7Nodes_ColorMatchMasked:
                 }),
             },
             "optional": {
+                "mask": ("MASK", {
+                    "tooltip": "Mask where white (1.0) = areas to exclude from color matching (e.g., inpainted region). If not provided, color matching is applied to the entire image."
+                }),
                 "strength": ("FLOAT", {
                     "default": 1.0, 
                     "min": 0.0, 
@@ -109,15 +109,15 @@ areas while keeping the inpainted region (the blue car) unchanged.
         # Return in original shape
         return blurred.squeeze(1) if blurred.shape[1] == 1 else blurred
 
-    def color_match_masked(self, image_ref, image_target, mask, method, strength=1.0, feather=0):
+    def color_match_masked(self, image_ref, image_target, method, mask=None, strength=1.0, feather=0):
         """
         Perform color matching while excluding masked regions.
         
         Args:
             image_ref: Reference image tensor (B, H, W, C)
             image_target: Target image tensor to color match (B, H, W, C)
-            mask: Mask tensor (B, H, W) where 1.0 = exclude from color matching
             method: Color transfer method
+            mask: Optional mask tensor (B, H, W) where 1.0 = exclude from color matching. If None, applies color matching to entire image.
             strength: Blend strength (0-1)
             feather: Gaussian blur radius for mask edges
             
@@ -134,6 +134,48 @@ areas while keeping the inpainted region (the blue car) unchanged.
         # Move to CPU for processing
         image_ref = image_ref.cpu()
         image_target = image_target.cpu()
+        
+        batch_size = image_target.shape[0]
+        _, H, W, C = image_target.shape
+        
+        # If no mask provided, perform standard color matching on entire images
+        if mask is None:
+            # Ensure reference batch size matches or is 1
+            if image_ref.shape[0] > 1 and image_ref.shape[0] != batch_size:
+                raise ValueError(
+                    "ColorMatchMasked: Use either a single reference image or a matching batch of reference images."
+                )
+            
+            cm = ColorMatcher()
+            output_images = []
+            
+            for i in range(batch_size):
+                target_np = image_target[i].numpy()
+                ref_np = image_ref[0 if image_ref.shape[0] == 1 else i].numpy()
+                
+                try:
+                    # Perform color matching on full images
+                    matched = cm.transfer(src=target_np, ref=ref_np, method=method)
+                    
+                    # Apply strength blending
+                    if strength < 1.0:
+                        result = target_np + strength * (matched - target_np)
+                    else:
+                        result = matched
+                    
+                    # Clamp to valid range
+                    result = np.clip(result, 0, 1)
+                    
+                except Exception as e:
+                    print(f"ColorMatchMasked: Error during color transfer: {e}")
+                    result = target_np
+                
+                output_images.append(torch.from_numpy(result.astype(np.float32)))
+            
+            output = torch.stack(output_images, dim=0)
+            return (output,)
+        
+        # Mask is provided - process with masking logic
         mask = mask.cpu()
         
         batch_size = image_target.shape[0]
