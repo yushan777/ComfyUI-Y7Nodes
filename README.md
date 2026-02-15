@@ -465,28 +465,6 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 >
 > </details>
 
-------
-
-### Y7 Grid 2 Batch
-
-> Takes a grid of images (like those generated in XY-plots) and processes it into a batch of individual images.
-> <details>
->   <summary>ℹ️ <i>See More Information</i></summary>
->   
->   Define the number of rows, columns, the size of the individual images in the grid, any offsets (to account for headers). Output is a batch of images that can be processed further in your workflow
->   
->   ![grid2batch](assets/grid2batch.jpg)
->   
->   **Parameters:**
->   
->   - `rows`: Number of rows in the grid
->   - `columns`: Number of columns in the grid
->   - `width`: Width of each individual image in the grid (in pixels)
->   - `height`: Height of each individual image in the grid (in pixels)
->   - `x_header`: If grid has an X header, specify its width in pixels. Set to 0 if there is no header.
->   - `y_header`: If grid has a Y header, specify its height in pixels. Set to 0 if there is no header.
-> </details>
-
 ---
 
 ### Y7 Image Size Presets

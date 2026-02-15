@@ -52,17 +52,6 @@ descriptions = {
         "Basic Text Input With Copy Button", 
         short_desc("Basic Text Input With Copy Button"),
     ],
-
-    "Y7Nodes_Grid2Batch": [
-        "Image Grid Splitter", 
-        short_desc("Splits a grid of images into a batch of individual images"),
-        normal("Takes a grid image (like those generated in XY-plots) and processes it into a batch of separate images."),
-        normal("Specify the grid structure with `rows` and `columns` parameters."),
-        normal("Set the dimensions of each individual image within the grid with `width` and `height`."),
-        normal("If your grid has headers, specify their size with `x_header` and `y_header` parameters."),
-        normal("If the dimensions of the image does not match your numbers, it will throw an error."),
-        normal("The output is a batch of images that can be processed further in your workflow.")
-    ],
     
     "Y7Nodes_ShowAnything": [
         "Show Anything",
