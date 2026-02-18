@@ -266,7 +266,7 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 >   **Customizing Prompt Instructions:**
 >   
 >   To customize how the model enhances prompts:
->   1. Copy `example_system_messages.py`
+>   1. Copy `system_messages_example.py`
 >   2. Rename it to `system_messages.py`
 >   3. Edit the file with your custom instructions
 >   4. The node will automatically load your custom version

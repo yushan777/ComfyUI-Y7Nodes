@@ -80,10 +80,10 @@ DEFAULT_PROMPT = ""
 # ==================================================================================
 # PROMPT INSTRUCTIONS FOR FLUX.2 [KLEIN]
 # ==================================================================================
-# System messages are loaded from example_system_messages.py
+# System messages are loaded from system_messages_example.py
 # (as taken directly from Black Forest Labs's FLUX.2 repo demo)
 # 
-# To customize, copy example_system_messages.py to system_messages.py
+# To customize, copy system_messages_example.py to system_messages.py
 # and modify the prompts there. The node will prioritize system_messages.py
 # if it exists.
 # ==================================================================================
@@ -93,26 +93,31 @@ def load_prompt_instruction():
     Load prompt instruction from system_messages module with fallback logic.
     Priority:
     1. system_messages.py (user's custom version)
-    2. example_system_messages.py (default from Black Forest Labs)
+    2. system_messages_example.py (default from Black Forest Labs)
+
+    This is loaded at comfyui startup - not during node execution
     """
+    # Get the custom_nodes directory name for log identification
+    _dir_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
     try:
         # Try to import custom system_messages first
         from . import system_messages
-        print(f"Loaded custom system message from: system_messages.py", color.BRIGHT_GREEN)
+        print(f"[{_dir_name}] Loaded custom system message from: system_messages.py", color.BRIGHT_GREEN)
         return system_messages.SYSTEM_MESSAGE_UPSAMPLING_T2I
     except ImportError:
         pass
     
     try:
-        # Fall back to example_system_messages
-        from . import example_system_messages
-        print(f"Loaded default system message from: example_system_messages.py", color.BRIGHT_BLUE)
-        return example_system_messages.SYSTEM_MESSAGE_UPSAMPLING_T2I
+        # Fall back to system_messages_example
+        from . import system_messages_example
+        print(f"[{_dir_name}] Loaded default system message from: system_messages_example.py", color.BRIGHT_BLUE)
+        return system_messages_example.SYSTEM_MESSAGE_UPSAMPLING_T2I
     except ImportError as e:
-        print(f"Error loading system messages: {str(e)}", color.YELLOW)
+        print(f"[{_dir_name}] Error loading system messages: {str(e)}", color.YELLOW)
     
     # Final fallback
-    print(f"No system_messages module found. Using minimal fallback.", color.YELLOW)
+    print(f"[{_dir_name}] No system_messages module found. Using minimal fallback.", color.YELLOW)
     return """You are an expert prompt engineer for FLUX.2 by Black Forest Labs. Rewrite user prompts to be more descriptive while strictly preserving their core subject and intent."""
 
 # Load the prompt instruction at module initialization
