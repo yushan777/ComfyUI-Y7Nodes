@@ -1,3 +1,6 @@
+1.0.30
+Updated Prompt Enhancer (Flux.2 Klein)
+
 1.0.29
 Crop To Nearest Multiple
 LM Studio Nodes for prompt enhancement and VL tasks

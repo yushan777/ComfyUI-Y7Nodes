@@ -1,0 +1,170 @@
+{
+  "id": "5db9e9b1-39cf-470e-9f3a-6c2029a60f7b",
+  "revision": 0,
+  "last_node_id": 3,
+  "last_link_id": 2,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "ShowText|pysssss",
+      "pos": [
+        -1550,
+        250
+      ],
+      "size": [
+        450,
+        450
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "609f3afaa74b2f88ef9ce8d939626065e3247469",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "A woman with a slender and appealing figure stands confidently in a modern, sleek hallway. She has an oval face with high cheekbones and a delicate jawline, framed by dark brown eyes that exude warmth and intelligence. Her skin tone is fair with a slight natural glow, and her long, straight chestnut hair falls just past her shoulders, cascading smoothly down her back. She is dressed in a simple white cotton t-shirt that fits snugly around her torso, paired with fitted denim jeans that accentuate her slim legs. Her feet are adorned with sleek black loaf ers featuring a minimalist design, adding a touch of understated elegance to her outfit. Her expression is composed and poised, with subtle confidence radiating from her stance. She holds her arms slightly relaxed at her sides, embodying calm assurance. The hallway is lined with smooth white painted walls that reflect the ambient light, meeting polished concrete flooring that shimmers under the illumination. A contemporary abstract painting in shades of electric blue and deep orange hangs against one wall, introducing a striking contrast to the neutral tones. Recessed lighting provides even, clean illumination throughout the space, casting soft shadows and enhancing the sense of openness. A clear glass railing runs along the length of the hallway, adding to the airy and sophisticated ambiance of the environment."
+      ]
+    },
+    {
+      "id": 2,
+      "type": "Y7Nodes_PromptEnhancerFlux2",
+      "pos": [
+        -1960,
+        10
+      ],
+      "size": [
+        360,
+        440
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "thinking_output",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "enhanced_prompt",
+          "type": "STRING",
+          "links": [
+            1,
+            2
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "1.0.29",
+        "Node name for S&R": "Y7Nodes_PromptEnhancerFlux2"
+      },
+      "widgets_values": [
+        "a woman, with a slim and attractive figure, wearing a white t-shirt, denim jeans, black loafers, standing, in a sleek hallway, smooth white walls meet polished concrete floors. A single abstract painting adds color, while recessed lighting and a glass railing enhance the airy, sophisticated space.",
+        "Qwen3-8B",
+        "none",
+        false,
+        512,
+        0.7,
+        0.9,
+        50,
+        938443721419526,
+        "randomize",
+        true
+      ]
+    },
+    {
+      "id": 3,
+      "type": "CatchEditTextNode",
+      "pos": [
+        -1540,
+        -50
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input_text",
+          "shape": 7,
+          "type": "STRING",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-imgnr-utils",
+        "ver": "3.2.4",
+        "Node name for S&R": "CatchEditTextNode"
+      },
+      "widgets_values": [
+        "Catches and shows any text being created by a previous node\nEnables editing the text for subsequent runs.\nMute: mutes connected input node.\nIf inputnode is forced to run,\n(e.g. randomize seed or other connected output to that node),\nthe input node still runs but the catcher ignores it.\nBlock: actively prevents previous node from running.\nUse statuscolor toggle to show mode on node header.",
+        "use_input",
+        true
+      ],
+      "color": "#2d4a2d"
+    }
+  ],
+  "links": [
+    [
+      1,
+      2,
+      1,
+      1,
+      0,
+      "STRING"
+    ],
+    [
+      2,
+      2,
+      1,
+      3,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "workflowRendererVersion": "LG",
+    "ds": {
+      "scale": 1.4153300992574058,
+      "offset": [
+        2103.1285304520084,
+        237.6974004139298
+      ]
+    },
+    "frontendVersion": "1.39.14"
+  },
+  "version": 0.4
+}
