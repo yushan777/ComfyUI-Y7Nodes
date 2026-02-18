@@ -164,4 +164,5 @@ cython_debug/
 
 # Custom ignores
 nodes/custom_dimensions.json
+nodes/system_messages.py
 prompt_instructions/prompt_instruction_flux2_klein.txt

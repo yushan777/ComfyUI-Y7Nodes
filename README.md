@@ -253,7 +253,6 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 >   - **Qwen3-8B Model**: Uses advanced LLM for prompt enhancement
 >   - **Josiefied-Qwen3-8B-abliterated Model**: Abliterated variant of the Qwen3-8B Model
 >   - **Thinking Mode**: Enable/disable the model's reasoning process output
->   - **Customizable Instructions**: Load custom prompt enhancement instructions from `prompt_instructions/prompt_instruction_flux2_klein.txt`
 >   - **Quantization Support**: Choose between none, 8-bit, or 4-bit quantization (requires bitsandbytes - primarily Linux)
 >   - **Platform Support**: Works on CUDA, Apple Silicon (MPS), and CPU
 >   - **Advanced Parameters**: Control temperature, top_p, top_k, and max_new_tokens for fine-tuned generation
