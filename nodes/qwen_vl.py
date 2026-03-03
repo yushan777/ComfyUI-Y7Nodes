@@ -121,20 +121,34 @@ class Y7Nodes_QwenVL:
     Image input is optional — omit it for text-only queries.
     """
 
-    _MODEL_DIR = os.path.join(
-        folder_paths.models_dir, "LLM", "Qwen-VL", "Qwen3-VL-8B-Instruct"
-    )
+    _BASE_DIR = os.path.join(folder_paths.models_dir, "LLM", "Qwen-VL")
 
     def __init__(self):
         self._patcher = None
         self._processor = None
         self._loaded_dtype = None
+        self._loaded_model = None
+
+    @classmethod
+    def _available_models(cls):
+        base = cls._BASE_DIR
+        if not os.path.isdir(base):
+            return []
+        return sorted(
+            d for d in os.listdir(base)
+            if os.path.isdir(os.path.join(base, d))
+        )
 
     @classmethod
     def INPUT_TYPES(cls):
+        models = cls._available_models()
+        if not models:
+            models = ["(no models found)"]
         preset_names = list(PRESET_PROMPTS.keys())
         return {
             "required": {
+                "model_name": (models, {"default": models[0]}),
+                "dtype": (["float16", "bfloat16"], {"default": "float16"}),
                 "preset_prompt": (
                     preset_names,
                     {
@@ -142,7 +156,7 @@ class Y7Nodes_QwenVL:
                         "tooltip": "Built-in instruction describing how the model should analyse the image.",
                     },
                 ),
-                "query": (
+                "custom_prompt": (
                     "STRING",
                     {
                         "default": "",
@@ -155,7 +169,6 @@ class Y7Nodes_QwenVL:
                 "top_p": ("FLOAT", {"default": 0.9, "min": 0.0, "max": 1.0, "step": 0.01}),
                 "repetition_penalty": ("FLOAT", {"default": 1.1, "min": 1.0, "max": 2.0, "step": 0.05}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 2**32 - 1}),
-                "dtype": (["float16", "bfloat16"], {"default": "float16"}),
                 "keep_model_loaded": (
                     "BOOLEAN",
                     {
@@ -178,12 +191,12 @@ class Y7Nodes_QwenVL:
     # Private helpers
     # ------------------------------------------------------------------
 
-    def _load(self, dtype):
-        model_path = self._MODEL_DIR
+    def _load(self, model_name, dtype):
+        model_path = os.path.join(self._BASE_DIR, model_name)
         if not os.path.isdir(model_path):
             raise FileNotFoundError(
-                f"Qwen3-VL model not found at:\n  {model_path}\n"
-                "Place the model weights in: models/LLM/Qwen-VL/Qwen3-VL-8B-Instruct"
+                f"Qwen-VL model not found at:\n  {model_path}\n"
+                f"Place the model weights in: models/LLM/Qwen-VL/{model_name}"
             )
 
         torch_dtype = torch.bfloat16 if dtype == "bfloat16" else torch.float16
@@ -216,6 +229,7 @@ class Y7Nodes_QwenVL:
         self._patcher = patcher
         self._processor = processor
         self._loaded_dtype = dtype
+        self._loaded_model = model_name
 
     def _unload(self):
         if self._patcher is not None:
@@ -230,6 +244,7 @@ class Y7Nodes_QwenVL:
             self._patcher = None
         self._processor = None
         self._loaded_dtype = None
+        self._loaded_model = None
         gc.collect()
 
     # ------------------------------------------------------------------
@@ -238,8 +253,9 @@ class Y7Nodes_QwenVL:
 
     def run(
         self,
+        model_name,
         preset_prompt,
-        query,
+        custom_prompt,
         max_new_tokens,
         temperature,
         top_p,
@@ -251,10 +267,10 @@ class Y7Nodes_QwenVL:
     ):
         pbar = ProgressBar(4)
 
-        # Reload if not cached or if dtype changed
-        if self._patcher is None or self._loaded_dtype != dtype:
+        # Reload if not cached or if model/dtype changed
+        if self._patcher is None or self._loaded_model != model_name or self._loaded_dtype != dtype:
             self._unload()
-            self._load(dtype)
+            self._load(model_name, dtype)
 
         pbar.update(1)  # model ready
 
@@ -263,8 +279,8 @@ class Y7Nodes_QwenVL:
 
         # Resolve instruction: custom query overrides preset
         instruction = PRESET_PROMPTS.get(preset_prompt, "Describe this image.")
-        if query and query.strip():
-            instruction = query.strip()
+        if custom_prompt and custom_prompt.strip():
+            instruction = custom_prompt.strip()
 
         # Ask ComfyUI's memory manager to move this model to the GPU,
         # coordinating with all other currently loaded models.
