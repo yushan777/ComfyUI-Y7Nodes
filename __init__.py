@@ -14,6 +14,7 @@ from .nodes.smolvlm import Y7Nodes_SmolVLM
 from .nodes.crop_to_nearest_multiple import Y7Nodes_CropToNearestMultiple
 from .nodes.color_match_masked import Y7Nodes_ColorMatchMasked
 from .nodes.lm_studio import Y7Nodes_LMStudioText, Y7Nodes_LMStudioVision, Y7Nodes_SelectLMSModel
+from .nodes.qwen_vl import Y7Nodes_QwenVL
 
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageRow": Y7Nodes_ImageRow,
@@ -30,7 +31,8 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ColorMatchMasked": Y7Nodes_ColorMatchMasked,
     "Y7Nodes_LMStudioText": Y7Nodes_LMStudioText,
     "Y7Nodes_LMStudioVision": Y7Nodes_LMStudioVision,
-    "Y7Nodes_SelectLMSModel": Y7Nodes_SelectLMSModel
+    "Y7Nodes_SelectLMSModel": Y7Nodes_SelectLMSModel,
+    "Y7Nodes_QwenVL": Y7Nodes_QwenVL,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageRow": "Y7 Image Row",
@@ -47,7 +49,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ColorMatchMasked": "Y7 Color Match (Masked)",
     "Y7Nodes_LMStudioText": "Y7 LM Studio (Text)",
     "Y7Nodes_LMStudioVision": "Y7 LM Studio (Vision)",
-    "Y7Nodes_SelectLMSModel": "Y7 Select LMS Model"
+    "Y7Nodes_SelectLMSModel": "Y7 Select LMS Model",
+    "Y7Nodes_QwenVL": "Y7 Qwen3-VL",
 }
 
 # Apply HTML-formatted documentation to node classes
