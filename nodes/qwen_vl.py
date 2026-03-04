@@ -230,7 +230,7 @@ class Y7Nodes_QwenVL:
         device = comfy.model_management.get_torch_device()
         offload_device = comfy.model_management.unet_offload_device()
 
-        patcher = comfy.model_patcher.ModelPatcher(
+        patcher = comfy.model_patcher.CoreModelPatcher(
             wrapped,
             load_device=device,
             offload_device=offload_device,
