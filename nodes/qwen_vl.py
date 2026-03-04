@@ -133,7 +133,6 @@ class Y7Nodes_QwenVL:
     def __init__(self):
         self._patcher = None
         self._processor = None
-        self._loaded_dtype = None
         self._loaded_model = None
 
     @classmethod
@@ -147,7 +146,6 @@ class Y7Nodes_QwenVL:
         return {
             "required": {
                 "model_name": (QWEN_VL_MODELS, {"default": "Qwen/Qwen3-VL-8B-Instruct"}),
-                "dtype": (["bfloat16", "float16"], {"default": "bfloat16"}),
                 "preset_prompt": (
                     preset_names,
                     {
@@ -197,7 +195,7 @@ class Y7Nodes_QwenVL:
     # Private helpers
     # ------------------------------------------------------------------
 
-    def _load(self, model_name, dtype, download_model=False):
+    def _load(self, model_name, download_model=False):
         model_path = self._local_model_dir(model_name)
         if not os.path.isdir(model_path):
             if not download_model:
@@ -214,8 +212,6 @@ class Y7Nodes_QwenVL:
             snapshot_download(repo_id=model_name, local_dir=model_path)
             print(f"[QwenVL] Download complete.")
 
-        torch_dtype = torch.bfloat16 if dtype == "bfloat16" else torch.float16
-
         # Processor is CPU-only (tokeniser + image preprocessor, no GPU weights)
         processor = AutoProcessor.from_pretrained(model_path)
 
@@ -224,7 +220,7 @@ class Y7Nodes_QwenVL:
         # coordinating VRAM with other loaded models (diffusion models, VAE, etc.).
         model = Qwen3VLForConditionalGeneration.from_pretrained(
             model_path,
-            torch_dtype=torch_dtype,
+            torch_dtype="auto",
             low_cpu_mem_usage=True,
         )
         model.eval()
@@ -243,7 +239,6 @@ class Y7Nodes_QwenVL:
 
         self._patcher = patcher
         self._processor = processor
-        self._loaded_dtype = dtype
         self._loaded_model = model_name
 
     def _unload(self):
@@ -258,7 +253,6 @@ class Y7Nodes_QwenVL:
                 print(f"[QwenVL] Patcher detach warning: {e}")
             self._patcher = None
         self._processor = None
-        self._loaded_dtype = None
         self._loaded_model = None
         gc.collect()
 
@@ -276,7 +270,6 @@ class Y7Nodes_QwenVL:
         top_p,
         repetition_penalty,
         seed,
-        dtype,
         keep_model_loaded,
         download_model,
         image=None,
@@ -284,9 +277,9 @@ class Y7Nodes_QwenVL:
         pbar = ProgressBar(4)
 
         # Reload if not cached or if model/dtype changed
-        if self._patcher is None or self._loaded_model != model_name or self._loaded_dtype != dtype:
+        if self._patcher is None or self._loaded_model != model_name:
             self._unload()
-            self._load(model_name, dtype, download_model=download_model)
+            self._load(model_name, download_model=download_model)
 
         pbar.update(1)  # model ready
 
