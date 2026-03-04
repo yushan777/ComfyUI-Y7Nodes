@@ -225,7 +225,8 @@ class Y7Nodes_QwenVL:
         )
         model.eval()
 
-        wrapped = _QwenVLWrapper(model)
+        _Cls = type(type(model).__name__, (_QwenVLWrapper,), {})
+        wrapped = _Cls(model)
 
         device = comfy.model_management.get_torch_device()
         offload_device = comfy.model_management.unet_offload_device()
