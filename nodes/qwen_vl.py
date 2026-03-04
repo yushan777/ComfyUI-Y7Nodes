@@ -10,6 +10,13 @@ import comfy.model_patcher
 from comfy.utils import ProgressBar
 from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 
+QWEN_VL_MODELS = [
+    "Qwen/Qwen3-VL-2B-Instruct",
+    "Qwen/Qwen3-VL-4B-Instruct",
+    "Qwen/Qwen3-VL-8B-Instruct",
+    "Qwen/Qwen3-VL-32B-Instruct",
+]
+
 # Preset instructions (image analysis tasks shown in the dropdown).
 # Values are the actual instruction text sent to the model.
 # Sourced from AILab_System_Prompts.json (AILab/ComfyUI-QwenVL).
@@ -121,7 +128,7 @@ class Y7Nodes_QwenVL:
     Image input is optional — omit it for text-only queries.
     """
 
-    _BASE_DIR = os.path.join(folder_paths.models_dir, "LLM", "Qwen-VL")
+    _BASE_DIR = os.path.join(folder_paths.models_dir, "LLM")
 
     def __init__(self):
         self._patcher = None
@@ -130,25 +137,17 @@ class Y7Nodes_QwenVL:
         self._loaded_model = None
 
     @classmethod
-    def _available_models(cls):
-        base = cls._BASE_DIR
-        if not os.path.isdir(base):
-            return []
-        return sorted(
-            d for d in os.listdir(base)
-            if os.path.isdir(os.path.join(base, d))
-        )
+    def _local_model_dir(cls, hf_model_id):
+        """Return the local directory for a HuggingFace model ID (org/name → name)."""
+        return os.path.join(cls._BASE_DIR, hf_model_id.split("/")[-1])
 
     @classmethod
     def INPUT_TYPES(cls):
-        models = cls._available_models()
-        if not models:
-            models = ["(no models found)"]
         preset_names = list(PRESET_PROMPTS.keys())
         return {
             "required": {
-                "model_name": (models, {"default": models[0]}),
-                "dtype": (["float16", "bfloat16"], {"default": "float16"}),
+                "model_name": (QWEN_VL_MODELS, {"default": "Qwen/Qwen3-VL-8B-Instruct"}),
+                "dtype": (["bfloat16", "float16"], {"default": "bfloat16"}),
                 "preset_prompt": (
                     preset_names,
                     {
@@ -176,6 +175,13 @@ class Y7Nodes_QwenVL:
                         "tooltip": "Keep the model in VRAM/RAM after the run so the next prompt skips reloading.",
                     },
                 ),
+                "download_model": (
+                    "BOOLEAN",
+                    {
+                        "default": False,
+                        "tooltip": "Automatically download the selected model from HuggingFace if it is not found locally.",
+                    },
+                ),
             },
             "optional": {
                 "image": ("IMAGE",),
@@ -191,13 +197,22 @@ class Y7Nodes_QwenVL:
     # Private helpers
     # ------------------------------------------------------------------
 
-    def _load(self, model_name, dtype):
-        model_path = os.path.join(self._BASE_DIR, model_name)
+    def _load(self, model_name, dtype, download_model=False):
+        model_path = self._local_model_dir(model_name)
         if not os.path.isdir(model_path):
-            raise FileNotFoundError(
-                f"Qwen-VL model not found at:\n  {model_path}\n"
-                f"Place the model weights in: models/LLM/Qwen-VL/{model_name}"
-            )
+            if not download_model:
+                short_name = model_name.split("/")[-1]
+                raise FileNotFoundError(
+                    f"Model '{model_name}' is not available locally.\n"
+                    f"Expected path: {model_path}\n"
+                    f"Enable 'download_model' to download it automatically, or manually place "
+                    f"the weights in: models/LLM/{short_name}"
+                )
+            print(f"[QwenVL] Downloading {model_name} to {model_path} ...")
+            from huggingface_hub import snapshot_download
+            os.makedirs(model_path, exist_ok=True)
+            snapshot_download(repo_id=model_name, local_dir=model_path)
+            print(f"[QwenVL] Download complete.")
 
         torch_dtype = torch.bfloat16 if dtype == "bfloat16" else torch.float16
 
@@ -263,6 +278,7 @@ class Y7Nodes_QwenVL:
         seed,
         dtype,
         keep_model_loaded,
+        download_model,
         image=None,
     ):
         pbar = ProgressBar(4)
@@ -270,7 +286,7 @@ class Y7Nodes_QwenVL:
         # Reload if not cached or if model/dtype changed
         if self._patcher is None or self._loaded_model != model_name or self._loaded_dtype != dtype:
             self._unload()
-            self._load(model_name, dtype)
+            self._load(model_name, dtype, download_model=download_model)
 
         pbar.update(1)  # model ready
 
