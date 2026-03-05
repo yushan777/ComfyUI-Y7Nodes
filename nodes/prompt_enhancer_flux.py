@@ -1,19 +1,15 @@
 import logging
 import os
-import platform
 import gc
 import hashlib
 import re
-from typing import List, Optional, Tuple, Union, Dict, Any
 from ..utils.colored_print import color, style
 import comfy.model_management
 import comfy.model_patcher
 import folder_paths
 import torch
-from transformers import AutoModelForCausalLM, AutoProcessor, AutoTokenizer, TextIteratorStreamer
+from transformers import AutoModelForCausalLM, AutoTokenizer
 from huggingface_hub import snapshot_download
-import numpy as np
-from threading import Thread
 
 # Set to True to enable peak VRAM logging for debugging
 LOG_PEAK_VRAM = False
@@ -22,22 +18,16 @@ LOG_PEAK_VRAM = False
 # Y7Nodes_PromptEnhancerFlux
 # .enhance()
 # │
-# ├── [Optional VRAM Cleanup]
-# │   └── unload models, clear cache, clear internal cache
+# ├── _load() [if not cached or model changed]
+# │   ├── model_path_download_if_needed() -> snapshot_download()
+# │   ├── AutoModelForCausalLM.from_pretrained() [CPU only]
+# │   ├── AutoTokenizer.from_pretrained()
+# │   ├── _LLMWrapper(model)
+# │   └── CoreModelPatcher(wrapped, load_device, offload_device)
 # │
-# ├── down_load_llm_model()
-# │   ├── Check cache (self._loaded_models)
-# │   ├── [If cache miss]:
-# │   │   ├── model_path_download_if_needed() -> snapshot_download()
-# │   │   ├── AutoModelForCausalLM.from_pretrained() -> .to(device)
-# │   │   ├── AutoTokenizer.from_pretrained()
-# │   │   └── Store in cache
-# │   └── Return model, tokenizer
+# ├── load_models_gpu([patcher])  [ComfyUI memory coordination]
 # │
-# ├── [Memory Management]
-# │   └── get_model_size(), comfy.model_management.free_memory()
-# │
-# ├── generate_both_prompts()
+# ├── generate_both_prompts(raw_model, tokenizer, device, ...)
 # │   ├── Format input (apply_chat_template/format_chat_messages)
 # │   ├── Tokenize input
 # │   ├── model.generate() [via Thread + TextIteratorStreamer]
@@ -46,15 +36,9 @@ LOG_PEAK_VRAM = False
 # │   ├── T5_PostProcess() -> extract_square_brackets()
 # │   └── Return cleaned (clip_prompt, t5_prompt)
 # │
+# ├── [Optional] _unload() if keep_model_loaded=False
+# │
 # └── Return (clip_l_prompt, t5xxl_prompt)
-
-# function to detect Apple Silicon
-def is_apple_silicon():    
-    return platform.system() == "Darwin" and platform.machine().startswith(("arm", "M"))
-
-# Function to check if CUDA is available
-def is_cuda_available():
-    return torch.cuda.is_available()
 
 
 # LLM model information - unchanged
@@ -269,16 +253,52 @@ def extract_square_brackets(text):
         return match.group(1)
     return None
 
+# ---------------------------------------------------------------------------
+# Compatibility wrapper
+# ---------------------------------------------------------------------------
+
+class _LLMWrapper(torch.nn.Module):
+    """Proxy around AutoModelForCausalLM for ModelPatcher compatibility.
+
+    HuggingFace's GenerationMixin defines `device` as a read-only property.
+    ModelPatcher writes model.device = device_to as a tracking attribute,
+    which raises AttributeError on any model that inherits that property.
+
+    This wrapper is a plain nn.Module with no conflicting properties, so
+    ModelPatcher can set tracking attributes freely.  The real model is
+    registered as self._llm_model (a child module), so .parameters(),
+    .to(), .state_dict() etc. all work transparently on the full weight tree.
+    """
+
+    def __init__(self, model):
+        super().__init__()
+        self._llm_model = model
+        # Pre-initialise counters that ModelPatcher reads with += before writing
+        self.lowvram_patch_counter = 0
+        self.model_lowvram = False
+
+    @property
+    def config(self):
+        return self._llm_model.config
+
+    def forward(self, *args, **kwargs):
+        return self._llm_model(*args, **kwargs)
+
+    def generate(self, *args, **kwargs):
+        return self._llm_model.generate(*args, **kwargs)
+
+
 # ==================================================================================
 # COMBO & SEPARATE GENERATION FUNCTIONS
 # ==================================================================================
 
 # COMBO generation func.
 def generate_both_prompts(
-                        prompt_enhancer_model, 
-                        prompt_enhancer_tokenizer, 
-                        user_prompt: str, 
-                        seed: int = None, 
+                        prompt_enhancer_model,
+                        prompt_enhancer_tokenizer,
+                        device,
+                        user_prompt: str,
+                        seed: int = None,
                         temperature: float = 0.7,
                         top_p: float = 0.9,
                         top_k: int = 40,
@@ -347,12 +367,7 @@ Your concise CLIP prompt here...
     # Free memory before tokenization
     gc.collect()
     
-    # Get device information from model
-    device = prompt_enhancer_model.device
-    device_type = device.type if hasattr(device, 'type') else str(device)
-    # print(f"Model is on device: {device_type}", color.BRIGHT_GREEN)
-    
-    # Create inputs 
+    # Create inputs
     model_inputs = prompt_enhancer_tokenizer([formatted_text], return_tensors="pt")
     model_inputs = {k: v.to(device) for k, v in model_inputs.items()}
 
@@ -365,9 +380,6 @@ Your concise CLIP prompt here...
     print(f"----------------------------------\n", color.BRIGHT_MAGENTA)
 
 
-    # Create a streamer, skip the input prompt (instructions)
-    streamer = TextIteratorStreamer(prompt_enhancer_tokenizer, skip_prompt=True, skip_special_tokens=True, stream_every=2)
-
     # Set up generation kwargs
     generation_kwargs = {
         "input_ids": model_inputs["input_ids"],
@@ -377,59 +389,26 @@ Your concise CLIP prompt here...
         "temperature": temperature,
         "top_p": top_p,
         "top_k": top_k,
-        "streamer": streamer,
     }
 
-    # Start generation in a separate thread
+    # Generate in the main thread — matches qwen_vl.py pattern.
+    # Running generate() in a new Thread breaks aimdo's CUDA virtual memory
+    # context, which is tied to the main thread.
     print("🔄 Starting prompt generation...", color.BRIGHT_BLUE)
-    thread = None # Initialize thread to None
+    with torch.no_grad():
+        generated_ids = prompt_enhancer_model.generate(**generation_kwargs)
 
-    # Apply platform-specific optimizations
-    try:
-        if is_apple_silicon() and device_type == "mps":
-            with torch.inference_mode(), torch.autocast("mps"):
-                thread = Thread(target=prompt_enhancer_model.generate, kwargs=generation_kwargs)
-                thread.start()
-        elif device_type == "cuda":
-            with torch.inference_mode(), torch.amp.autocast(device_type="cuda"):
-                thread = Thread(target=prompt_enhancer_model.generate, kwargs=generation_kwargs)
-                thread.start()
-        else:
-            with torch.inference_mode():
-                thread = Thread(target=prompt_enhancer_model.generate, kwargs=generation_kwargs)
-                thread.start()
-    except Exception as e:
-        print(f"Error with optimized generation: {str(e)}, falling back to standard mode", color.YELLOW)
-        with torch.inference_mode():
-            thread = Thread(target=prompt_enhancer_model.generate, kwargs=generation_kwargs)
-            thread.start()
+    input_len = model_inputs["input_ids"].shape[-1]
+    decoded_response = prompt_enhancer_tokenizer.decode(
+        generated_ids[0][input_len:],
+        skip_special_tokens=True,
+        clean_up_tokenization_spaces=False,
+    ).strip()
 
-    # Process the streamed tokens
-    decoded_response = ""
-    print("📝 Generating: ", end="", flush=True)
-    token_count = 0
-    printed_something = False # Flag to track if we've started printing actual content
-
-    if thread: # Check if thread was successfully created and started
-        for token in streamer:
-            decoded_response += token
-            if token: # Only print non-empty tokens
-                print(token, end="", flush=True)
-                printed_something = True
-                token_count += 1 # Only count printed tokens
-                if token_count > 0 and token_count % 50 == 0:  # Add a newline every 50 *printed* tokens for readability
-                    print() # Use print() for newline, flush is handled
-
-        thread.join() # Wait for the generation thread to finish
-        if printed_something: # Add a final newline only if something was printed
-             print() # Ensure the completion message is on a new line
-        print("✅ Generation complete.  Post-processing...", color.BRIGHT_GREEN)
-    else:
-        print("\n❌ Generation thread failed to start.", color.BRIGHT_RED)
-        return "Error: Generation failed", "Error: Generation failed"
+    print("✅ Generation complete.  Post-processing...", color.BRIGHT_GREEN)
 
     # Clean up memory explicitly
-    del model_inputs, generation_kwargs, streamer, thread
+    del model_inputs, generation_kwargs, generated_ids
     gc.collect()
 
     # print(f"Combined raw response:\n{decoded_response}\n", color.ORANGE)
@@ -556,21 +535,15 @@ def format_chat_messages(messages, add_generation_prompt=True):
     
     return formatted_text
 
-# Helper function to calculate model size - unchanged
-def get_model_size(model):
-    """Calculate the memory size of a model based on parameters and buffers."""
-    total_size = sum(p.numel() * p.element_size() for p in model.parameters())
-    total_size += sum(b.numel() * b.element_size() for b in model.buffers())
-    return total_size
-
 # ==================================================================================
 # MAIN NODE CLASS
 # ==================================================================================
 class Y7Nodes_PromptEnhancerFlux:
-    # Class variable to cache loaded models and tokenizers, so they aren't needed to be loaded
-    # from disk each time.  these are cleared if unload_models_before_run is true
-    _loaded_models: Dict[str, Tuple[Any, Any]] = {}
-    _last_used_model_name: Optional[str] = None # Stores the name of the last used model - used to know when to flush cache
+
+    def __init__(self):
+        self._patcher = None
+        self._tokenizer = None
+        self._loaded_model_name = None
 
     @classmethod
     def INPUT_TYPES(s):
@@ -609,6 +582,13 @@ class Y7Nodes_PromptEnhancerFlux:
                     "INT",
                     {"default": 0, "min": 0, "max": 0xffffffffffffffff}
                 ),
+                "keep_model_loaded": (
+                    "BOOLEAN",
+                    {
+                        "default": True,
+                        "tooltip": "Keep the model in VRAM/RAM after the run so the next prompt skips reloading.",
+                    },
+                ),
             },
             "hidden":{}
         }
@@ -636,6 +616,53 @@ class Y7Nodes_PromptEnhancerFlux:
         return hash_hex
         
     # ==================================================================================
+    # Private helpers
+    # ==================================================================================
+
+    def _load(self, model_display_name):
+        model_path = self.model_path_download_if_needed(model_display_name)
+
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
+
+        # Load weights to CPU — never move to GPU yourself.
+        # Do NOT use device_map="auto"; that bypasses ComfyUI's memory manager.
+        model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            torch_dtype="auto",
+            low_cpu_mem_usage=True,
+        )
+        model.eval()
+
+        wrapped = _LLMWrapper(model)
+
+        device = comfy.model_management.get_torch_device()
+        offload_device = comfy.model_management.unet_offload_device()
+
+        patcher = comfy.model_patcher.CoreModelPatcher(
+            wrapped,
+            load_device=device,
+            offload_device=offload_device,
+            size=comfy.model_management.module_size(model),
+        )
+
+        self._patcher = patcher
+        self._tokenizer = tokenizer
+        self._loaded_model_name = model_display_name
+
+    def _unload(self):
+        if self._patcher is not None:
+            try:
+                # detach() moves the model back to offload_device (CPU) and zeroes
+                # model_loaded_weight_memory so ComfyUI's accounting stays correct.
+                self._patcher.detach(unpatch_all=False)
+            except Exception as e:
+                print(f"[PromptEnhancerFlux] Patcher detach warning: {e}")
+            self._patcher = None
+        self._tokenizer = None
+        self._loaded_model_name = None
+        gc.collect()
+
+    # ==================================================================================
     # main function
     # ==================================================================================
     def enhance(self, **kwargs):
@@ -645,149 +672,71 @@ class Y7Nodes_PromptEnhancerFlux:
         temperature = kwargs.get("temperature")
         top_p = kwargs.get("top_p")
         top_k = kwargs.get("top_k")
-
-        # === Check if model changed from the one last used and clear cache if needed ===
-        current_model_key = llm_display_name
-        if self._last_used_model_name is not None and self._last_used_model_name != current_model_key:
-            print(f"ℹ️ Model changed from '{self._last_used_model_name}' to '{current_model_key}'. Clearing internal cache.", color.YELLOW)
-            if hasattr(self, '_loaded_models'):
-                self._loaded_models.clear()
-            gc.collect() # Force garbage collection after clearing cache
-        
+        keep_model_loaded = kwargs.get("keep_model_loaded", True)
 
         # Default prompt if empty
         if not prompt.strip():
             t5xxl_prompt = 'Please provide a prompt, no matter how basic. If you wish to use a token or trigger words enclose them in square brackets.\nExamples:\n\n"A man sitting in a cafe".\n"[ohwx woman] standing in the middle of a busy street"'
             clip_l_prompt = ""
             return (clip_l_prompt, t5xxl_prompt,)
-        
+
         try:
-            # Force garbage collection before starting
-            gc.collect()
+            # Reload if not cached or if model changed
+            if self._patcher is None or self._loaded_model_name != llm_display_name:
+                self._unload()
+                self._load(llm_display_name)
 
-            # For Apple Silicon, use MPS device if available
-            if is_apple_silicon() and torch.backends.mps.is_available():
-                print("Using MPS (Metal Performance Shaders) for Apple Silicon", color.BRIGHT_GREEN)
-                load_device = "mps"
-            elif is_cuda_available():
-                print("Using CUDA device", color.BRIGHT_GREEN)
-                load_device = comfy.model_management.get_torch_device()                
-            else:
-                print("No GPU detected, using CPU (this will be slow)", color.YELLOW)
-                load_device = "cpu"
+            # Ask ComfyUI's memory manager to move this model to the GPU,
+            # coordinating with all other currently loaded models.
+            # Request 20% extra headroom beyond the model size for activation
+            # memory, KV cache, and generation buffers.
+            overhead = int(self._patcher.model_size() * 0.20)
+            comfy.model_management.load_models_gpu([self._patcher], memory_required=overhead)
+            device = self._patcher.load_device
 
-            # Load/download the model - it will be placed on the correct device by down_load_llm_model
-            llm_model, llm_tokenizer = self.down_load_llm_model(llm_display_name, load_device)
-            self._last_used_model_name = current_model_key
-
-            # Calculate model size for memory management
-            model_size = get_model_size(llm_model)
-            if is_apple_silicon():
-                # Use a smaller buffer on Apple Silicon to avoid over-allocation
-                model_size += 536870912  # Add 512MB as buffer instead of 1GB
-            else:
-                model_size += 1073741824  # Add 1GB as buffer for other platforms
-                comfy.model_management.free_memory(model_size, load_device)
-                        
             print(f"Seed={seed}", color.BRIGHT_BLUE)
-
-            # Verify model is on the correct device
-            if hasattr(llm_model, 'device'):
-                print(f"Model is on device: {llm_model.device}", color.BRIGHT_GREEN)
-            else:
-                print(f"Model device info not available", color.YELLOW)
 
             # ======================================================================
             # VRAM Logging Start (if enabled)
             if LOG_PEAK_VRAM:
-                if is_cuda_available():
-                    torch.cuda.reset_peak_memory_stats(load_device)
-                    print(f"[PromptEnhancerFlux DEBUG] Reset peak VRAM stats for device {load_device}.", color.CYAN)
-                # Note: Peak memory tracking is primarily a CUDA feature in PyTorch
+                if torch.cuda.is_available():
+                    torch.cuda.reset_peak_memory_stats(device)
+                    print(f"[PromptEnhancerFlux DEBUG] Reset peak VRAM stats for device {device}.", color.CYAN)
 
             # Generate both prompts in a single model call
             print("Generating both T5 and CLIP prompts...", color.BRIGHT_BLUE)
 
             clip_l_prompt, t5xxl_prompt = generate_both_prompts(
-                                                            llm_model,
-                                                            llm_tokenizer,
-                                                            prompt, 
-                                                            seed, 
-                                                            temperature=temperature, 
-                                                            top_p=top_p, 
-                                                            top_k=top_k
-                                                        )
+                self._patcher.model,
+                self._tokenizer,
+                device,
+                prompt,
+                seed,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k,
+            )
 
             # ======================================================================
             # VRAM Logging End (if enabled)
             if LOG_PEAK_VRAM:
-                if is_cuda_available():
-                    peak_vram_bytes = torch.cuda.max_memory_allocated(load_device)
+                if torch.cuda.is_available():
+                    peak_vram_bytes = torch.cuda.max_memory_allocated(device)
                     peak_vram_mb = peak_vram_bytes / (1024 * 1024)
                     print(f"[PromptEnhancerFlux DEBUG] Peak VRAM allocated during generation: {peak_vram_mb:.2f} MB", color.ORANGE)
                 else:
                     print("[PromptEnhancerFlux DEBUG] VRAM logging skipped (CUDA not available).", color.ORANGE)
             # ======================================================================
 
-
-            # print("Cleaning up model...\n", color.BRIGHT_BLUE)
-            
-            # First, try to move model to CPU regardless of platform
-            # try:
-            #     llm_model.to("cpu")
-            # except Exception as e:
-            #     print(f"Warning: Could not move model to CPU: {str(e)}", color.YELLOW)
-            
-            # # Clear any references to the model and tokenizer
-            # del llm_model
-            # del llm_tokenizer
-            
-            # # # Platform-specific cleanup
-            # if is_apple_silicon():
-            #     # For Apple Silicon
-            #     gc.collect()
-            #     if hasattr(torch.mps, 'empty_cache'):
-            #         torch.mps.empty_cache()
-            
-            # elif is_cuda_available():
-            #     # For NVIDIA GPUs
-            #     gc.collect()
-            #     torch.cuda.empty_cache()
-            #     comfy.model_management.soft_empty_cache()
-            #     # More aggressive CUDA cleanup
-            #     comfy.model_management.cleanup_models()
-            
-            # else:
-            #     # CPU fallback
-            #     gc.collect()
-            
-            # # Final garbage collection pass
-            gc.collect()
-            
             return (clip_l_prompt, t5xxl_prompt,)
 
-        # ========================================
-        except RuntimeError as runtime_e:
-            # Catch specific allocation errors first
-            error_message = str(runtime_e)
-            if "Allocation on device" in error_message:
-                print(f"❌ Critical Error: Device Allocation Failed: {error_message}", color.BRIGHT_RED)
-                # Re-raise the exception to stop ComfyUI workflow execution
-                raise runtime_e
-            else:
-                # Re-raise other RuntimeErrors to be caught by the general Exception handler below
-                # or propagate up if not caught later.
-                raise runtime_e
         except Exception as e:
-            # General exception handler
             print(f"❌ Error: {str(e)}", color.BRIGHT_RED)
-            # This return allows the workflow to continue, which might be undesirable
-            # depending on the error. Consider re-raising 'e' here too if errors
-            # should generally halt the workflow.
-            return (
-                f"Error: {str(e)}",
-                f"Error: Please check the model output format"
-            )
+            raise
+
+        finally:
+            if not keep_model_loaded:
+                self._unload()
     
     # ==================================================================================
     # Model download and loading methods - unchanged functionality but optimized
@@ -865,124 +814,3 @@ class Y7Nodes_PromptEnhancerFlux:
 
         return full_model_path
 
-    # ==============================================================================================
-    # down_load_llm_model (or load from Cache)
-    # ==============================================================================================
-    def down_load_llm_model(self, model_display_name, load_device):
-        repo_path = get_repo_info(model_display_name)
-        cache_key = f"{model_display_name}_{load_device}"
-
-        # Check cache first
-        if cache_key in self._loaded_models:
-            print(f"✅ Using cached model {model_display_name} on device {load_device}", color.BRIGHT_GREEN)
-            llm_model, llm_tokenizer = self._loaded_models[cache_key]
-            # Ensure model is on the requested device (device_map handles this better now, but keep check)
-            # Note: With device_map='auto', checking llm_model.device might be less straightforward
-            # as the model can be split across devices. We rely on device_map for placement.
-            # --- Robust Device Type Checking ---
-            # Get target device type as string ('cuda', 'cpu', 'mps')
-            if isinstance(load_device, torch.device):
-                target_device_type = load_device.type
-            elif isinstance(load_device, str):
-                target_device_type = load_device.split(':')[0]
-            elif isinstance(load_device, int): # Handle integer case (likely CUDA index)
-                target_device_type = 'cuda'
-            else:
-                target_device_type = 'cpu' # Default fallback
-
-            # Get current model's device type as string
-            if hasattr(llm_model, 'hf_device_map') and llm_model.hf_device_map:
-                # Get type from the first device in the map
-                first_device_in_map = next(iter(llm_model.hf_device_map.values()))
-                if isinstance(first_device_in_map, torch.device):
-                    current_device_type = first_device_in_map.type
-                elif isinstance(first_device_in_map, str):
-                     current_device_type = first_device_in_map.split(':')[0]
-                elif isinstance(first_device_in_map, int):
-                     current_device_type = 'cuda'
-                else: # Fallback if map value is unexpected type
-                     current_device_type = str(llm_model.device).split(':')[0]
-            else: # Model not using device_map or map is empty
-                if isinstance(llm_model.device, torch.device):
-                    current_device_type = llm_model.device.type
-                else: # Assume string like 'cuda:0' or 'cpu'
-                    current_device_type = str(llm_model.device).split(':')[0]
-            # --- End Robust Device Type Checking ---
-
-
-            if current_device_type != target_device_type:
-                 print(f"⚠️ Cached model device type ({current_device_type}) differs from target ({target_device_type}). Reloading.", color.YELLOW)
-                 # No easy way to move a device_map model, so just reload
-                 del self._loaded_models[cache_key] # Remove invalid cache entry
-                 # Proceed to load model below
-            else:
-                 # Model is likely on the correct device(s) via device_map
-                 return llm_model, llm_tokenizer
-
-
-        # If not in cache or moved device failed, load it
-        print(f"🔄 Loading model {model_display_name} to device {load_device}", color.BRIGHT_BLUE)
-        model_path = self.model_path_download_if_needed(model_display_name)
-
-        try:
-            # Force garbage collection before loading model
-            gc.collect()
-            if is_cuda_available():
-                torch.cuda.empty_cache()
-            elif is_apple_silicon() and hasattr(torch.mps, 'empty_cache'):
-                torch.mps.empty_cache()
-
-            # Determine torch_dtype based on device
-            if is_apple_silicon():
-                torch_dtype = torch.float16
-            else: # CUDA or CPU
-                # Prefer bfloat16 if supported, otherwise float16
-                if torch.cuda.is_available() and torch.cuda.get_device_capability(load_device)[0] >= 8:
-                    torch_dtype = torch.bfloat16
-                    print("   Using bfloat16", color.GREEN)
-                else:
-                    torch_dtype = torch.float16
-                    print("   Using float16 (bfloat16 not supported or not CUDA)", color.GREEN)
-
-            # Load model
-            llm_model = AutoModelForCausalLM.from_pretrained(
-                model_path,
-                torch_dtype=torch_dtype,
-                low_cpu_mem_usage=True,
-                device_map="auto"
-            )
-
-            # No explicit .to(load_device) needed when using device_map="auto"
-            # Print device map if available
-            if hasattr(llm_model, 'hf_device_map'):
-                print(f"   Model device map: {llm_model.hf_device_map}", color.GREEN)
-            else:
-                 print(f"   Model loaded (device map info not directly available, likely on {load_device})", color.GREEN)
-
-
-            # Load tokenizer
-            llm_tokenizer = AutoTokenizer.from_pretrained(model_path)
-
-            print(f"   Caching model {model_display_name} for device {load_device}", color.BLUE)
-            self._loaded_models[cache_key] = (llm_model, llm_tokenizer)
-
-            return llm_model, llm_tokenizer
-
-        except (FileNotFoundError, ValueError) as e: # Corrected indentation for except block
-            print(f"❌ Error: Model files are incomplete or corrupted: {str(e)}", color.RED)
-            print(f"🔄 Please manually delete the directory : {model_path}", color.YELLOW)
-            print(f"🔄 Then re-launch the workflow to attempt downloading again.", color.YELLOW)
-            print(f"🔄 Alternatively you can manually download the model from: \nhttps://huggingface.co/{repo_path}", color.YELLOW)
-            print(f"   and places the files to: {model_path}", color.YELLOW)
-            raise RuntimeError(f"Model at {model_path} is incomplete or corrupted. Please delete this directory and try again.")
-        except Exception as e:
-            print(f"❌ Unexpected error loading model {model_display_name}: {str(e)}", color.RED)
-            # Attempt to clean up potentially partially loaded model from cache if it exists
-            if cache_key in self._loaded_models:
-                del self._loaded_models[cache_key]
-            gc.collect()
-            if is_cuda_available():
-                torch.cuda.empty_cache()
-            elif is_apple_silicon() and hasattr(torch.mps, 'empty_cache'):
-                torch.mps.empty_cache()
-            raise # Re-raise the exception after cleanup attempt
