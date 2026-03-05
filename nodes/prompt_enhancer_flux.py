@@ -10,7 +10,7 @@ import comfy.model_management
 import comfy.model_patcher
 import folder_paths
 import torch
-from transformers import AutoModelForCausalLM, AutoProcessor, AutoTokenizer, TextIteratorStreamer, BitsAndBytesConfig
+from transformers import AutoModelForCausalLM, AutoProcessor, AutoTokenizer, TextIteratorStreamer
 from huggingface_hub import snapshot_download
 import numpy as np
 from threading import Thread
@@ -590,10 +590,6 @@ class Y7Nodes_PromptEnhancerFlux:
                         "tooltip": "Select LLM model."
                     }
                 ),
-                "quantization": ( # highest prec. to lowest
-                    ["none", "8bit", "4bit"],
-                    {"default": "none", "tooltip": "Select quantization level (requires bitsandbytes - primarily Linux only)."}
-                ),
                 "temperature": (
                     "FLOAT",
                     {"default": 0.7, "min": 0.1, "max": 2.0, "step": 0.1,
@@ -610,15 +606,10 @@ class Y7Nodes_PromptEnhancerFlux:
                      "tooltip": "Limits token selection to the k most likely next tokens"}
                 ),
                 "seed": (
-                    "INT", 
+                    "INT",
                     {"default": 0, "min": 0, "max": 0xffffffffffffffff}
                 ),
-                "unload_models_before_run": (
-                    "BOOLEAN", 
-                    {"default": True, 
-                     "tooltip": "Frees up Memory (unload all models) before each run."}
-                ),                
-            }, 
+            },
             "hidden":{}
         }
 
@@ -632,13 +623,12 @@ class Y7Nodes_PromptEnhancerFlux:
     def IS_CHANGED(cls, **kwargs):
         prompt = kwargs.get("prompt", "")
         llm_display_name = kwargs.get("llm_name", "")
-        quantization = kwargs.get("quantization", "none") # Added quantization
         seed = kwargs.get("seed", 0)
         temperature = kwargs.get("temperature", 0.7)
         top_p = kwargs.get("top_p", 0.9)
         top_k = kwargs.get("top_k", 40)
 
-        input_string = f"{prompt}_{llm_display_name}_{quantization}_{seed}_{temperature}_{top_p}_{top_k}" # Added quantization to hash
+        input_string = f"{prompt}_{llm_display_name}_{seed}_{temperature}_{top_p}_{top_k}"
         hash_object = hashlib.md5(input_string.encode())
         hash_hex = hash_object.hexdigest()
         
@@ -655,14 +645,11 @@ class Y7Nodes_PromptEnhancerFlux:
         temperature = kwargs.get("temperature")
         top_p = kwargs.get("top_p")
         top_k = kwargs.get("top_k")
-        unload_models_before_run = kwargs.get("unload_models_before_run")
-        quantization = kwargs.get("quantization", "none") # Extract quantization
 
-        # === Check if model or quantization changed from the one last used and clear cache if needed ===
-        # We need a combined key for checking changes, including quantization
-        current_model_key = f"{llm_display_name}_{quantization}"
+        # === Check if model changed from the one last used and clear cache if needed ===
+        current_model_key = llm_display_name
         if self._last_used_model_name is not None and self._last_used_model_name != current_model_key:
-            print(f"ℹ️ Model/Quantization changed from '{self._last_used_model_name}' to '{current_model_key}'. Clearing internal cache.", color.YELLOW)
+            print(f"ℹ️ Model changed from '{self._last_used_model_name}' to '{current_model_key}'. Clearing internal cache.", color.YELLOW)
             if hasattr(self, '_loaded_models'):
                 self._loaded_models.clear()
             gc.collect() # Force garbage collection after clearing cache
@@ -675,34 +662,7 @@ class Y7Nodes_PromptEnhancerFlux:
             return (clip_l_prompt, t5xxl_prompt,)
         
         try:
-            # ================= VRAM Cleanup =================
-            # if unload_models_before_run is on, then flush the vram and cache
-            # this helps if this node is used in a larger workflow that contains other model loaders.
-            if unload_models_before_run == True:
-                # If FREE_VRAM_BEFORE_RUNNING is True
-                print("unloading models and clearing cache...", color.YELLOW)
-
-                try:
-                    # Use Comfy's function to unload models potentially loaded by other nodes
-                    comfy.model_management.unload_all_models() 
-                    gc.collect() # Garbage collect first
-                    if is_cuda_available():
-                        torch.cuda.empty_cache()
-                        comfy.model_management.soft_empty_cache() # Added for good measure
-                        print("   - CUDA cache cleared.", color.YELLOW)
-                    elif is_apple_silicon() and hasattr(torch.mps, 'empty_cache'):
-                        torch.mps.empty_cache()
-                        print("   - MPS cache cleared.", color.YELLOW)
-                    # Clear the node's internal cache as well
-                    if hasattr(self, '_loaded_models'):
-                        print("   - Clearing internal node model cache.", color.YELLOW)
-                        self._loaded_models.clear()
-                    print("✅ VRAM cleanup attempt finished.", color.YELLOW)
-                except Exception as cleanup_error:
-                    print(f"⚠️ Warning during VRAM cleanup: {str(cleanup_error)}", color.YELLOW)
-            # =============== End VRAM Cleanup ===============
-
-            # Force garbage collection before starting (kept original gc.collect)
+            # Force garbage collection before starting
             gc.collect()
 
             # For Apple Silicon, use MPS device if available
@@ -717,8 +677,8 @@ class Y7Nodes_PromptEnhancerFlux:
                 load_device = "cpu"
 
             # Load/download the model - it will be placed on the correct device by down_load_llm_model
-            llm_model, llm_tokenizer = self.down_load_llm_model(llm_display_name, load_device, quantization) # Pass quantization
-            self._last_used_model_name = current_model_key # Update the last used model/quantization key
+            llm_model, llm_tokenizer = self.down_load_llm_model(llm_display_name, load_device)
+            self._last_used_model_name = current_model_key
 
             # Calculate model size for memory management
             model_size = get_model_size(llm_model)
@@ -906,16 +866,15 @@ class Y7Nodes_PromptEnhancerFlux:
         return full_model_path
 
     # ==============================================================================================
-    # down_load_llm_model (or load from Cache) - Updated for Quantization
+    # down_load_llm_model (or load from Cache)
     # ==============================================================================================
-    def down_load_llm_model(self, model_display_name, load_device, quantization="none"): # Added quantization parameter
+    def down_load_llm_model(self, model_display_name, load_device):
         repo_path = get_repo_info(model_display_name)
-        # Cache key now includes quantization level
-        cache_key = f"{model_display_name}_{load_device}_{quantization}"
+        cache_key = f"{model_display_name}_{load_device}"
 
         # Check cache first
         if cache_key in self._loaded_models:
-            print(f"✅ Using cached model {model_display_name} (Quant: {quantization}) on device {load_device}", color.BRIGHT_GREEN)
+            print(f"✅ Using cached model {model_display_name} on device {load_device}", color.BRIGHT_GREEN)
             llm_model, llm_tokenizer = self._loaded_models[cache_key]
             # Ensure model is on the requested device (device_map handles this better now, but keep check)
             # Note: With device_map='auto', checking llm_model.device might be less straightforward
@@ -962,7 +921,7 @@ class Y7Nodes_PromptEnhancerFlux:
 
 
         # If not in cache or moved device failed, load it
-        print(f"🔄 Loading model {model_display_name} (Quant: {quantization}) to device {load_device}", color.BRIGHT_BLUE)
+        print(f"🔄 Loading model {model_display_name} to device {load_device}", color.BRIGHT_BLUE)
         model_path = self.model_path_download_if_needed(model_display_name)
 
         try:
@@ -985,23 +944,12 @@ class Y7Nodes_PromptEnhancerFlux:
                     torch_dtype = torch.float16
                     print("   Using float16 (bfloat16 not supported or not CUDA)", color.GREEN)
 
-            # --- Quantization Config ---
-            quantization_config = None
-            if quantization == "4bit":
-                print("   Applying 4-bit quantization", color.GREEN)
-                quantization_config = BitsAndBytesConfig(load_in_4bit=True)
-            elif quantization == "8bit":
-                print("   Applying 8-bit quantization", color.GREEN)
-                quantization_config = BitsAndBytesConfig(load_in_8bit=True)
-            # --- End Quantization Config ---
-
-            # Load model with quantization config and device_map
+            # Load model
             llm_model = AutoModelForCausalLM.from_pretrained(
                 model_path,
                 torch_dtype=torch_dtype,
                 low_cpu_mem_usage=True,
-                quantization_config=quantization_config, # Pass the config
-                device_map="auto" # Let transformers handle device placement
+                device_map="auto"
             )
 
             # No explicit .to(load_device) needed when using device_map="auto"
@@ -1015,8 +963,7 @@ class Y7Nodes_PromptEnhancerFlux:
             # Load tokenizer
             llm_tokenizer = AutoTokenizer.from_pretrained(model_path)
 
-            # Store in cache using the quantization-aware key
-            print(f"   Caching model {model_display_name} (Quant: {quantization}) for device {load_device}", color.BLUE)
+            print(f"   Caching model {model_display_name} for device {load_device}", color.BLUE)
             self._loaded_models[cache_key] = (llm_model, llm_tokenizer)
 
             return llm_model, llm_tokenizer
