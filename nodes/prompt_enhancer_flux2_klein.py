@@ -478,7 +478,8 @@ class Y7Nodes_PromptEnhancerFlux2:
         )
         model.eval()
 
-        wrapped = _LLMWrapper(model)
+        ModelClass = type(model_display_name, (_LLMWrapper,), {})
+        wrapped = ModelClass(model)
 
         device = comfy.model_management.get_torch_device()
         offload_device = comfy.model_management.unet_offload_device()
