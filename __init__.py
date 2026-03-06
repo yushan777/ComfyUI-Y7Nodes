@@ -13,7 +13,7 @@ from .nodes.image_size_presets import Y7Nodes_ImageSizePresets
 from .nodes.crop_to_nearest_multiple import Y7Nodes_CropToNearestMultiple
 from .nodes.color_match_masked import Y7Nodes_ColorMatchMasked
 from .nodes.lm_studio import Y7Nodes_LMStudioText, Y7Nodes_LMStudioVision, Y7Nodes_SelectLMSModel
-from .nodes.qwen_vl import Y7Nodes_QwenVL
+from .nodes.qwen3_vl import Y7Nodes_QwenVL
 
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageRow": Y7Nodes_ImageRow,

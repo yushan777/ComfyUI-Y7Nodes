@@ -124,7 +124,7 @@ If you just need one text input then I recommend using [ImagineerNL's original n
 
 ------
 
-### Y7 Prompt Enhancer (Flux)
+### Y7 Prompt Enhancer (Flux.1)
 
 > Takes any basic prompt and enhances it and produces T5 and CLIP friendly variants of the enhanced prompt. token / trigger words can be used in sq. brackets
 > Example: [ohwx man], [agg woman], [sks dog]
@@ -239,7 +239,7 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 
 ------
 
-### Y7 Prompt Enhancer (Flux2 Klein)
+### Y7 Prompt Enhancer (Flux.2 Klein)
 
 > Takes any basic prompt and enhances it specifically for FLUX.2 [klein] using the Qwen3-8B LLM model or an abliterated version. Features include customizable prompt instructions, thinking mode, and advanced generation parameters.
 >
@@ -461,6 +461,72 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 >   **Output:**
 >   
 >   - `model_id`: The selected model identifier string
+>
+> </details>
+
+---
+
+### Y7 Qwen3-VL
+
+> Run vision-language inference using Qwen3-VL models directly within ComfyUI. Supports image analysis and text-only queries with multiple preset instructions and customizable prompts.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   Uses the HuggingFace `Qwen3VLForConditionalGeneration` model integrated with ComfyUI's memory manager for proper VRAM coordination alongside other loaded models (diffusion models, VAE, etc.).
+>
+>   **Models Available:**
+>
+>   - `Qwen/Qwen3-VL-2B-Instruct`
+>   - `Qwen/Qwen3-VL-4B-Instruct`
+>   - `Qwen/Qwen3-VL-8B-Instruct` (default)
+>   - `Qwen/Qwen3-VL-32B-Instruct`
+>
+>   **Preset Instructions:**
+>
+>   - **Tags**: Generates a comma-separated list of up to 50 visual tags for text-to-image AI
+>   - **Simple Description**: A single concise sentence describing the main subject and setting
+>   - **Detailed Description**: A detailed paragraph covering subject, environment, lighting, and composition
+>   - **Ultra Detailed Description**: An extended paragraph with micro-details, textures, and lighting analysis
+>   - **Cinematic Description**: A film-still style paragraph with camera language and mood
+>   - **Detailed Analysis**: Structured output in sections: Subject, People, Environment, Lighting, Camera/Composition, Color/Texture
+>   - **Short Story**: A short imaginative story inspired by the image
+>   - **Prompt Refine & Expand**: Refines and expands a text prompt for creative image generation
+>
+>   **Inputs:**
+>
+>   - `image`: Optional image input — omit for text-only queries
+>   - `model_name`: Which Qwen3-VL model to use
+>   - `preset_prompt`: Built-in instruction for how the model should analyse the image
+>   - `custom_prompt`: If filled, replaces the preset instruction entirely
+>   - `max_new_tokens`: Maximum tokens to generate (64–4096, default 512)
+>   - `temperature`: Controls randomness (0.0–2.0, default 0.7)
+>   - `top_p`: Nucleus sampling threshold (0.0–1.0, default 0.9)
+>   - `repetition_penalty`: Penalises repeated tokens (1.0–2.0, default 1.1)
+>   - `seed`: Random seed for reproducibility
+>   - `keep_model_loaded`: Keep the model in VRAM between runs to skip reloading
+>   - `download_model`: Automatically download the selected model from HuggingFace if not found locally
+>
+>   **Output:**
+>
+>   - `response`: The model's text response
+>
+>   **Model Location:**
+>
+>   Models are stored in `models/LLM/<model-name>`. If `download_model` is enabled and the model is not found locally, it will be downloaded automatically from HuggingFace.
+>
+>   ```
+>   ComfyUI
+>   └── models
+>       └── LLM
+>           └── Qwen3-VL-8B-Instruct
+>               ├── config.json
+>               ├── generation_config.json
+>               ├── model-*.safetensors
+>               ├── preprocessor_config.json
+>               ├── tokenizer.json
+>               └── tokenizer_config.json
+>   ```
 >
 > </details>
 

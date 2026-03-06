@@ -1,3 +1,7 @@
+1.0.31
+Updated Prompt Enhancer (Flux.1 and Flux.2 Klein) to be compatible with ComfyUI's new memory management system (dynamic vram) which is now default.
+Added a Qwen3-VL custom node based on 1038lab/ComfyUI-QwenVL but compatible with ComfyUI's new memory management as mentioned above.
+
 1.0.30
 Updated Prompt Enhancer (Flux.2 Klein)
 

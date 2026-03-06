@@ -10,7 +10,7 @@ import comfy.model_patcher
 from comfy.utils import ProgressBar
 from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 
-QWEN_VL_MODELS = [
+QWEN3_VL_MODELS = [
     "Qwen/Qwen3-VL-2B-Instruct",
     "Qwen/Qwen3-VL-4B-Instruct",
     "Qwen/Qwen3-VL-8B-Instruct",
@@ -145,7 +145,7 @@ class Y7Nodes_QwenVL:
         preset_names = list(PRESET_PROMPTS.keys())
         return {
             "required": {
-                "model_name": (QWEN_VL_MODELS, {"default": "Qwen/Qwen3-VL-8B-Instruct"}),
+                "model_name": (QWEN3_VL_MODELS, {"default": "Qwen/Qwen3-VL-8B-Instruct"}),
                 "preset_prompt": (
                     preset_names,
                     {
