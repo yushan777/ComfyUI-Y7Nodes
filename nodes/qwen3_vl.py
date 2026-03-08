@@ -11,10 +11,10 @@ from comfy.utils import ProgressBar
 from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 
 QWEN3_VL_MODELS = [
-    "Qwen/Qwen3-VL-2B-Instruct",
-    "Qwen/Qwen3-VL-4B-Instruct",
-    "Qwen/Qwen3-VL-8B-Instruct",
-    "Qwen/Qwen3-VL-32B-Instruct",
+    "Qwen3-VL-2B-Instruct",
+    "Qwen3-VL-4B-Instruct",
+    "Qwen3-VL-8B-Instruct",
+    "Qwen3-VL-32B-Instruct",
 ]
 
 # Preset instructions (image analysis tasks shown in the dropdown).
