@@ -162,6 +162,9 @@ cython_debug/
 # macOS
 .DS_Store
 
+# Claude Code
+.claude/
+
 # Custom ignores
 nodes/custom_dimensions.json
 nodes/system_messages.py

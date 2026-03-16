@@ -181,6 +181,22 @@ descriptions = {
         normal("- `Height`: The selected or custom height.", 1)
     ],
 
+    "Y7Nodes_AspectRatioPicker": [
+        "Aspect Ratio Picker",
+        short_desc("Interactive 2D canvas for picking image dimensions by aspect ratio and resolution."),
+        normal("Drag the handle left/right to change the aspect ratio (portrait → landscape)."),
+        normal("Drag the handle up/down to change the total resolution (small → large)."),
+        normal("Vertical guide lines mark common ratios: 9:21, 9:16, 2:3, 3:4, 1:1, 4:3, 3:2, 16:9, 21:9."),
+        normal("Horizontal guide lines mark common resolution equivalents (~512, ~1k, ~1.5k px²)."),
+        normal("Hold Shift while dragging to toggle snapping to the nearest common aspect ratio."),
+        normal("Double-click the right panel (top half for width, bottom half for height) to enter a value directly."),
+        normal("The handle shape mirrors the selected aspect ratio for a visual preview."),
+        normal("Node properties (right-click → Properties): step, minRatio, maxRatio, minRes, maxRes, snap."),
+        normal("Outputs:"),
+        normal("- `width`: Selected width in pixels (INT), rounded to `step`.", 1),
+        normal("- `height`: Selected height in pixels (INT), rounded to `step`.", 1),
+    ],
+
     "Y7Nodes_CropToNearestMultiple": [
         "Crop to Nearest Multiple",
         short_desc("Crops images to ensure dimensions are divisible by a specified multiple value - default 16px. You can always use a calculator if you prefer."),
