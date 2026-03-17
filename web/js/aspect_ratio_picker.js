@@ -1,5 +1,5 @@
-// Based on mxToolkit.Slider2D v.0.9.92 by Max Smirnov 2025
-// Cloned as Y7Nodes AspectRatioPicker — integer only
+// Based on a custom node : mxToolkit.Slider2D by Max Smirnov 
+// Cloned as Y7Nodes AspectRatioPicker
 import { app } from "../../../scripts/app.js";
 
 class Y7AspectRatioPicker
@@ -92,7 +92,7 @@ class Y7AspectRatioPicker
             }
 
             ctx.fillStyle="rgba(183, 144, 255, 0.2)";
-            ctx.strokeStyle="rgba(200,200,200,0.7)";
+            ctx.strokeStyle="rgba(228, 17, 17, 0.7)";
             ctx.beginPath();
             ctx.rect(shiftLeft, shiftLeft+(this.size[1]-shiftLeft-shiftLeft)*(1-this.intpos.y),(this.size[0]-shiftRight-shiftLeft)*this.intpos.x,(this.size[1]-shiftLeft-shiftLeft)*(this.intpos.y));
             ctx.fill();
