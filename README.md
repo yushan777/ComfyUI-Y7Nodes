@@ -532,6 +532,27 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 
 ---
 
+### Y7 Aspect Ratio Picker
+
+> Interactive 2D canvas for picking image width and height by dragging.
+>
+> <img src="assets/aspect_ratio_picker.png" alt="aspect ratio picker" width="50%"/>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   - Click or drag anywhere in the canvas to set width (X axis, left→right) and height (Y axis, bottom→top).
+>   - A filled rectangle shows the selected proportions; the dot marks the current position.
+>   - The simplified aspect ratio (e.g. 16:9, 4:3, 1:1) is displayed at the bottom of the canvas.
+>   - Current width and height values are shown in the right panel. Double-click either value to type a number directly.
+>   - Shift+click the right panel values to swap width and height (portrait ↔ landscape).
+>   - Snapping to step increments is on by default. Hold Shift while dragging to temporarily disable snapping.
+>   - Node properties (right-click → Properties): `valueX`, `valueY`, `minX`, `maxX`, `minY`, `maxY`, `stepX`, `stepY`, `snap`, `dots`.
+>   - Outputs `width` and `height` as INT.
+>
+> </details>
+
+---
+
 ### Y7 Image Size Presets
 > Select predefined image size/aspect ratios loaded from a custom json file. Provides width and height outputs.
 >

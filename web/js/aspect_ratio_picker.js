@@ -7,12 +7,19 @@ class Y7AspectRatioPicker
     constructor(node)
     {
         this.node = node;
-        this.node.properties = { valueX:512, valueY:512, minX:0, minY:0, maxX:2048, maxY:2048, stepX:64, stepY:64, snap: true, dots: true, frame: true };
+        this.node.properties = { valueX:512, valueY:512, minX:0, minY:0, maxX:2048, maxY:2048, stepX:64, stepY:64, snap: true, dots: true };
+        this.node.helpIconOffsetX = 14;
         this.node.intpos = { x:0.5, y:0.5 };
-        this.node.size = [210, 210];
+        this.node.size = [205, 205];
         const fontsize = LiteGraph.NODE_SUBTEXT_SIZE;
         const shX = (this.node.slot_start_y || 0)+fontsize*1.5;
         const shY = shX + LiteGraph.NODE_SLOT_HEIGHT;
+        function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+        function simplifiedRatio(x, y) {
+            if (x <= 0 || y <= 0) return `${x}:${y}`;
+            const d = gcd(x, y);
+            return `${x/d}:${y/d}`;
+        }
         const minSize = 60;
         const shiftLeft = 10;
         const shiftRight = 60;
@@ -58,6 +65,7 @@ class Y7AspectRatioPicker
             this.widgets[1].value = this.properties.valueY;
         }
 
+        const _origDrawForeground = this.node.onDrawForeground;
         this.node.onDrawForeground = function(ctx)
         {
             this.configured = true;
@@ -81,15 +89,12 @@ class Y7AspectRatioPicker
                 ctx.fill();
             }
 
-            if (this.properties.frame)
-            {
-                ctx.fillStyle="rgba(200,200,200,0.1)";
-                ctx.strokeStyle="rgba(200,200,200,0.7)";
-                ctx.beginPath();
-                ctx.rect(shiftLeft, shiftLeft+(this.size[1]-shiftLeft-shiftLeft)*(1-this.intpos.y),(this.size[0]-shiftRight-shiftLeft)*this.intpos.x,(this.size[1]-shiftLeft-shiftLeft)*(this.intpos.y));
-                ctx.fill();
-                ctx.stroke();
-            }
+            ctx.fillStyle="rgba(183, 144, 255, 0.2)";
+            ctx.strokeStyle="rgba(200,200,200,0.7)";
+            ctx.beginPath();
+            ctx.rect(shiftLeft, shiftLeft+(this.size[1]-shiftLeft-shiftLeft)*(1-this.intpos.y),(this.size[0]-shiftRight-shiftLeft)*this.intpos.x,(this.size[1]-shiftLeft-shiftLeft)*(this.intpos.y));
+            ctx.fill();
+            ctx.stroke();
 
             ctx.fillStyle=LiteGraph.NODE_TEXT_COLOR;
             ctx.beginPath();
@@ -102,11 +107,23 @@ class Y7AspectRatioPicker
             ctx.arc(shiftLeft+(this.size[0]-shiftRight-shiftLeft)*this.intpos.x, shiftLeft+(this.size[1]-shiftLeft-shiftLeft)*(1-this.intpos.y), 5, 0, 2 * Math.PI, false);
             ctx.stroke();
 
-            ctx.fillStyle=LiteGraph.NODE_TEXT_COLOR;
             ctx.font = (fontsize) + "px Arial";
+            ctx.fillStyle = "rgba(200,200,200,0.45)";
+            ctx.textAlign = "right";
+            ctx.fillText("w", this.size[0]-14, shX);
+            ctx.fillText("h", this.size[0]-14, shY);
+            ctx.fillStyle = LiteGraph.NODE_TEXT_COLOR;
             ctx.textAlign = "center";
-            ctx.fillText(this.properties.valueX, this.size[0]-shiftRight+24, (shX));
-            ctx.fillText(this.properties.valueY, this.size[0]-shiftRight+24, (shY));
+            ctx.fillText(this.properties.valueX, this.size[0]-shiftRight+21, shX);
+            ctx.fillText(this.properties.valueY, this.size[0]-shiftRight+21, shY);
+
+            const canvasCenterX = shiftLeft + (this.size[0]-shiftRight-shiftLeft)/2;
+            const canvasBottom = this.size[1]-shiftLeft-6;
+            ctx.fillStyle = "rgba(200,200,200,0.5)";
+            ctx.font = (fontsize - 1) + "px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(simplifiedRatio(this.properties.valueX, this.properties.valueY), canvasCenterX, canvasBottom);
+            if (_origDrawForeground) _origDrawForeground.apply(this, arguments);
         }
 
         this.node.onDblClick = function(e, pos, canvas)
@@ -127,9 +144,10 @@ class Y7AspectRatioPicker
             }
         }
 
+        const _origMouseDown = this.node.onMouseDown;
         this.node.onMouseDown = function(e)
         {
-            if (e.canvasY - this.pos[1] < 0) return false;
+            if (e.canvasY - this.pos[1] < 0) return _origMouseDown ? _origMouseDown.apply(this, arguments) : false;
             if (e.shiftKey &&
                 e.canvasX > this.pos[0]+this.size[0]-shiftRight+10 &&
                 e.canvasX < this.pos[0]+this.size[0]-15 &&
@@ -152,7 +170,7 @@ class Y7AspectRatioPicker
                 return true;
             }
 
-            if ( e.canvasX < this.pos[0]+shiftLeft-5 || e.canvasX > this.pos[0]+this.size[0]-shiftRight+5 ) return false;
+if ( e.canvasX < this.pos[0]+shiftLeft-5 || e.canvasX > this.pos[0]+this.size[0]-shiftRight+5 ) return false;
             if ( e.canvasY < this.pos[1]+shiftLeft-5 || e.canvasY > this.pos[1]+this.size[1]-shiftLeft+5 )  return false;
             this.capture = true;
             this.captureInput(true);
@@ -200,6 +218,7 @@ class Y7AspectRatioPicker
         }
 
         this.node.onSelected = function(e) { this.onMouseUp(e) }
+        this.node.resizable = false;
         this.node.computeSize = () => [minSize + shiftRight - shiftLeft, minSize];
     }
 }

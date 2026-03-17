@@ -219,7 +219,7 @@ function initHelpDOM() {
             ctx.save();
             ctx.font = 'bold 20px Arial';
             ctx.fillStyle = 'orange'; 
-            ctx.fillText("?", this.size[0] - 17, -8);
+            ctx.fillText("?", this.size[0] - (this.helpIconOffsetX ?? 17), -8);
             ctx.restore();
         });
         
