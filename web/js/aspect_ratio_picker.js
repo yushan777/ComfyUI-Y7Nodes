@@ -7,20 +7,22 @@ class Y7AspectRatioPicker
     constructor(node)
     {
         this.node = node;
-        this.node.properties = { valueX:512, valueY:512, minX:0, minY:0, maxX:2048, maxY:2048, stepX:64, stepY:64, snap: true, dots: true };
+        this.node.properties = { valueX:1024, valueY:1024, minX:0, minY:0, maxX:2048, maxY:2048, stepX:64, stepY:64, snap: true, dots: true };
         this.node.helpIconOffsetX = 14;
         this.node.intpos = { x:0.5, y:0.5 };
-        this.node.size = [205, 205];
+        const min_width_height = 200;
+
+        this.node.size = [min_width_height, min_width_height];
         const fontsize = LiteGraph.NODE_SUBTEXT_SIZE;
         const shX = (this.node.slot_start_y || 0)+fontsize*1.5;
         const shY = shX + LiteGraph.NODE_SLOT_HEIGHT;
+        const shZ = shY + LiteGraph.NODE_SLOT_HEIGHT;
         function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
         function simplifiedRatio(x, y) {
             if (x <= 0 || y <= 0) return `${x}:${y}`;
             const d = gcd(x, y);
             return `${x/d}:${y/d}`;
         }
-        const minSize = 60;
         const shiftLeft = 10;
         const shiftRight = 60;
 
@@ -117,12 +119,10 @@ class Y7AspectRatioPicker
             ctx.fillText(this.properties.valueX, this.size[0]-shiftRight+21, shX);
             ctx.fillText(this.properties.valueY, this.size[0]-shiftRight+21, shY);
 
-            const canvasCenterX = shiftLeft + (this.size[0]-shiftRight-shiftLeft)/2;
-            const canvasBottom = this.size[1]-shiftLeft-6;
             ctx.fillStyle = "rgba(200,200,200,0.5)";
-            ctx.font = (fontsize - 1) + "px Arial";
+            ctx.font = (fontsize - 2) + "px Arial";
             ctx.textAlign = "center";
-            ctx.fillText(simplifiedRatio(this.properties.valueX, this.properties.valueY), canvasCenterX, canvasBottom);
+            ctx.fillText(simplifiedRatio(this.properties.valueX, this.properties.valueY), this.size[0]-shiftRight+30, shZ);
             if (_origDrawForeground) _origDrawForeground.apply(this, arguments);
         }
 
@@ -218,8 +218,12 @@ if ( e.canvasX < this.pos[0]+shiftLeft-5 || e.canvasX > this.pos[0]+this.size[0]
         }
 
         this.node.onSelected = function(e) { this.onMouseUp(e) }
-        this.node.resizable = false;
-        this.node.computeSize = () => [minSize + shiftRight - shiftLeft, minSize];
+        this.node.resizable = true;
+        this.node.onResize = function(size) {
+            if (size[1] < min_width_height) size[1] = min_width_height;
+            size[0] = size[1] + shiftRight - shiftLeft;
+        };
+        this.node.computeSize = () => [min_width_height + shiftRight - shiftLeft, min_width_height];
     }
 }
 
