@@ -7,7 +7,7 @@ class Y7AspectRatioPicker
     constructor(node)
     {
         this.node = node;
-        this.node.properties = { valueX:512, valueY:512, minX:0, minY:0, maxX:2048, maxY:2048, stepX:64, stepY:64, snap: true, dots: true, frame: true, frameAlert:0 };
+        this.node.properties = { valueX:512, valueY:512, minX:0, minY:0, maxX:2048, maxY:2048, stepX:64, stepY:64, snap: true, dots: true, frame: true };
         this.node.intpos = { x:0.5, y:0.5 };
         this.node.size = [210, 210];
         const fontsize = LiteGraph.NODE_SUBTEXT_SIZE;
@@ -83,16 +83,8 @@ class Y7AspectRatioPicker
 
             if (this.properties.frame)
             {
-                if ((this.properties.frameAlert > 0) && (this.properties.valueX*this.properties.valueY > this.properties.frameAlert))
-                {
-                    ctx.fillStyle="rgba(250,0,0,0.2)";
-                    ctx.strokeStyle="rgba(250,0,0,0.7)";
-                }
-                else
-                {
-                    ctx.fillStyle="rgba(200,200,200,0.1)";
-                    ctx.strokeStyle="rgba(200,200,200,0.7)";
-                }
+                ctx.fillStyle="rgba(200,200,200,0.1)";
+                ctx.strokeStyle="rgba(200,200,200,0.7)";
                 ctx.beginPath();
                 ctx.rect(shiftLeft, shiftLeft+(this.size[1]-shiftLeft-shiftLeft)*(1-this.intpos.y),(this.size[0]-shiftRight-shiftLeft)*this.intpos.x,(this.size[1]-shiftLeft-shiftLeft)*(this.intpos.y));
                 ctx.fill();
