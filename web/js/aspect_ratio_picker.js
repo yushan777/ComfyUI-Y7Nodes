@@ -19,6 +19,7 @@ class Y7AspectRatioPicker
         const shX = (this.node.slot_start_y || 0)+fontsize*1.5;
         const shY = shX + LiteGraph.NODE_SLOT_HEIGHT;
         const shZ = shY + LiteGraph.NODE_SLOT_HEIGHT;
+        const shW = shZ + LiteGraph.NODE_SLOT_HEIGHT;
         function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
         function simplifiedRatio(x, y) {
             if (x <= 0 || y <= 0) return `${x}:${y}`;
@@ -123,6 +124,9 @@ class Y7AspectRatioPicker
             ctx.font = (fontsize - 2) + "px Arial";
             ctx.textAlign = "center";
             ctx.fillText(simplifiedRatio(this.properties.valueX, this.properties.valueY), this.size[0]-shiftRight+30, shZ);
+
+            const mp = (this.properties.valueX * this.properties.valueY / 1_000_000).toFixed(1);
+            ctx.fillText(mp + "MP", this.size[0]-shiftRight+30, shW);
             if (_origDrawForeground) _origDrawForeground.apply(this, arguments);
         }
 

@@ -199,6 +199,7 @@ descriptions = {
         normal("Outputs:"),
         normal("- `width`: Selected width in pixels (INT).", 1),
         normal("- `height`: Selected height in pixels (INT).", 1),
+        normal("The right panel also shows the total megapixel count (e.g. `1.0MP` at 1024×1024)."),
     ],
 
     "Y7Nodes_CropToNearestMultiple": [

@@ -55,6 +55,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   - Shift+click the right panel values to swap width and height (portrait ↔ landscape).
 >   - Snapping to step increments is on by default. Hold Shift while dragging to temporarily disable snapping.
 >   - Node properties (right-click → Properties): `valueX`, `valueY`, `minX`, `maxX`, `minY`, `maxY`, `stepX`, `stepY`, `snap`, `dots`.
+>   - The right panel shows width, height, simplified ratio (e.g. 16:9), and total megapixels (e.g. 1.0MP).
 >   - Outputs `width` and `height` as INT.
 >
 > </details>
