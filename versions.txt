@@ -1,3 +1,6 @@
+1.0.35
+Added swap button to Aspect Ratio Picker
+
 1.0.34
 Small Update
 
