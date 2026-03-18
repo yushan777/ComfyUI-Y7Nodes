@@ -18,7 +18,7 @@ class Y7AspectRatioPicker
         const fontsize = LiteGraph.NODE_SUBTEXT_SIZE;
         const shX = (this.node.slot_start_y || 0)+fontsize*1.5;
         const shY = shX + LiteGraph.NODE_SLOT_HEIGHT;
-        const shZ = shY + LiteGraph.NODE_SLOT_HEIGHT;
+        const shZ = shY + LiteGraph.NODE_SLOT_HEIGHT + 30;
         const shW = shZ + LiteGraph.NODE_SLOT_HEIGHT;
         function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
         function simplifiedRatio(x, y) {
@@ -120,6 +120,16 @@ class Y7AspectRatioPicker
             ctx.fillText(this.properties.valueX, this.size[0]-shiftRight+21, shX);
             ctx.fillText(this.properties.valueY, this.size[0]-shiftRight+21, shY);
 
+            // Swap button
+            ctx.fillStyle = this.swapPressed ? "rgba(100,140,255,0.8)" : "rgba(60,90,160,0.5)";
+            ctx.beginPath();
+            ctx.roundRect(this.size[0]-shiftRight+8, shY+8, shiftRight-14, 13, 3);
+            ctx.fill();
+            ctx.fillStyle = "rgba(210,210,210,0.9)";
+            ctx.font = (fontsize-2) + "px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("swap", this.size[0]-shiftRight/2, shY+18);
+
             ctx.fillStyle = "rgba(200,200,200,0.5)";
             ctx.font = (fontsize - 2) + "px Arial";
             ctx.textAlign = "center";
@@ -152,6 +162,27 @@ class Y7AspectRatioPicker
         this.node.onMouseDown = function(e)
         {
             if (e.canvasY - this.pos[1] < 0) return _origMouseDown ? _origMouseDown.apply(this, arguments) : false;
+            {
+                const lx = e.canvasX - this.pos[0];
+                const ly = e.canvasY - this.pos[1];
+                if (lx > this.size[0]-shiftRight+4 && lx < this.size[0]-4 && ly > shY+4 && ly < shY+17 &&
+                    this.properties.valueX <= this.properties.maxY && this.properties.valueX >= this.properties.minY &&
+                    this.properties.valueY <= this.properties.maxX && this.properties.valueY >= this.properties.minX)
+                {
+                    let tmpX = this.properties.valueX;
+                    this.properties.valueX = this.properties.valueY;
+                    this.properties.valueY = tmpX;
+                    this.intpos.x = (this.properties.valueX-this.properties.minX)/(this.properties.maxX-this.properties.minX);
+                    this.intpos.y = (this.properties.valueY-this.properties.minY)/(this.properties.maxY-this.properties.minY);
+                    this.onPropertyChanged("valueX");
+                    this.onPropertyChanged("valueY");
+                    this.swapPressed = true;
+                    setTimeout(() => { this.swapPressed = false; this.setDirtyCanvas(true); }, 150);
+                    this.updateThisNodeGraph();
+                    this.graph.setisChangedFlag(this.id);
+                    return true;
+                }
+            }
             if (e.shiftKey &&
                 e.canvasX < this.pos[0]+this.size[0]-15 &&
                 e.canvasX > this.pos[0]+this.size[0]-shiftRight+15 &&
