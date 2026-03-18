@@ -44,7 +44,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 > Interactive 2D canvas for picking image width and height by dragging.
 >
-> <img src="assets/aspect_ratio_picker.png" alt="aspect ratio picker" width="50%"/>
+> <img src="assets/aspect_ratio_picker.jpg" alt="aspect ratio picker" width="50%"/>
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >
