@@ -1,3 +1,6 @@
+1.0.33
+Added Aspect Ratio Picker
+
 1.0.32
 Fixed Qwen3-VL model paths 
 
