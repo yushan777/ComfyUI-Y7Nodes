@@ -52,7 +52,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   - A filled rectangle shows the selected proportions; the dot marks the current position.
 >   - The simplified aspect ratio (e.g. 16:9, 4:3, 1:1) is displayed at the bottom of the canvas.
 >   - Current width and height values are shown in the right panel. Double-click either value to type a number directly.
->   - Shift+click the right panel values to swap width and height (portrait ↔ landscape).
+>   - Click the **Swap** button (below the height value) to swap width and height (portrait ↔ landscape).
 >   - Snapping to step increments is on by default. Hold Shift while dragging to temporarily disable snapping.
 >   - Node properties (right-click → Properties): `valueX`, `valueY`, `minX`, `maxX`, `minY`, `maxY`, `stepX`, `stepY`, `snap`, `dots`.
 >   - The right panel shows width, height, simplified ratio (e.g. 16:9), and total megapixels (e.g. 1.0MP).

@@ -188,7 +188,7 @@ descriptions = {
         normal("A filled rectangle shows the selected proportions; the dot marks the current position."),
         normal("The simplified aspect ratio (e.g. 16:9, 4:3, 1:1) is displayed at the bottom of the canvas."),
         normal("Current width and height values are shown in the right panel. Double-click either value to type a number directly."),
-        normal("Shift+click the right panel values to swap width and height (portrait ↔ landscape)."),
+        normal("Click the Swap button (below the height value) to swap width and height (portrait ↔ landscape)."),
         normal("Snapping to step increments is on by default. Hold Shift while dragging to temporarily disable snapping."),
         normal("Node properties (right-click → Properties):"),
         normal("- `valueX` / `valueY`: Current width and height.", 1),

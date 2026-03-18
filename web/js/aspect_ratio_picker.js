@@ -10,7 +10,7 @@ class Y7AspectRatioPicker
         this.node.properties = { valueX:1024, valueY:1024, minX:0, minY:0, maxX:2048, maxY:2048, stepX:64, stepY:64, snap: true, dots: true };
         this.node.helpIconOffsetX = 14;
         this.node.intpos = { x:0.5, y:0.5 };
-        const min_width_height = 160;
+        const min_width_height = 160; // min starting width and height for node
         const shiftLeftTopBottom = 10;  // padding inset on the left, top, and bottom edges of the drawing canvas
         const shiftRight = 60; // reserved width on the right side for the output values/labels panel
 
@@ -128,7 +128,7 @@ class Y7AspectRatioPicker
             ctx.fillStyle = "rgba(210,210,210,0.9)";
             ctx.font = (fontsize-2) + "px Arial";
             ctx.textAlign = "center";
-            ctx.fillText("swap", this.size[0]-shiftRight/2, shY+18);
+            ctx.fillText("swap", this.size[0]-shiftRight/2 + 1, shY+18);
 
             ctx.fillStyle = "rgba(200,200,200,0.5)";
             ctx.font = (fontsize - 2) + "px Arial";
