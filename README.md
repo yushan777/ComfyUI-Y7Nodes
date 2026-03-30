@@ -611,6 +611,12 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 
 ---
 
+### Sampler Select (Name)
+
+> Select a sampler by name and output it as a linkable string — works around ComfyUI's built-in KSampler nodes not exposing sampler name as a connectable input.
+
+---
+
 ## Example Workflows
 
 Example workflows can be found in the `workflows` directory. 

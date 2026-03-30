@@ -1,3 +1,6 @@
+1.0.36
+Added Sampler Select (Name) node - works around ComfyUI's built-in KSampler nodes not exposing sampler name as a connectable input
+
 1.0.35
 Added swap button to Aspect Ratio Picker
 
