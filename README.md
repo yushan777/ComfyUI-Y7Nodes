@@ -611,6 +611,45 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 
 ---
 
+### Y7 Paste Cropped Image Back
+
+> <img src="assets/paste_cropped_image_back.jpg" alt="paste cropped image back" width="100%"/>
+>
+> Paste a cropped image back onto a base image post-editing at a region defined by edge-relative coordinates. Varient of the WAS equivalent, except `right` and `bottom` are offsets measured inward from the right and bottom edges.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   Sometimes you may want to change or refine a specific area of an image without affecting the rest too much — for example, fixing a face, hand, or background detail after generation. A typical workflow is to crop the region, run it through img2img or inpainting, then paste the result back using this node.
+>
+>   Works well with the **OLM Drag Crop** custom node, which lets you visually drag-select a crop region and outputs the crop coordinates directly — those coordinates can be wired into this node's `top`, `left`, `right`, and `bottom` inputs.
+>
+>   The paste region is computed as:
+>   - `x1 = left`
+>   - `y1 = top`
+>   - `x2 = image_width - right`
+>   - `y2 = image_height - bottom`
+>
+>   This makes it easy to target edge-relative regions without knowing the image dimensions in advance — e.g., set `right=256, bottom=256` to always paste into the bottom-right 256-wide strip of any image.
+>
+>   **Inputs:**
+>
+>   - `image_orig`: Base image to paste onto
+>   - `image_crop`: Image to paste into the defined region (resized to fit)
+>   - `left` / `top`: Pixel offsets from the left and top edges
+>   - `right` / `bottom`: Pixel offsets inward from the right and bottom edges
+>   - `crop_blending`: Feathering/blending amount at paste edges (0.0–1.0)
+>   - `crop_sharpening`: Number of sharpening passes applied before pasting (0–3)
+>
+>   **Outputs:**
+>
+>   - `IMAGE`: Base image with crop pasted in
+>   - `MASK`: The blended mask used for the paste operation
+>
+> </details>
+
+---
+
 ### Sampler Select (Name)
 
 > Select a sampler by name and output it as a linkable string — works around ComfyUI's built-in KSampler nodes not exposing sampler name as a connectable input.

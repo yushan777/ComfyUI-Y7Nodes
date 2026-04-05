@@ -1,3 +1,6 @@
+1.0.37
+Added Paste Cropped Image Back node. A variant of WAS_Image_Paste_Crop_Location where 'right' and 'bottom' are offsets inward from the right and bottom edges of the image, rather than absolute pixel coordinates from the top-left. Used to paste/reinsert cropped image back into the original, post-editing.
+
 1.0.36
 Added Sampler Select (Name) node - works around ComfyUI's built-in KSampler nodes not exposing sampler name as a connectable input
 

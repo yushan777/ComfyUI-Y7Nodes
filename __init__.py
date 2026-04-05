@@ -16,6 +16,7 @@ from .nodes.aspect_ratio_picker import Y7Nodes_AspectRatioPicker
 from .nodes.lm_studio import Y7Nodes_LMStudioText, Y7Nodes_LMStudioVision, Y7Nodes_SelectLMSModel
 from .nodes.qwen3_vl import Y7Nodes_QwenVL
 from .nodes.sampler_select_name import SamplerSelect_Name
+from .nodes.paste_cropped_image_back import Y7Nodes_PasteCroppedImageBack
 
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageRow": Y7Nodes_ImageRow,
@@ -35,6 +36,7 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_SelectLMSModel": Y7Nodes_SelectLMSModel,
     "Y7Nodes_QwenVL": Y7Nodes_QwenVL,
     "SamplerSelect_Name": SamplerSelect_Name,
+    "Y7Nodes_PasteCroppedImageBack": Y7Nodes_PasteCroppedImageBack,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageRow": "Y7 Image Row",
@@ -54,6 +56,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_SelectLMSModel": "Y7 Select LMS Model",
     "Y7Nodes_QwenVL": "Y7 Qwen3-VL",
     "SamplerSelect_Name": "Sampler Select (Name)",
+    "Y7Nodes_PasteCroppedImageBack": "Y7 Paste Cropped Image Back",
 }
 
 # Apply HTML-formatted documentation to node classes
