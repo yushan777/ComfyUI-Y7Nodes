@@ -350,6 +350,7 @@ descriptions = {
         normal("- `y1 = top`", 1),
         normal("- `x2 = image_width - right`", 1),
         normal("- `y2 = image_height - bottom`", 1),
+        normal("The `image_crop` is always resized to exactly fit the paste region. If it was upscaled for editing (e.g. sent through img2img at a higher resolution), it will be scaled back down during pasting. There is no aspect-ratio preservation — if the aspect ratio of the crop image differs from the paste region, it will be stretched to fit and appear distorted."),
         normal("Inputs:"),
         normal("- `image_orig`: Base image to paste onto", 1),
         normal("- `image_crop`: Image to paste into the defined region (will be resized to fit)", 1),

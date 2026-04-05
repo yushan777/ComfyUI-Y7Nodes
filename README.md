@@ -632,6 +632,8 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 >
 >   This makes it easy to target edge-relative regions without knowing the image dimensions in advance — e.g., set `right=256, bottom=256` to always paste into the bottom-right 256-wide strip of any image.
 >
+>   The `image_crop` is always resized to exactly fit the paste region. If it was upscaled for editing (e.g. sent through img2img at a higher resolution), it will be scaled back down during pasting. There is no aspect-ratio preservation — if the aspect ratio of the crop image differs from the paste region, it will be stretched to fit and appear distorted.
+>
 >   **Inputs:**
 >
 >   - `image_orig`: Base image to paste onto
