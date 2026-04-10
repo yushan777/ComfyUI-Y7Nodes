@@ -4,140 +4,214 @@ from ..utils.colored_print import color, style
 script_directory = os.path.dirname(os.path.abspath(__file__))
 
 default_dims = [
-                    { "label": "◼︎ (1:1) - 1024x1024", "value": "1024x1024" },
-                    { "label": "◼︎ (1:1) - 1280x1280", "value": "1280x1280" },
-                    { "label": "◼︎ (1:1) - 1536x1536", "value": "1536x1536" },
-                    { "label": "◼︎ (1:1) - 1792x1792", "value": "1792x1792" },
-                    { "label": "◼︎ (1:1) - 2048x2048", "value": "2048x2048" },
+    { "label": "◼︎ (1:1) - 1024x1024", "value": "1024x1024" },
+    { "label": "◼︎ (1:1) - 1280x1280", "value": "1280x1280" },
+    { "label": "◼︎ (1:1) - 1536x1536", "value": "1536x1536" },
+    { "label": "◼︎ (1:1) - 1792x1792", "value": "1792x1792" },
+    { "label": "◼︎ (1:1) - 2048x2048", "value": "2048x2048" },
 
-                    { "label": "🁢 (1:2) - 768x1536", "value": "768x1536" },
-                    { "label": "🁢 (9:21) - 640x1536", "value": "640x1536" },
+    { "label": "🁢 (1:2) - 768x1536", "value": "768x1536" },
+    { "label": "🁢 (9:21) - 640x1536", "value": "640x1536" },
 
-                    { "label": "🁢 (9:16) - 720x1280", "value": "720x1280" },
-                    { "label": "🁢 (9:16) - 768x1344", "value": "768x1344" },
-                    { "label": "🁢 (9:16) - 1080x1920", "value": "1080x1920" },
+    { "label": "🁢 (9:16) - 720x1280", "value": "720x1280" },
+    { "label": "🁢 (9:16) - 768x1344", "value": "768x1344" },
+    { "label": "🁢 (9:16) - 1080x1920", "value": "1080x1920" },
 
-                    { "label": "🁢 (4:5) - 1024x1280", "value": "1024x1280" },
-                    { "label": "🁢 (4:5) - 1280x1600", "value": "1280x1600" },
+    { "label": "🁢 (5:8) - 832x1216", "value": "832x1216" },
 
-                    { "label": "🁢 (5:8) - 832x1216", "value": "832x1216" },
+    { "label": "🁢 (4:5) - 1024x1280", "value": "1024x1280" },
+    { "label": "🁢 (4:5) - 1280x1600", "value": "1280x1600" },
 
-                    { "label": "🁢 (3:4) - 896x1152", "value": "896x1152" },
+    { "label": "🁢 (3:5) - 960x1600", "value": "960x1600" },
 
-                    { "label": "🁢 (2:3) - 960x1440", "value": "960x1440" },
-                    { "label": "🁢 (2:3) - 1216x1824", "value": "1216x1824" },
+    { "label": "🁢 (2:3) - 960x1440", "value": "960x1440" },
+    { "label": "🁢 (2:3) - 1216x1824", "value": "1216x1824" },
 
-                    { "label": "🁢 (3:5) - 960x1600", "value": "960x1600" },
+    { "label": "🁢 (3:4) - 896x1152", "value": "896x1152" },
 
-                    { "label": "🁢 (5:7) - 896x1248", "value": "896x1248" },
+    { "label": "🁢 (5:7) - 896x1248", "value": "896x1248" },
 
+    { "label": "🀰 (2:1) - 1536x768", "value": "1536x768" },
+    { "label": "🀰 (21:9) - 1536x640", "value": "1536x640" },
 
-                    { "label": "🀰 (2:1) - 1536x768", "value": "1536x768" },
-                    { "label": "🀰 (21:9) - 1536x640", "value": "1536x640" },
+    { "label": "🀰 (16:9) - 1280x720", "value": "1280x720" },
+    { "label": "🀰 (16:9) - 1344x768", "value": "1344x768" },
+    { "label": "🀰 (16:9) - 1920x1080", "value": "1920x1080" },
 
-                    { "label": "🀰 (16:9) - 1280x720", "value": "1280x720" },
-                    { "label": "🀰 (16:9) - 1344x768", "value": "1344x768" },
-                    { "label": "🀰 (16:9) - 1920x1080", "value": "1920x1080" },
+    { "label": "🀰 (7:5) - 1248x896", "value": "1248x896" },
 
-                    { "label": "🀰 (5:4) - 1280x1024", "value": "1280x1024" },
-                    { "label": "🀰 (5:4) - 1600x1280", "value": "1600x1280" },
+    { "label": "🀰 (5:4) - 1280x1024", "value": "1280x1024" },
+    { "label": "🀰 (5:4) - 1600x1280", "value": "1600x1280" },
 
-                    { "label": "🀰 (4:3) - 1152x896", "value": "1152x896" },
+    { "label": "🀰 (4:3) - 1152x896", "value": "1152x896" },
 
-                    { "label": "🀰 (3:2) - 1216x832", "value": "1216x832" },
-                    { "label": "🀰 (3:2) - 1440x960", "value": "1440x960" },
-                    { "label": "🀰 (3:2) - 1824x1216", "value": "1824x1216" },
+    { "label": "🀰 (3:2) - 1216x832", "value": "1216x832" },
+    { "label": "🀰 (3:2) - 1440x960", "value": "1440x960" },
+    { "label": "🀰 (3:2) - 1824x1216", "value": "1824x1216" },
 
-                    { "label": "🀰 (5:3) - 1600x960", "value": "1600x960" },
+    { "label": "🀰 (5:3) - 1600x960", "value": "1600x960" }
+]
 
-                    { "label": "🀰 (7:5) - 1248x896", "value": "1248x896" }             
-                ]
+flux2_dims = [
+    { "label": "◼︎ square (1:1) - 1024x1024", "value": "1024x1024" },
+    { "label": "◼︎ square (1:1) - 1280x1280", "value": "1280x1280" },
+    { "label": "◼︎ square (1:1) - 1536x1536", "value": "1536x1536" },
+    { "label": "◼︎ square (1:1) - 1792x1792", "value": "1792x1792" },
+    { "label": "◼︎ square (1:1) - 2048x2048", "value": "2048x2048" },
+
+    { "label": "🀰 landscape (3:2) - 1152x768", "value": "1152x768" },
+    { "label": "🀰 landscape (3:2) - 1440x960", "value": "1440x960" },
+    { "label": "🀰 landscape (3:2) - 1536x1024", "value": "1536x1024" },
+    { "label": "🀰 landscape (3:2) - 1920x1280", "value": "1920x1280" },
+
+    { "label": "🁢 portrait (2:3) - 768x1152", "value": "768x1152" },
+    { "label": "🁢 portrait (2:3) - 960x1440", "value": "960x1440" },
+    { "label": "🁢 portrait (2:3) - 1024x1536", "value": "1024x1536" },
+    { "label": "🁢 portrait (2:3) - 1280x1920", "value": "1280x1920" },
+
+    { "label": "🀰 landscape (4:3) - 1024x768", "value": "1024x768" },
+    { "label": "🀰 landscape (4:3) - 1280x960", "value": "1280x960" },
+    { "label": "🀰 landscape (4:3) - 1600x1200", "value": "1600x1200" },
+    { "label": "🀰 landscape (4:3) - 1792x1344", "value": "1792x1344" },
+    { "label": "🀰 landscape (4:3) - 2048x1536", "value": "2048x1536" },
+
+    { "label": "🁢 portrait (3:4) - 768x1024", "value": "768x1024" },
+    { "label": "🁢 portrait (3:4) - 960x1280", "value": "960x1280" },
+    { "label": "🁢 portrait (3:4) - 1200x1600", "value": "1200x1600" },
+    { "label": "🁢 portrait (3:4) - 1344x1792", "value": "1344x1792" },
+    { "label": "🁢 portrait (3:4) - 1536x2048", "value": "1536x2048" },
+
+    { "label": "🀰 landscape (16:9) - 1024x576", "value": "1024x576" },
+    { "label": "🀰 landscape (16:9) - 1280x720", "value": "1280x720" },
+    { "label": "🀰 landscape (16:9) - 1600x896", "value": "1600x896" },
+    { "label": "🀰 landscape (16:9) - 1920x1088", "value": "1920x1088" },
+
+    { "label": "🁢 portrait (9:16) - 576x1024", "value": "576x1024" },
+    { "label": "🁢 portrait (9:16) - 720x1280", "value": "720x1280" },
+    { "label": "🁢 portrait (9:16) - 896x1600", "value": "896x1600" },
+    { "label": "🁢 portrait (9:16) - 1088x1920", "value": "1088x1920" },
+
+    { "label": "🀰 landscape (21:9) - 1024x432", "value": "1024x432" },
+    { "label": "🀰 landscape (21:9) - 1344x576", "value": "1344x576" },
+    { "label": "🀰 landscape (21:9) - 1680x720", "value": "1680x720" },
+    { "label": "🀰 landscape (21:9) - 2016x864", "value": "2016x864" },
+
+    { "label": "🁢 portrait (9:21) - 432x1008", "value": "432x1008" },
+    { "label": "🁢 portrait (9:21) - 576x1344", "value": "576x1344" },
+    { "label": "🁢 portrait (9:21) - 720x1680", "value": "720x1680" },
+    { "label": "🁢 portrait (9:21) - 864x2016", "value": "864x2016" }
+]
+
+qwen_image_dims = [
+    { "label": "◼︎ square (1:1) - 1024x1024", "value": "1024x1024" },
+    { "label": "◼︎ square hd (1:1) - 1328x1328", "value": "1328x1328" },
+    { "label": "🀰 landscape (4:3) - 1472x1104", "value": "1472x1104" },
+    { "label": "🀰 landscape (16:9) - 1664x928", "value": "1664x928" },
+    { "label": "🁢 portrait (3:4) - 1104x1472", "value": "1104x1472" },
+    { "label": "🁢 portrait (9:16) - 928x1664", "value": "928x1664" }
+]
 
 class Y7Nodes_ImageSizePresets:
 
-    # Class variable to store the loaded dimensions
-    dimensions_dict = None
+    # Class variable to store the loaded custom dimensions (None if not found)
+    custom_dims = None
+    custom_dims_loaded = False
 
     @classmethod
-    def load_dimensions(cls):
-        """Load dimensions from JSON file once and cache the result"""
-        if cls.dimensions_dict is None:
+    def load_custom_dims(cls):
+        """Try to load custom dimensions from JSON file once and cache the result."""
+        if not cls.custom_dims_loaded:
+            cls.custom_dims_loaded = True
             try:
                 with open(os.path.join(script_directory, 'custom_dimensions.json')) as f:
-                    cls.dimensions_dict = json.load(f)
+                    cls.custom_dims = json.load(f)
             except FileNotFoundError:
                 print(f"custom_dimensions.json not found in {script_directory}. Using defaults.", color.ORANGE)
-                # Provide a default entry if the file is not found
-                cls.dimensions_dict = default_dims
-
+                cls.custom_dims = None
             except json.JSONDecodeError:
                 print(f"Error parsing custom_dimensions.json. Using defaults.", color.RED)
-                cls.dimensions_dict = default_dims
+                cls.custom_dims = None
+        return cls.custom_dims
 
-        return cls.dimensions_dict
-        
+    @classmethod
+    def get_dims_for_preset(cls, preset_name):
+        """Return the dimensions list for the given preset name."""
+        if preset_name == "qwen-image":
+            return qwen_image_dims
+        elif preset_name == "flux.2":
+            return flux2_dims
+        elif preset_name == "custom*":
+            custom = cls.load_custom_dims()
+            return custom if custom is not None else default_dims
+        else:  # "default"
+            return default_dims
+
     @classmethod
     def INPUT_TYPES(cls):
-        dimensions_dict = cls.load_dimensions()
+        custom = cls.load_custom_dims()
 
-        # Use the full label as the dropdown option
-        presets = [d["label"] for d in dimensions_dict]
-        
-        # Add a "Custom" option
-        if not any(preset.startswith("Custom") for preset in presets):
-            presets.append("Custom")
+        # Build combined dimension list (deduplicated by label)
+        # Order: default, flux2, qwen, custom (if available)
+        seen_labels = set()
+        combined_dims = []
+        for dims in [default_dims, flux2_dims, qwen_image_dims, custom or []]:
+            for d in dims:
+                if d["label"] not in seen_labels:
+                    seen_labels.add(d["label"])
+                    combined_dims.append(d)
+
+        dimension_options = [d["label"] for d in combined_dims]
+        dimension_options.append("Custom")
 
         return {
-        "required": {
-            "preset": (presets,),
-            "custom_w": ("INT", {
-                    "default": 1024,
-                    "min": 128,
-                    "max": 7680,
-                    "step": 16,
-                    "tooltip": "custom width"
-                }),
-            "custom_h": ("INT", {
-                    "default": 1024,
-                    "min": 128,
-                    "max": 7680,
-                    "step": 16,
-                    "tooltip": "custom height"
-                }),
-
-
-        },
+            "required": {
+                "preset": (["default", "flux.2", "qwen-image", "custom*"],),
+                "dimension": (dimension_options,),
+                "custom_w": ("INT", {
+                        "default": 1024,
+                        "min": 128,
+                        "max": 7680,
+                        "step": 16,
+                        "tooltip": "custom width"
+                    }),
+                "custom_h": ("INT", {
+                        "default": 1024,
+                        "min": 128,
+                        "max": 7680,
+                        "step": 16,
+                        "tooltip": "custom height"
+                    }),
+            },
         }
 
     RETURN_TYPES = ("INT", "INT")
     RETURN_NAMES = ("Width", "Height")
     FUNCTION = "generate"
-    CATEGORY = "Y7Nodes/Utilss"    
+    CATEGORY = "Y7Nodes/Utilss"
 
-    def generate(self, preset, custom_w, custom_h):
+    def generate(self, preset, dimension, custom_w, custom_h):
         try:
-            # Check if the custom option is selected
-            if preset == "Custom":
+            if dimension == "Custom":
                 return (custom_w, custom_h)
-            
-            # Use the already loaded dimensions
-            dimensions_dict = self.load_dimensions()
-            
-            # Find the matching preset
-            dimension_entry = next((d for d in dimensions_dict if d["label"] == preset), None)
-            
-            if dimension_entry:
-                # Get the value from the matched entry
-                value = dimension_entry["value"]
-                
-                # Split the value into width and height
-                width, height = [int(x.strip()) for x in value.split('x')]
+
+            # Get dims for the selected preset
+            dims = self.get_dims_for_preset(preset)
+
+            # Find matching entry in the preset's set
+            entry = next((d for d in dims if d["label"] == dimension), None)
+
+            # Fallback: search all sets if not found in the preset's set
+            if entry is None:
+                all_dims = default_dims + flux2_dims + qwen_image_dims + (self.load_custom_dims() or [])
+                entry = next((d for d in all_dims if d["label"] == dimension), None)
+
+            if entry:
+                width, height = [int(x.strip()) for x in entry["value"].split('x')]
                 return (width, height)
             else:
-                print(f"Preset not found in dimensions_dict: {preset}", color.RED)
-                return (1024, 1024)  # Default fallback
-                
+                print(f"Dimension not found: {dimension}", color.RED)
+                return (1024, 1024)
+
         except Exception as e:
-            # Catch any unexpected errors
-            print(f"Error processing preset: {str(e)}", color.RED)
-            return (1024, 1024)  # Default fallback
+            print(f"Error processing dimension: {str(e)}", color.RED)
+            return (1024, 1024)

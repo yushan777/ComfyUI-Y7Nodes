@@ -88,10 +88,17 @@ if hasattr(PromptServer, "instance") and not PromptServer.instance.app.frozen:
     # print(f"{dir_name}")
 
 
+    async def get_image_size_dims(request):
+        preset = request.rel_url.query.get("preset", "default")
+        dims = Y7Nodes_ImageSizePresets.get_dims_for_preset(preset)
+        labels = [d["label"] for d in dims] + ["Custom"]
+        return web.json_response({"labels": labels})
+
     # Register routes using the actual directory name
     PromptServer.instance.app.add_routes([
         # Route for JavaScript files
-        web.static(f"/{dir_name}", (current_dir / "web").as_posix())
+        web.static(f"/{dir_name}", (current_dir / "web").as_posix()),
+        web.get("/y7nodes/image_size_dims", get_image_size_dims),
 
 
     # # Register routes for web assets and data files

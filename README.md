@@ -555,12 +555,16 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 ---
 
 ### Y7 Image Size Presets
-> Select predefined image size/aspect ratios loaded from a custom json file. Provides width and height outputs.
+> Select predefined image size/aspect ratios from a named preset set. Provides width and height outputs.
 >
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
+>
 >   - Provides outputs for `width` and `height` (INT).
->   - Looks for and loads presets from `custom_dimensions.json` located in the `nodes` directory. You can edit this file to add your own presets.
+>   - The `preset` widget selects the active dimension set: `default`, `flux.2`, `qwen-image`, or `custom*`.
+>   - The `dimension` dropdown updates dynamically to show only the dimensions for the selected preset.
+>   - Select `Custom` from the dimension dropdown to use manually entered `custom_w` / `custom_h` values.
+>   - The `custom*` preset loads from `custom_dimensions.json` in the `nodes` directory; falls back to `default` if the file is missing or invalid. See `custom_dimensions_example.json` for the expected format.
 > </details>
 
 ---
