@@ -156,8 +156,8 @@ qwen_image_dims = [
 
 video_dims = [
     # SD
-    { "label": "🀰 SD 576p (4:3) - 720x576",       "value": "720x576"   },
-    { "label": "🀰 SD 576p (16:9) - 1024x576",     "value": "1024x576"  },
+    { "label": "🀰 SD 480p (4:3) - 640x480",       "value": "640x480"   },
+    { "label": "🀰 SD 480p (16:9) - 854x480",     "value": "854x480"  },
 
     # HD
     { "label": "🀰 HD 720p (16:9) - 1280x720",         "value": "1280x720"  },
