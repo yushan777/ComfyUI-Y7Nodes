@@ -1,3 +1,6 @@
+1.0.40
+Updated Image Size (Presets)
+
 1.0.39
 Updated Image Size (Presets)
 
