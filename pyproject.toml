@@ -1,8 +1,8 @@
 [project]
 name = "comfyui-y7nodes"
 description = "A collection of utility, quality-of-life nodes for ComfyUI (Probably only useful to me)."
-version = "1.0.38"
-license = {file = "LICENSE"}
+version = "1.0.39"
+license = {file ="LICENSE"}
 # classifiers = [
 #     # For OS-independent nodes (works on all operating systems)
 #     "Operating System :: OS Independent",
