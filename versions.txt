@@ -1,3 +1,6 @@
+1.0.41
+Added Image scaling nodes with post-scaling display of resolution. dditional width and height outputs.
+
 1.0.40
 Updated Image Size (Presets)
 

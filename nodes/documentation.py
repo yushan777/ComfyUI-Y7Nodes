@@ -227,6 +227,38 @@ descriptions = {
         normal("This is standard behavior in image processing and the bias is minimal.", 1)
     ],
 
+    "Y7Nodes_ScaleImageBy": [
+        "Scale Image By",
+        short_desc("Scales an image by a multiplier while preserving aspect ratio."),
+        normal("Multiplies both width and height by `scale_by`, then resamples using the chosen method."),
+        normal("The scaled dimensions are displayed directly on the node after execution."),
+        normal("Inputs:"),
+        normal("- `image`: The input image to scale", 1),
+        normal("- `upscale_method`: Resampling algorithm — `nearest-exact`, `bilinear`, `area`, `bicubic`, or `lanczos`", 1),
+        normal("- `scale_by`: Multiplier applied to both dimensions (default: 1.0, range: 0.01–8.0)", 1),
+        normal("- `resolution_steps`: Snap output dimensions to the nearest multiple of this value (default: 8). Common values: 8, 16, 64", 1),
+        normal("Outputs:"),
+        normal("- `image`: The scaled image", 1),
+        normal("- `width`: Output width in pixels (INT)", 1),
+        normal("- `height`: Output height in pixels (INT)", 1),
+    ],
+
+    "Y7Nodes_ScaleImageToTotalPixels": [
+        "Scale Image to Total Pixels",
+        short_desc("Scales an image to a target total pixel count (in megapixels) while preserving aspect ratio."),
+        normal("Computes a uniform scale factor so that `width × height` equals the target megapixel count, then resamples using the chosen method."),
+        normal("The scaled dimensions are displayed directly on the node after execution."),
+        normal("Inputs:"),
+        normal("- `image`: The input image to scale", 1),
+        normal("- `upscale_method`: Resampling algorithm — `nearest-exact`, `bilinear`, `area`, `bicubic`, or `lanczos`", 1),
+        normal("- `megapixels`: Target total pixel count in megapixels (default: 1.0, range: 0.01–16.0)", 1),
+        normal("- `resolution_steps`: Snap output dimensions to the nearest multiple of this value (default: 8). Common values: 8, 16, 64", 1),
+        normal("Outputs:"),
+        normal("- `image`: The scaled image", 1),
+        normal("- `width`: Output width in pixels (INT)", 1),
+        normal("- `height`: Output height in pixels (INT)", 1),
+    ],
+
     "Y7Nodes_ColorMatchMasked": [
         "Color Match (Masked)",
         short_desc("Color matches the target image to a reference while excluding masked regions from the calculation."),
