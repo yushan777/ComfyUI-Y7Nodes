@@ -229,8 +229,8 @@ app.registerExtension({
 
             // ================================================================================================
             function populate(text) {
-                // Convert to string if it's not already
-                const displayText = text.toString();
+                // Convert to string if it's not already; join batched items with a blank line separator
+                const displayText = Array.isArray(text) ? text.join('\n\n') : text.toString();
                                 
                 // Update the text
                 this.widgets[TEXT_WIDGET].value = displayText;

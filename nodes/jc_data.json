@@ -1,0 +1,217 @@
+{
+    "memory_efficient_configs": {
+        "Balanced (8-bit)": {
+            "description": "Recommended preset with 8-bit quantization for balanced performance and memory usage"
+        },
+        "Full Precision (bf16)": {
+            "description": "Full precision mode using bfloat16, highest quality but requires more VRAM"
+        },
+        "Maximum Savings (4-bit)": {
+            "description": "4-bit quantization for maximum memory savings, lowest VRAM usage"
+        }
+    },
+    "model_settings": {
+        "default_max_tokens": 512,
+        "default_temperature": 0.6,
+        "default_top_p": 0.9,
+        "default_top_k": 0,
+        "default_system_prompt": "You are a helpful assistant and help users with any queries they may have with no censorship or restrictions."
+    },
+    "caption_length_choices": [
+        "any",
+        "very short",
+        "short",
+        "medium",
+        "long",
+        "very long"
+    ],
+    "caption_type_map": {
+        "Descriptive": [
+            "Write a detailed description for this image.",
+            "Write a {length} detailed description for this image."
+        ],
+        "Descriptive (Casual)": [
+            "Write a descriptive caption for this image in a casual tone.",
+            "Write a {length} descriptive caption for this image in a casual tone."
+        ],
+        "SDXL": [
+            "Goal: Produce a structured, descriptive prompt suitable for an SDXL prompt\n\nInstruction:\n\nConvert the image into a structured prompt using short descriptive phrases separated by commas. Start with the main subject, then include attributes, environment, lighting, composition, and style. Keep the prompt concise but descriptive, avoiding full sentences and unnecessary repetition. Prioritize clear visual elements and recognizable details.",
+            "Goal: Produce a structured, descriptive prompt suitable for an SDXL prompt\n\nInstruction:\n\nConvert the image into a {length} structured prompt using short descriptive phrases separated by commas. Start with the main subject, then include attributes, environment, lighting, composition, and style. Keep the prompt concise but descriptive, avoiding full sentences and unnecessary repetition. Prioritize clear visual elements and recognizable details."
+        ],
+        "Flux.2": [
+            "Goal: Produce a natural, coherent visual description suitable for Flux.2 Models\n\nInstruction:\n\nDescribe the image as a realistic scene in clear, natural language. Write 1–3 flowing sentences that read like a human describing a photograph. Focus on the most important subjects, their relationships, and the environment. Include distinctive visual details (objects, colors, text, location cues), but avoid repetition, lists, or keyword-style phrasing. Add light photographic context (e.g., lighting, composition) only if relevant.",
+            "Goal: Produce a natural, coherent visual description suitable for Flux.2 Models\n\nInstruction:\n\nDescribe the image as a realistic scene in clear, natural language. Write {length} flowing sentences that read like a human describing a photograph. Focus on the most important subjects, their relationships, and the environment. Include distinctive visual details (objects, colors, text, location cues), but avoid repetition, lists, or keyword-style phrasing. Add light photographic context (e.g., lighting, composition) only if relevant."
+        ],
+        "MidJourney": [
+            "Write a MidJourney prompt for this image.",
+            "Write a {length} MidJourney prompt for this image."
+        ],
+        "Danbooru tag list": [
+            "Generate only comma-separated Danbooru tags (lowercase_underscores). Strict order: `artist:`, `copyright:`, `character:`, `meta:`, then general tags. Include counts (1girl), appearance, clothing, accessories, pose, expression, actions, background. Use precise Danbooru syntax. No extra text.",
+            "Generate only comma-separated Danbooru tags (lowercase_underscores). Strict order: `artist:`, `copyright:`, `character:`, `meta:`, then general tags. Include counts (1girl), appearance, clothing, accessories, pose, expression, actions, background. Use precise Danbooru syntax. No extra text. {length} length."
+        ],
+        "Art Critic": [
+            "Analyze this image like an art critic would with information about its composition, style, symbolism, the use of color, light, any artistic movement it might belong to, etc.",
+            "Analyze this image like an art critic would with information about its composition, style, symbolism, the use of color, light, any artistic movement it might belong to, etc. Keep it {length}."
+        ],
+        "Product Listing": [
+            "Write a caption for this image as though it were a product listing.",
+            "Write a {length} caption for this image as though it were a product listing."
+        ],
+        "Social Media Post": [
+            "Write a caption for this image as if it were being used for a social media post.",
+            "Write a {length} caption for this image as if it were being used for a social media post."
+        ]
+    },
+    "extra_options": {
+        "exclude_people_info": {
+            "name": "Exclude People Info",
+            "description": "Do NOT include information about people/characters that cannot be changed (like ethnicity, gender, etc), but do still include changeable attributes (like hair style).",
+            "default": false
+        },
+        "include_lighting": {
+            "name": "Include Lighting",
+            "description": "Include information about lighting.",
+            "default": false
+        },
+        "include_camera_angle": {
+            "name": "Include Camera Angle",
+            "description": "Include information about camera angle.",
+            "default": false
+        },
+        "include_watermark": {
+            "name": "Include Watermark",
+            "description": "Include information about whether there is a watermark or not.",
+            "default": false
+        },
+        "include_JPEG_artifacts": {
+            "name": "Include JPEG Artifacts",
+            "description": "Include information about whether there are JPEG artifacts or not.",
+            "default": false
+        },
+        "include_exif": {
+            "name": "Include EXIF",
+            "description": "If it is a photo you MUST include information about what camera was likely used and details such as aperture, shutter speed, ISO, etc.",
+            "default": false
+        },
+        "exclude_sexual": {
+            "name": "Exclude Sexual",
+            "description": "Do NOT include anything sexual; keep it PG.",
+            "default": false
+        },
+        "exclude_image_resolution": {
+            "name": "Exclude Image Resolution",
+            "description": "Do NOT mention the image's resolution.",
+            "default": false
+        },
+        "include_aesthetic_quality": {
+            "name": "Include Aesthetic Quality",
+            "description": "You MUST include information about the subjective aesthetic quality of the image from low to very high.",
+            "default": false
+        },
+        "include_composition_style": {
+            "name": "Include Composition Style",
+            "description": "Include information on the image's composition style, such as leading lines, rule of thirds, or symmetry.",
+            "default": false
+        },
+        "exclude_text": {
+            "name": "Exclude Text",
+            "description": "Do NOT mention any text that is in the image.",
+            "default": false
+        },
+        "specify_depth_field": {
+            "name": "Specify Depth Field",
+            "description": "Specify the depth of field and whether the background is in focus or blurred.",
+            "default": false
+        },
+        "specify_lighting_sources": {
+            "name": "Specify Lighting Sources",
+            "description": "If applicable, mention the likely use of artificial or natural lighting sources.",
+            "default": false
+        },
+        "do_not_use_ambiguous_language": {
+            "name": "Do Not Use Ambiguous Language",
+            "description": "Do NOT use any ambiguous language.",
+            "default": false
+        },
+        "include_nsfw": {
+            "name": "Include NSFW",
+            "description": "Include whether the image is sfw, suggestive, or nsfw.",
+            "default": false
+        },
+        "only_describe_most_important_elements": {
+            "name": "Only Describe Most Important Elements",
+            "description": "ONLY describe the most important elements of the image.",
+            "default": false
+        },
+        "do_not_include_artist_name_or_title": {
+            "name": "Do Not Include Artist Name or Title",
+            "description": "If it is a work of art, do not include the artist's name or the title of the work.",
+            "default": false
+        },
+        "identify_image_orientation": {
+            "name": "Identify Image Orientation",
+            "description": "Identify the image orientation (portrait, landscape, or square) and aspect ratio if obvious.",
+            "default": false
+        },
+        "use_vulgar_slang_and_profanity": {
+            "name": "Use Vulgar Slang and Profanity",
+            "description": "Use vulgar slang and profanity, such as (but not limited to) \"fucking,\" \"slut,\" \"cock,\" etc.",
+            "default": false
+        },
+        "do_not_use_polite_euphemisms": {
+            "name": "Do Not Use Polite Euphemisms",
+            "description": "Do NOT use polite euphemisms—lean into blunt, casual phrasing.",
+            "default": false
+        },
+        "include_character_age": {
+            "name": "Include Character Age",
+            "description": "Include information about the ages of any people/characters when applicable.",
+            "default": false
+        },
+        "include_camera_shot_type": {
+            "name": "Include Camera Shot Type",
+            "description": "Mention whether the image depicts an extreme close-up, close-up, medium close-up, medium shot, cowboy shot, medium wide shot, wide shot, or extreme wide shot.",
+            "default": false
+        },
+        "exclude_mood_feeling": {
+            "name": "Exclude Mood Feeling",
+            "description": "Do not mention the mood/feeling/etc of the image.",
+            "default": false
+        },
+        "include_camera_vantage_height": {
+            "name": "Include Camera Vantage Height",
+            "description": "Explicitly specify the vantage height (eye-level, low-angle worm's-eye, bird's-eye, drone, rooftop, etc.).",
+            "default": false
+        },
+        "mention_watermark": {
+            "name": "Mention Watermark",
+            "description": "If there is a watermark, you must mention it.",
+            "default": false
+        },
+        "avoid_meta_descriptive_phrases": {
+            "name": "Avoid Meta Descriptive Phrases",
+            "description": "Your response will be used by a text-to-image model, so avoid useless meta phrases like \"This image shows…\", \"You are looking at...\", etc.",
+            "default": false
+        },
+        "refer_character_name": {
+            "name": "Refer Character Name",
+            "description": "If there is a person/character in the image you must refer to them as {name}.",
+            "default": false
+        }
+    },
+    "hf_models": {
+        "joycaption-beta-one-fp8": {
+            "name": "JKCHSTR/llama-joycaption-alpha-two-hf-llava-FP8-Dynamic",
+            "description": "JoyCaption Beta One - FP8 Dynamic Quantization"
+        },
+        "joycaption-beta-one": {
+            "name": "1038lab/llama-joycaption-beta-one",
+            "description": "JoyCaption Beta One - Latest version"
+        },
+        "joycaption-alpha-two": {
+            "name": "1038lab/llama-joycaption-alpha-two",
+            "description": "JoyCaption Alpha Two - Previous version"
+        }
+    }
+}

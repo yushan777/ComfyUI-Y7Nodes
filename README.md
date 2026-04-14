@@ -554,6 +554,148 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 
 ---
 
+### Y7 JoyCaption
+
+> Generate image captions using a JoyCaption LLaVA model, with full control over caption style, length, and generation parameters.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   A variant of [1038lab/ComfyUI-JoyCaption](https://github.com/1038lab/ComfyUI-JoyCaption). Only HuggingFace JoyCaption models are supported.
+>
+>   **Models** (downloaded automatically to `models/LLM/` on first use):
+>
+>   - `joycaption-beta-one-fp8` — FP8 Dynamic quantization variant
+>   - `joycaption-beta-one` — Latest beta release (default)
+>   - `joycaption-alpha-two` — Previous alpha release
+>
+>   **Caption Styles** (`prompt_style`):
+>
+>   - `Descriptive`, `Descriptive (Casual)`, `SDXL`, `Flux.2`, `MidJourney`, `Danbooru tag list`, `Art Critic`, `Product Listing`, `Social Media Post`
+>
+>   **Inputs:**
+>
+>   - `image`: The image to caption
+>   - `model`: Which JoyCaption model to use
+>   - `quantization`: Memory precision — `Full Precision (bf16)`, `Balanced (8-bit)`, or `Maximum Savings (4-bit)`
+>   - `prompt_style`: Caption style (see above)
+>   - `caption_length`: Target length — `any`, `very short`, `short`, `medium`, `long`, `very long`
+>   - `max_new_tokens`: Maximum tokens to generate (1–2048, default 512)
+>   - `temperature`: Controls randomness (0.0–2.0, default 0.6)
+>   - `top_p`: Nucleus sampling threshold (0.0–1.0, default 0.9)
+>   - `top_k`: Top-k sampling limit (0 = disabled, range 0–100)
+>   - `seed`: Random seed for reproducible results
+>   - `custom_prompt`: If filled, replaces the built-in prompt entirely
+>   - `memory_management`: How to handle the model between runs:
+>     - `Keep in Memory` — stays loaded (fastest for repeated runs)
+>     - `Clear After Run` — frees VRAM immediately after each run
+>     - `Global Cache` — shared cache across multiple JoyCaption node instances
+>   - `extra_options` *(optional)*: Connect a **JoyCaption Extra Options** node to add caption modifiers
+>
+>   **Outputs:**
+>
+>   - `PROMPT`: The prompt sent to the model (useful for debugging)
+>   - `STRING`: The generated caption text
+>
+> </details>
+
+---
+
+### Y7 JoyCaption Extra Options
+
+> Optional caption modifiers — connect to the JoyCaption node to refine what the model includes or excludes in its output.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   Each toggle appends an instruction to the caption prompt. Enable only the options relevant to your use case.
+>
+>   | Option | Effect |
+>   |---|---|
+>   | Exclude People Info | Omit fixed attributes (ethnicity, gender) but keep changeable ones (hair, clothing) |
+>   | Include Lighting | Describe lighting conditions |
+>   | Include Camera Angle | Describe camera angle |
+>   | Include Watermark | Note whether a watermark is present |
+>   | Include JPEG Artifacts | Note whether JPEG artifacts are present |
+>   | Include EXIF | Describe likely camera settings (aperture, shutter speed, ISO, etc.) |
+>   | Exclude Sexual | Keep the caption PG |
+>   | Exclude Image Resolution | Do not mention image resolution |
+>   | Include Aesthetic Quality | Rate the subjective aesthetic quality (low to very high) |
+>   | Include Composition Style | Describe composition style (leading lines, rule of thirds, etc.) |
+>   | Exclude Text | Do not mention any text visible in the image |
+>   | Specify Depth Field | Describe depth of field and background focus |
+>   | Specify Lighting Sources | Mention likely artificial or natural light sources |
+>   | Do Not Use Ambiguous Language | Avoid vague phrasing |
+>   | Include NSFW | State whether the image is SFW, suggestive, or NSFW |
+>   | Only Describe Most Important Elements | Focus only on the most prominent elements |
+>   | Do Not Include Artist Name or Title | Omit artist name and artwork title |
+>   | Identify Image Orientation | Note portrait, landscape, or square orientation |
+>   | Include Character Age | Describe the ages of people/characters |
+>   | Include Camera Shot Type | Specify shot type (close-up, medium shot, wide shot, etc.) |
+>   | Exclude Mood Feeling | Do not describe mood or emotional tone |
+>   | Include Camera Vantage Height | Specify vantage height (eye-level, bird's-eye, worm's-eye, etc.) |
+>   | Mention Watermark | Explicitly mention any watermark present |
+>   | Avoid Meta Descriptive Phrases | Skip phrases like "This image shows…" for cleaner T2I prompts |
+>   | Refer Character Name | Refer to people/characters by the name in `character_name` |
+>
+>   The `character_name` field is used when **Refer Character Name** is enabled.
+>
+> </details>
+
+---
+
+### Y7 Image Batch Path
+
+> Load a batch of images from a directory and output them as a list of image tensors with matching file paths. Designed to pair with Caption Saver and JoyCaption for batch captioning workflows.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   Supports jpg, jpeg, png, and webp. Images are EXIF-transposed and converted to RGB float32 tensors.
+>
+>   Connect `IMAGE` to JoyCaption (or any other VLM node) and `IMAGE_PATH` to Caption Saver. The path list tells Caption Saver exactly where to write each `.txt` file.
+>
+>   **Inputs:**
+>
+>   - `image_dir`: Path to the directory containing images
+>   - `batch_size`: Number of images to load (0 = all)
+>   - `start_from`: 1-based index of the first image to load — useful for resuming part-way through a directory
+>   - `sort_method`: Load order — `sequential` (alphabetical), `reverse`, or `random`
+>
+>   **Outputs** (both are lists):
+>
+>   - `IMAGE`: List of image tensors, one per file
+>   - `IMAGE_PATH`: List of full file paths matching each image tensor
+>
+>   Note: When `sort_method` is `random`, the node re-evaluates on every run.
+>
+> </details>
+
+---
+
+### Y7 Caption Saver
+
+> Save a caption string as a `.txt` file next to the source image, using the same filename stem (e.g. `cat.jpg` → `cat.txt`).
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   Designed to pair with **Image Batch Path** and **JoyCaption**: connect `IMAGE_PATH` from Image Batch Path and the caption `STRING` from JoyCaption.
+>
+>   Compatible with any node that outputs a STRING — not limited to JoyCaption. Examples: Florence2, MiniCPM, LLaVA, Qwen-VL, etc.
+>
+>   **Inputs:**
+>
+>   - `string`: The caption text to write (must be connected)
+>   - `image_path`: Full path to the source image (must be connected — e.g. from Image Batch Path)
+>   - `overwrite`: If true, overwrites any existing `.txt` file. If false, appends a counter to avoid overwriting (e.g. `cat_01.txt`, `cat_02.txt`)
+>
+>   This node has no outputs — it is a terminal/output node.
+>
+> </details>
+
+---
+
 ### Y7 Image Size Presets
 > Select predefined image size/aspect ratios from a named preset set. Provides width and height outputs.
 >

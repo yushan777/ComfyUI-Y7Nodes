@@ -1,3 +1,8 @@
+1.0.42
+Updated Show Anything node.
+Added Joycaption nodes.
+Added Captioning tool nodes.
+
 1.0.41
 Added Image scaling nodes with post-scaling display of resolution. dditional width and height outputs.
 

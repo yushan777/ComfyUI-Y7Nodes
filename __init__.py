@@ -19,6 +19,8 @@ from .nodes.sampler_select_name import SamplerSelect_Name
 from .nodes.paste_cropped_image_back import Y7Nodes_PasteCroppedImageBack
 from .nodes.scale_image_to_total_pixels import Y7Nodes_ScaleImageToTotalPixels
 from .nodes.scale_image_by import Y7Nodes_ScaleImageBy
+from .nodes.joycaption import Y7Nodes_JoyCaption, Y7Nodes_JoyCaption_ExtraOptions
+from .nodes.caption_tools import Y7Nodes_ImageBatchPath, Y7Nodes_CaptionSaver
 
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageRow": Y7Nodes_ImageRow,
@@ -41,6 +43,10 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_PasteCroppedImageBack": Y7Nodes_PasteCroppedImageBack,
     "Y7Nodes_ScaleImageToTotalPixels": Y7Nodes_ScaleImageToTotalPixels,
     "Y7Nodes_ScaleImageBy": Y7Nodes_ScaleImageBy,
+    "Y7Nodes_JoyCaption": Y7Nodes_JoyCaption,
+    "Y7Nodes_JoyCaption_ExtraOptions": Y7Nodes_JoyCaption_ExtraOptions,
+    "Y7Nodes_ImageBatchPath": Y7Nodes_ImageBatchPath,
+    "Y7Nodes_CaptionSaver": Y7Nodes_CaptionSaver,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageRow": "Y7 Image Row",
@@ -63,6 +69,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_PasteCroppedImageBack": "Y7 Paste Cropped Image Back",
     "Y7Nodes_ScaleImageToTotalPixels": "Y7 Scale Image to Total Pixels",
     "Y7Nodes_ScaleImageBy": "Y7 Scale Image By",
+    "Y7Nodes_JoyCaption": "Y7 JoyCaption",
+    "Y7Nodes_JoyCaption_ExtraOptions": "Y7 JoyCaption Extra Options",
+    "Y7Nodes_ImageBatchPath": "Y7 Image Batch Path",
+    "Y7Nodes_CaptionSaver": "Y7 Caption Saver",
 }
 
 # Apply HTML-formatted documentation to node classes
