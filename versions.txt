@@ -1,3 +1,6 @@
+1.0.43
+Updated Qwen3 VL node.
+
 1.0.42
 Updated Show Anything node.
 Added Joycaption nodes.

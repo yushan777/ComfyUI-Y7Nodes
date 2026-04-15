@@ -13,9 +13,20 @@ from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 QWEN3_VL_MODELS = [
     "Qwen3-VL-2B-Instruct",
     "Qwen3-VL-4B-Instruct",
+    "Qwen3-VL-4B-Instruct-heretic",
     "Qwen3-VL-8B-Instruct",
+    "Qwen3-VL-8B-Instruct-heretic",
     "Qwen3-VL-32B-Instruct",
 ]
+
+_QWEN3_VL_HF_ORG = "Qwen"
+
+# Models hosted under a different HuggingFace org than _QWEN3_VL_HF_ORG.
+# Maps model name → full repo ID (org/name).
+_QWEN3_VL_HF_REPO_OVERRIDES = {
+    "Qwen3-VL-4B-Instruct-heretic": "coder3101/Qwen3-VL-4B-Instruct-heretic",
+    "Qwen3-VL-8B-Instruct-heretic": "coder3101/Qwen3-VL-8B-Instruct-heretic",
+}
 
 # Preset instructions (image analysis tasks shown in the dropdown).
 # Values are the actual instruction text sent to the model.
@@ -145,7 +156,7 @@ class Y7Nodes_QwenVL:
         preset_names = list(PRESET_PROMPTS.keys())
         return {
             "required": {
-                "model_name": (QWEN3_VL_MODELS, {"default": "Qwen/Qwen3-VL-8B-Instruct"}),
+                "model_name": (QWEN3_VL_MODELS, {"default": "Qwen3-VL-8B-Instruct", "tooltip": "Select model. Weights go in models/LLM/<model-name>."}),
                 "preset_prompt": (
                     preset_names,
                     {
@@ -206,21 +217,22 @@ class Y7Nodes_QwenVL:
                     f"Enable 'download_model' to download it automatically, or manually place "
                     f"the weights in: models/LLM/{short_name}"
                 )
-            print(f"[QwenVL] Downloading {model_name} to {model_path} ...")
+            repo_id = _QWEN3_VL_HF_REPO_OVERRIDES.get(model_name, f"{_QWEN3_VL_HF_ORG}/{model_name}")
+            print(f"[QwenVL] Downloading {repo_id} to {model_path} ...")
             from huggingface_hub import snapshot_download
             os.makedirs(model_path, exist_ok=True)
-            snapshot_download(repo_id=model_name, local_dir=model_path)
+            snapshot_download(repo_id=repo_id, local_dir=model_path)
             print(f"[QwenVL] Download complete.")
 
         # Processor is CPU-only (tokeniser + image preprocessor, no GPU weights)
-        processor = AutoProcessor.from_pretrained(model_path)
+        processor = AutoProcessor.from_pretrained(model_path, fix_mistral_regex=True)
 
         # Load weights to CPU.  Do NOT use device_map="auto" — that moves tensors
         # directly to GPU and bypasses ComfyUI's memory manager, preventing it from
         # coordinating VRAM with other loaded models (diffusion models, VAE, etc.).
         model = Qwen3VLForConditionalGeneration.from_pretrained(
             model_path,
-            torch_dtype="auto",
+            dtype="auto",
             low_cpu_mem_usage=True,
         )
         model.eval()
