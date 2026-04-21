@@ -8,6 +8,7 @@ import folder_paths
 import comfy.model_management
 import comfy.model_patcher
 from comfy.utils import ProgressBar
+import transformers
 from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 
 QWEN3_VL_MODELS = [
@@ -225,7 +226,10 @@ class Y7Nodes_QwenVL:
             print(f"[QwenVL] Download complete.")
 
         # Processor is CPU-only (tokeniser + image preprocessor, no GPU weights)
-        processor = AutoProcessor.from_pretrained(model_path, fix_mistral_regex=True)
+        # fix_mistral_regex was needed in transformers 4.x but causes a duplicate-kwarg
+        # error in 5.x where it is already applied internally
+        _proc_kwargs = {} if int(transformers.__version__.split(".")[0]) >= 5 else {"fix_mistral_regex": True}
+        processor = AutoProcessor.from_pretrained(model_path, **_proc_kwargs)
 
         # Load weights to CPU.  Do NOT use device_map="auto" — that moves tensors
         # directly to GPU and bypasses ComfyUI's memory manager, preventing it from
