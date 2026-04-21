@@ -229,16 +229,21 @@ class Y7Nodes_QwenVL:
         # fix_mistral_regex was needed in transformers 4.x but causes a duplicate-kwarg
         # error in 5.x where it is already applied internally
         _proc_kwargs = {} if int(transformers.__version__.split(".")[0]) >= 5 else {"fix_mistral_regex": True}
-        processor = AutoProcessor.from_pretrained(model_path, **_proc_kwargs)
+        _prev_verbosity = transformers.logging.get_verbosity()
+        transformers.logging.set_verbosity_error()
+        try:
+            processor = AutoProcessor.from_pretrained(model_path, **_proc_kwargs)
 
-        # Load weights to CPU.  Do NOT use device_map="auto" — that moves tensors
-        # directly to GPU and bypasses ComfyUI's memory manager, preventing it from
-        # coordinating VRAM with other loaded models (diffusion models, VAE, etc.).
-        model = Qwen3VLForConditionalGeneration.from_pretrained(
-            model_path,
-            dtype="auto",
-            low_cpu_mem_usage=True,
-        )
+            # Load weights to CPU.  Do NOT use device_map="auto" — that moves tensors
+            # directly to GPU and bypasses ComfyUI's memory manager, preventing it from
+            # coordinating VRAM with other loaded models (diffusion models, VAE, etc.).
+            model = Qwen3VLForConditionalGeneration.from_pretrained(
+                model_path,
+                dtype="auto",
+                low_cpu_mem_usage=True,
+            )
+        finally:
+            transformers.logging.set_verbosity(_prev_verbosity)
         model.eval()
 
         _Cls = type(type(model).__name__, (_QwenVLWrapper,), {})
