@@ -1,3 +1,6 @@
+1.0.45
+Added Load Image node that recognises files organised into sub-directories
+
 1.0.44
 Updated Qwen3 VL node (bug fix)
 

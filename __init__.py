@@ -21,6 +21,7 @@ from .nodes.scale_image_to_total_pixels import Y7Nodes_ScaleImageToTotalPixels
 from .nodes.scale_image_by import Y7Nodes_ScaleImageBy
 from .nodes.joycaption import Y7Nodes_JoyCaption, Y7Nodes_JoyCaption_ExtraOptions
 from .nodes.caption_tools import Y7Nodes_ImageBatchPath, Y7Nodes_CaptionSaver
+from .nodes.load_image import Y7Nodes_LoadImage
 
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageRow": Y7Nodes_ImageRow,
@@ -47,6 +48,7 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_JoyCaption_ExtraOptions": Y7Nodes_JoyCaption_ExtraOptions,
     "Y7Nodes_ImageBatchPath": Y7Nodes_ImageBatchPath,
     "Y7Nodes_CaptionSaver": Y7Nodes_CaptionSaver,
+    "Y7Nodes_LoadImage": Y7Nodes_LoadImage,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageRow": "Y7 Image Row",
@@ -73,6 +75,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_JoyCaption_ExtraOptions": "Y7 JoyCaption Extra Options",
     "Y7Nodes_ImageBatchPath": "Y7 Image Batch Path",
     "Y7Nodes_CaptionSaver": "Y7 Caption Saver",
+    "Y7Nodes_LoadImage": "Y7 Load Image",
 }
 
 # Apply HTML-formatted documentation to node classes

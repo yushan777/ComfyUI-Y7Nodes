@@ -856,6 +856,14 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 
 ---
 
+### Y7 Load Image
+
+> The native ComfyUI Load Image node only lists files directly in the `input` folder. This node is identical except it walks the full `input` directory tree, so images organised into subdirectories appear in the dropdown.
+>
+> Outputs `image` (IMAGE) and `mask` (MASK), same as the built-in node.
+
+---
+
 ## Example Workflows
 
 Example workflows can be found in the `workflows` directory. 

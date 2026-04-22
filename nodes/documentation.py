@@ -475,6 +475,15 @@ descriptions = {
         normal("Note: When `sort_method` is `random`, the node re-evaluates on every run."),
     ],
 
+    "Y7Nodes_LoadImage": [
+        "Load Image",
+        short_desc("Load an image with support for subdirectories — otherwise identical to the native Load Image node."),
+        normal("The native ComfyUI Load Image node only lists files directly in the `input` folder. This node walks the entire `input` directory tree so images organised into subfolders appear in the dropdown."),
+        normal("Outputs:"),
+        normal("- `image`: RGB image tensor", 1),
+        normal("- `mask`: Alpha channel as a mask (zeros if no alpha channel present)", 1),
+    ],
+
     "Y7Nodes_CaptionSaver": [
         "Caption Saver",
         short_desc("Save a caption string as a .txt file next to the source image, using the same filename stem."),
