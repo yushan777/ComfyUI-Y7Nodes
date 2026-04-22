@@ -8,7 +8,6 @@ from .nodes.prompt_enhancer_flux2_klein import Y7Nodes_PromptEnhancerFlux2
 from .nodes.t5_token_count import Y7Nodes_T5_TokenCounter
 from .nodes.clip_token_count import Y7Nodes_CLIP_TokenCounter
 from .nodes.catch_edit_text_dual import Y7Nodes_CatchEditTextNodeDual
-from .nodes.image_row import Y7Nodes_ImageRow
 from .nodes.image_size_presets import Y7Nodes_ImageSizePresets
 from .nodes.crop_to_nearest_multiple import Y7Nodes_CropToNearestMultiple
 from .nodes.color_match_masked import Y7Nodes_ColorMatchMasked
@@ -22,9 +21,9 @@ from .nodes.scale_image_by import Y7Nodes_ScaleImageBy
 from .nodes.joycaption import Y7Nodes_JoyCaption, Y7Nodes_JoyCaption_ExtraOptions
 from .nodes.caption_tools import Y7Nodes_ImageBatchPath, Y7Nodes_CaptionSaver
 from .nodes.load_image import Y7Nodes_LoadImage
+from .nodes.image_stitcher import Y7Nodes_ImageStitcher
 
 NODE_CLASS_MAPPINGS = {
-    "Y7Nodes_ImageRow": Y7Nodes_ImageRow,
     "Y7Nodes_ImageSizePresets": Y7Nodes_ImageSizePresets,
     "Y7Nodes_Text": Y7Nodes_Text,
     "Y7Nodes_ShowAnything": Y7Nodes_ShowAnything,
@@ -49,9 +48,9 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageBatchPath": Y7Nodes_ImageBatchPath,
     "Y7Nodes_CaptionSaver": Y7Nodes_CaptionSaver,
     "Y7Nodes_LoadImage": Y7Nodes_LoadImage,
+    "Y7Nodes_ImageStitcher": Y7Nodes_ImageStitcher,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Y7Nodes_ImageRow": "Y7 Image Row",
     "Y7Nodes_ImageSizePresets" : "Y7 Image Size (Presets)",
     "Y7Nodes_Text": "Y7 Text",
     "Y7Nodes_ShowAnything": "Y7 Show Anything",
@@ -76,6 +75,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageBatchPath": "Y7 Image Batch Path",
     "Y7Nodes_CaptionSaver": "Y7 Caption Saver",
     "Y7Nodes_LoadImage": "Y7 Load Image",
+    "Y7Nodes_ImageStitcher": "Y7 Image Stitcher",
 }
 
 # Apply HTML-formatted documentation to node classes

@@ -1,0 +1,781 @@
+{
+  "id": "b479a068-fccc-4d8e-92ef-e3f55ad1012d",
+  "revision": 0,
+  "last_node_id": 13,
+  "last_link_id": 20,
+  "nodes": [
+    {
+      "id": 5,
+      "type": "OlmDragCrop",
+      "pos": [
+        -360,
+        1780
+      ],
+      "size": [
+        360,
+        755
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 5
+        },
+        {
+          "name": "mask",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            6
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "name": "CROP_JSON",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "o-l-l-i/ComfyUI-Olm-DragCrop",
+        "ver": "5e286e835bb6b36e610ee657e51e770a9eae207d",
+        "Node name for S&R": "OlmDragCrop",
+        "dragStart": [
+          106.66666666666666,
+          0
+        ],
+        "dragEnd": [
+          213.33333333333331,
+          106.66666666666666
+        ],
+        "actualImageWidth": 3072,
+        "actualImageHeight": 3072,
+        "crop_left": 1024,
+        "crop_right": 1024,
+        "crop_top": 0,
+        "crop_bottom": 2048,
+        "crop_width": 1024,
+        "crop_height": 1024,
+        "snapValue": "64",
+        "aspectRatioString": "1:1",
+        "aspectLockEnabled": true,
+        "infoDisplayEnabled": true,
+        "box_color": "#d5ff6b",
+        "lastResolution": "3072x3072"
+      },
+      "widgets_values": [
+        1776893517245,
+        1024,
+        1024,
+        0,
+        2048,
+        1024,
+        1024,
+        3072,
+        3072,
+        "64",
+        "1:1",
+        true,
+        "set_ratio",
+        "refresh",
+        null,
+        "Lime",
+        "reset"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "OlmDragCrop",
+      "pos": [
+        -760,
+        1780
+      ],
+      "size": [
+        360,
+        755
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 2
+        },
+        {
+          "name": "mask",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            3
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "name": "CROP_JSON",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "o-l-l-i/ComfyUI-Olm-DragCrop",
+        "ver": "5e286e835bb6b36e610ee657e51e770a9eae207d",
+        "Node name for S&R": "OlmDragCrop",
+        "dragStart": [
+          0,
+          0
+        ],
+        "dragEnd": [
+          106.66666666666666,
+          106.66666666666666
+        ],
+        "actualImageWidth": 3072,
+        "actualImageHeight": 3072,
+        "crop_left": 0,
+        "crop_right": 2048,
+        "crop_top": 0,
+        "crop_bottom": 2048,
+        "crop_width": 1024,
+        "crop_height": 1024,
+        "snapValue": "64",
+        "aspectRatioString": "1:1",
+        "aspectLockEnabled": true,
+        "infoDisplayEnabled": true,
+        "box_color": "#d5ff6b",
+        "lastResolution": "3072x3072"
+      },
+      "widgets_values": [
+        "init",
+        0,
+        2048,
+        0,
+        2048,
+        1024,
+        1024,
+        3072,
+        3072,
+        "64",
+        "1:1",
+        true,
+        "set_ratio",
+        "refresh",
+        null,
+        "Lime",
+        "reset"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "PreviewImage",
+      "pos": [
+        450.0419638318394,
+        1812.6446750313773
+      ],
+      "size": [
+        140,
+        246
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 4
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.19.3",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 9,
+      "type": "OlmDragCrop",
+      "pos": [
+        -758.084050975423,
+        2687.503143383552
+      ],
+      "size": [
+        360,
+        755
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 13
+        },
+        {
+          "name": "mask",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            9
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "name": "CROP_JSON",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "o-l-l-i/ComfyUI-Olm-DragCrop",
+        "ver": "5e286e835bb6b36e610ee657e51e770a9eae207d",
+        "Node name for S&R": "OlmDragCrop",
+        "dragStart": [
+          106.66666666666666,
+          106.66666666666666
+        ],
+        "dragEnd": [
+          213.33333333333331,
+          213.33333333333331
+        ],
+        "actualImageWidth": 3072,
+        "actualImageHeight": 3072,
+        "crop_left": 1024,
+        "crop_right": 1024,
+        "crop_top": 1024,
+        "crop_bottom": 1024,
+        "crop_width": 1024,
+        "crop_height": 1024,
+        "snapValue": "64",
+        "aspectRatioString": "1:1",
+        "aspectLockEnabled": true,
+        "infoDisplayEnabled": true,
+        "box_color": "#d5ff6b",
+        "lastResolution": "3072x3072"
+      },
+      "widgets_values": [
+        1776894184072,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        1024,
+        3072,
+        3072,
+        "64",
+        "1:1",
+        true,
+        "set_ratio",
+        "refresh",
+        null,
+        "Lime",
+        "reset"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "LoadImage",
+      "pos": [
+        -1190,
+        1760
+      ],
+      "size": [
+        282.798828125,
+        314.0000000000001
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            2,
+            5,
+            13,
+            17
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.19.3",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "waitress-grid-3072.png",
+        "image"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "OlmDragCrop",
+      "pos": [
+        -358.084050975423,
+        2687.503143383552
+      ],
+      "size": [
+        360,
+        755
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 17
+        },
+        {
+          "name": "mask",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            10
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "name": "CROP_JSON",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "o-l-l-i/ComfyUI-Olm-DragCrop",
+        "ver": "5e286e835bb6b36e610ee657e51e770a9eae207d",
+        "Node name for S&R": "OlmDragCrop",
+        "dragStart": [
+          220,
+          106.66666666666666
+        ],
+        "dragEnd": [
+          320,
+          213.33333333333331
+        ],
+        "actualImageWidth": 3072,
+        "actualImageHeight": 3072,
+        "crop_left": 2112,
+        "crop_right": 0,
+        "crop_top": 1024,
+        "crop_bottom": 1024,
+        "crop_width": 960,
+        "crop_height": 1024,
+        "snapValue": "64",
+        "aspectRatioString": "1:1",
+        "aspectLockEnabled": true,
+        "infoDisplayEnabled": true,
+        "box_color": "#d5ff6b",
+        "lastResolution": "3072x3072"
+      },
+      "widgets_values": [
+        1776894184070,
+        2112,
+        0,
+        1024,
+        1024,
+        960,
+        1024,
+        3072,
+        3072,
+        "64",
+        "1:1",
+        true,
+        "set_ratio",
+        "refresh",
+        null,
+        "Lime",
+        "reset"
+      ]
+    },
+    {
+      "id": 1,
+      "type": "Y7Nodes_GridStitcher",
+      "pos": [
+        60,
+        1790
+      ],
+      "size": [
+        310,
+        130
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 3
+        },
+        {
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "stitched_image",
+          "type": "IMAGE",
+          "links": [
+            4,
+            18
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "d78b6b5e87b4863a42a85c14c27c2b55a317a9e0",
+        "Node name for S&R": "Y7Nodes_GridStitcher"
+      },
+      "widgets_values": [
+        2,
+        "Side-by-Side (Horizontal)"
+      ]
+    },
+    {
+      "id": 10,
+      "type": "Y7Nodes_GridStitcher",
+      "pos": [
+        60,
+        2710
+      ],
+      "size": [
+        310,
+        214
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 9
+        },
+        {
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 10
+        },
+        {
+          "name": "image3",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "stitched_image",
+          "type": "IMAGE",
+          "links": [
+            12,
+            19
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "d78b6b5e87b4863a42a85c14c27c2b55a317a9e0",
+        "Node name for S&R": "Y7Nodes_GridStitcher"
+      },
+      "widgets_values": [
+        3,
+        "Side-by-Side (Horizontal)"
+      ]
+    },
+    {
+      "id": 11,
+      "type": "PreviewImage",
+      "pos": [
+        420,
+        2710
+      ],
+      "size": [
+        140,
+        246
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 12
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.19.3",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 13,
+      "type": "PreviewImage",
+      "pos": [
+        1058.250736426697,
+        2353.009296574856
+      ],
+      "size": [
+        140,
+        246
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 20
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.19.3",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 12,
+      "type": "Y7Nodes_GridStitcher",
+      "pos": [
+        620,
+        2290
+      ],
+      "size": [
+        210,
+        110
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 18
+        },
+        {
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "stitched_image",
+          "type": "IMAGE",
+          "links": [
+            20
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "d78b6b5e87b4863a42a85c14c27c2b55a317a9e0",
+        "Node name for S&R": "Y7Nodes_GridStitcher"
+      },
+      "widgets_values": [
+        2,
+        "Top-and-Bottom (Vertical)"
+      ]
+    }
+  ],
+  "links": [
+    [
+      2,
+      2,
+      0,
+      3,
+      0,
+      "IMAGE"
+    ],
+    [
+      3,
+      3,
+      0,
+      1,
+      0,
+      "IMAGE"
+    ],
+    [
+      4,
+      1,
+      0,
+      4,
+      0,
+      "IMAGE"
+    ],
+    [
+      5,
+      2,
+      0,
+      5,
+      0,
+      "IMAGE"
+    ],
+    [
+      6,
+      5,
+      0,
+      1,
+      1,
+      "IMAGE"
+    ],
+    [
+      9,
+      9,
+      0,
+      10,
+      0,
+      "IMAGE"
+    ],
+    [
+      10,
+      7,
+      0,
+      10,
+      1,
+      "IMAGE"
+    ],
+    [
+      12,
+      10,
+      0,
+      11,
+      0,
+      "IMAGE"
+    ],
+    [
+      13,
+      2,
+      0,
+      9,
+      0,
+      "IMAGE"
+    ],
+    [
+      17,
+      2,
+      0,
+      7,
+      0,
+      "IMAGE"
+    ],
+    [
+      18,
+      1,
+      0,
+      12,
+      0,
+      "IMAGE"
+    ],
+    [
+      19,
+      10,
+      0,
+      12,
+      1,
+      "IMAGE"
+    ],
+    [
+      20,
+      12,
+      0,
+      13,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.39142513012209307,
+      "offset": [
+        2657.031389730235,
+        -375.004379970424
+      ]
+    },
+    "frontendVersion": "1.42.14",
+    "VHS_latentpreview": true,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

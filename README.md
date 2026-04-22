@@ -75,15 +75,20 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 > </details>
 
 ---
-### Image Row
-> Takes up to 4 images and concats them together horizontally in a row with captions:
-> 
-> <img src="assets/image_row.jpg" alt="image row" width="100%"/>
+
+### Y7 Image Stitcher
+
+> Stitches 2–8 images side-by-side or top-to-bottom. The `image_count` widget controls how many image sockets are shown on the node.
+>
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >
->   - Captions list will map too whatever images has been inputed
->   - Preview mode by default, switch to save mode.
+>   - Set `image_count` (2–8) to show exactly that many image input sockets. Sockets are added or removed live as you change the value.
+>   - **Side-by-Side (Horizontal)**: all images are resized to match the first image's height, then concatenated left-to-right.
+>   - **Top-and-Bottom (Vertical)**: all images are resized to match the first image's width, then concatenated top-to-bottom.
+>   - Unconnected sockets within the count are skipped gracefully.
+>   - Output is a single `IMAGE` tensor.
+>
 > </details>
 
 ---
