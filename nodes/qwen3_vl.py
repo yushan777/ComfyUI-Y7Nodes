@@ -45,6 +45,12 @@ PRESET_PROMPTS = {
         "Analyze the image and write a single concise sentence that describes the main subject "
         "and setting. Keep it grounded in visible details only."
     ),
+    "🖼️ Standard Description": (
+        "Write 3–5 sentences describing what is visible in the image. Cover the main subject and "
+        "what it is doing or showing; the environment or setting; and one or two notable visual "
+        "qualities such as lighting mood, color palette, or composition. Stay factual and grounded "
+        "in visible details only. No preface, no reasoning, no <think>."
+    ),
     "🖼️ Detailed Description": (
         "Write ONE detailed paragraph (6–10 sentences). Describe only what is visible: subject(s) "
         "and actions; people details if present (approx age group, gender expression if clear, hair, "
