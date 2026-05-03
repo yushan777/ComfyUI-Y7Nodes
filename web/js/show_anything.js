@@ -231,38 +231,14 @@ app.registerExtension({
             function populate(text) {
                 // Convert to string if it's not already; join batched items with a blank line separator
                 const displayText = Array.isArray(text) ? text.join('\n\n') : text.toString();
-                                
-                // Update the text
+
+                // Update the widget value and its DOM textarea element
                 this.widgets[TEXT_WIDGET].value = displayText;
+                if (this.widgets[TEXT_WIDGET].inputEl) {
+                    this.widgets[TEXT_WIDGET].inputEl.value = displayText;
+                }
 
-            
-                // ===========================================================================================
-                // Resize node (if needed)
-                requestAnimationFrame(() => {
-
-                    // console.log("=====>> requestAnimationFrame() called!!!")
-                    // this function doesn't seem to do anything
-
-                    // 1. Get required node dimensions based on content
-                    //sz[0] = width, sz[1] = height
-                    //let sz = this.computeSize();
-
-                    // 2. Maintain current size : (ensure the node never shrinks smaller than its current size)
-                    // allow it to grow but never shrink (can get annoying)
-                    // If the computed width (sz[0]) <  the current width (this.size[0]), keep the current width
-                    // If the computed height (sz[1]) <  the current height (this.size[1]), keep the current width
-                    //if (sz[0] < this.size[0]) sz[0] = this.size[0];  // width
-                    //if (sz[1] < this.size[1]) sz[1] = this.size[1];  // height
-
-                    // 3. Add padding to the height (e.g., 10 pixels)
-                    // sz[1] -= 50;  // Add your desired padding amount here
-
-                    // 4. Apply the resize
-                    //this.onResize?.(sz);
-
-                    // 5. Tell ComfyUI to redraw
-                    //app.graph.setDirtyCanvas(true, false);
-                });
+                app.graph.setDirtyCanvas(true, false);
             }
 
         }
