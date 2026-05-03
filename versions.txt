@@ -1,3 +1,6 @@
+1.0.47
+Fixed bug in Show Anything node.
+
 1.0.46
 Added Image Stitcher node.
 
