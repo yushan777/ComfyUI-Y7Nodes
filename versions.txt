@@ -1,3 +1,6 @@
+1.0.49
+image compare node added
+
 1.0.48
 updated Qwen3-VL node
 

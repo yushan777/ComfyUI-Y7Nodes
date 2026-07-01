@@ -93,6 +93,25 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ---
 
+### Y7 Image Compare
+
+> Compares two images with a draggable slider for interactive side-by-side comparison directly on the node.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   - Connect `image_a` (required) and `image_b` (optional), then drag the slider to reveal `image_a` over `image_b`.
+>   - Two blend modes: `normal` (slider wipe) and `difference` (highlights variations between the two images).
+>   - The preview updates live as the slider is moved or the blend mode is changed, and persists across workflow-tab switches.
+>   - The node auto-resizes to match the aspect ratio of the input images; slider position and blend mode are saved with the workflow.
+>   - Right-click over the image for `Open Image` / `Save Image` options.
+>   - Preview-only node with no outputs.
+>   - Based on `Eses Image Compare` by Eses Nodes.
+>
+> </details>
+
+---
+
 ### CLIP Token Counter
 
 > Takes text (string) as input and, using the CLIP tokenizer, displays token count and more:

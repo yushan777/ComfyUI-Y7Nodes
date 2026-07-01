@@ -44,6 +44,25 @@ descriptions = {
         normal("- `image1` … `imageN`: Images to stitch together", 1),
     ],
 
+    "Y7Nodes_ImageCompare": [
+        "Image Compare",
+        short_desc("Compare two images with a draggable slider and selectable blend modes."),
+        normal("Provides an interactive side-by-side comparison directly on the node. Drag the slider to reveal `image_a` over `image_b`, and switch blend modes to analyse differences."),
+        normal("The preview updates live as the slider is moved or the blend mode is changed, and persists across workflow-tab switches."),
+        normal("Blend modes:"),
+        normal("- `normal`: Slider reveals `image_a` over `image_b`", 1),
+        normal("- `difference`: Blended comparison for visual analysis of variations", 1),
+        normal("Inputs:"),
+        normal("- `image_a`: First image (required)", 1),
+        normal("- `image_b`: Second image (optional)", 1),
+        normal("This node has no outputs; it is a preview-only node for on-canvas comparison."),
+        normal("Quality of life:"),
+        normal("- The node auto-resizes to match the aspect ratio of the input images", 1),
+        normal("- Slider position and blend mode are saved with the workflow", 1),
+        normal(""),
+        normal("Based on `Eses Image Compare` by Eses Nodes."),
+    ],
+
     "Y7Nodes_Text":[
         "Basic Text Input With Copy Button",
         short_desc("Basic Text Input With Copy Button"),
