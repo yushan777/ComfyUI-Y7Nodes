@@ -1,8 +1,13 @@
+1.0.51
+- Removed joycaption node.
+- Removed Qwen-VL node. No longer needed since there is now native support for VL functionality using Load Clip + Generate Text nodes.
+- Removed PromptEnhancerFlux and PromptEnhancerFlux2
+
 1.0.50
-submitted wrong branch previously - oops
+- Submitted wrong branch previously - oops
 
 1.0.49
-image compare node added
+Image compare node added
 
 1.0.48
 updated Qwen3-VL node

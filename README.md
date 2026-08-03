@@ -152,13 +152,11 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ### Catch and Edit Text (Dual)
 > Based on the original ![CatchEditTextNode by ImagineerNL](https://github.com/ImagineerNL/ComfyUI-IMGNR-Utils)
-> A node that catches and shows text(s) generated from a previous node and enables editing the text for subsequent runs. Using the edited text also mutes the input node.  Modified from the original to take two text inputs to work with the Prompt Enhancer (shown below) and provide two text outputs.
+> A node that catches and shows text(s) generated from a previous node and enables editing the text for subsequent runs. Using the edited text also mutes the input node.  Modified from the original to take two text inputs to work with the Prompt Enhancer node and provide two text outputs.
 > 
 > <img src="assets/prompt_enhancer_flux_with_catch_edit_text.jpg" alt="catch edit text" width="100%"/>
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
->
->   See screenshot for Prompt Enhancer below. 
 >
 >   This node acts as a receiver and editor for text sent from two sources.
 action widget:
@@ -170,204 +168,66 @@ If you just need one text input then I recommend using [ImagineerNL's original n
 
 ------
 
-### Y7 Prompt Enhancer (Flux.1)
+### Y7 Prompt Enhancer (Native)
 
-> Takes any basic prompt and enhances it and produces T5 and CLIP friendly variants of the enhanced prompt. token / trigger words can be used in sq. brackets
-> Example: [ohwx man], [agg woman], [sks dog]
->
-> <img src="assets/prompt_enhancer_flux_with_catch_edit_text.jpg" alt="catch edit text" width="100%"/>
-> <details>
->   <summary>ℹ️ <i>See More Information</i></summary>
->   
->   ![Prompt Enhancer (Flux) ](assets/prompt_enhancer_flux_with_catch_edit_text.jpg)
->   
->   Flux.1 uses two encoders: CLIP and T5 XXL. CLIP processes only the first 77 tokens (including <bos>/<eos>), and anything beyond that depends on the implementation. In ComfyUI, long prompts are split into 77-token chunks for CLIP, which are then batched and concatenated. On the other hand, T5, supports up to 512 tokens (or 256 in the "schnell" version) and works well with natural, descriptive language.
->   
->   Most users simply feed the same (T5) prompt into both encoders, as it's the most straightforward approach. However, because the first 77 tokens are shared by both encoders—and the rest are exclusive to T5—how you structure your prompt can make a big difference.
->   
->   Front-loading long prose too early can reduce CLIP's effectiveness, while cramming too many keywords up front may limit T5's ability to build nuance throughout the rest of the prompt.
->   
->   For (possibly) better results, a hybrid approach of starting with high-impact keywords to guide CLIP, then follow with flowing, descriptive language tailored for T5. This approach plays to the strengths of both encoders (again, possibly).
->   
->   **Token/Trigger words** are handled by enclosing them inside square brackets `[ohwx man]`, but occasionally it might not work.
->
->  There can be quirks in some of the responses generated, but it will get you most of the way in producing prompts in both formats very quickly and you can always edit them afterwards (in your own editor). 
->   
->   Four LLM models are available, offering a balance of knowledge, instruction-following, and minimal censorship.
-> 
->   If you're using a GPU with limited VRAM, consider switching to 8-bit or 4-bit quantization to reduce memory usage (with some trade-offs in quality).
-**Note: This requires BitsandBytes** which is primarily Linux-focused. Support for Windows and macOS can be tricky — and there might be workarounds, but they’re beyond the scope of this note.
-If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should be fine
->
->   Additionally, you can choose to unload all models before each run — helpful for workflows involving other large models that remain cached. Alternatively, you can always use [SeanScripts's Unload Model custom nodes](https://github.com/SeanScripts/ComfyUI-Unload-Model) which provide a convenient way to handle this dynamically.
->
->   The node will attempt to download the selected model (approx 14.5GB) if it can't be found.  
->
->   If you wish to download the model(s) manually, links and paths shown below:
->   https://huggingface.co/teknium/OpenHermes-2.5-Mistral-7B 
->   
->   ```
->   ComfyUI
->   └── models
->       └── LLM
->           └── OpenHermes-2.5-Mistral-7B
->           |   ├── added_tokens.json
->           |   ├── config.json
->           |   ├── generation_config.json
->           |   ├── model-00001-of-00002.safetensors
->           |   ├── model-00002-of-00002.safetensors
->           |   ├── model.safetensors.index.json
->           |   ├── special_tokens_map.json
->           |   ├── tokenizer.model
->           |   ├── tokenizer_config.json
->           |   ├── transformers_inference.py>           
->   ```
->   
->   For https://huggingface.co/teknium/Hermes-Trismegistus-Mistral-7B (approx. 14.5GB)
->   
->   ```
->   ComfyUI
->   └── models
->       └── LLM        
->           └── Hermes-Trismegistus-Mistral-7B        
->           |   ├── added_tokens.json
->           |   ├── config.json
->           |   ├── generation_config.json
->           |   ├── pytorch_model-00001-of-00002.bin
->           |   ├── pytorch_model-00002-of-00002.bin
->           |   ├── pytorch_model.bin.index.json
->           |   ├── special_tokens_map.json
->           |   ├── tokenizer.model
->           |   ├── tokenizer_config.json
->   ```
->
->   For https://huggingface.co/cognitivecomputations/Dolphin3.0-Llama3.1-8B (approx. 16GB)
->   ```
->   ComfyUI
->   └── models
->       └── LLM        
->           └── Dolphin3.0-Llama3.1-8B        
->           |   ├── config.json
->           |   ├── generation_config.json
->           |   ├── model-00001-of-00004.safetensors
->           |   ├── model-00002-of-00004.safetensors
->           |   ├── model-00003-of-00004.safetensors
->           |   ├── model-00004-of-00004.safetensors
->           |   ├── model.safetensors.index.json
->           |   ├── special_tokens_map.json
->           |   ├── tokenizer_config.json
->           |   ├── tokenizer.json
->           |   ├── trainer_state.json
->   ```
-
->   For https://huggingface.co/Qwen/Qwen2.5-7B-Instruct (approx. 15.2GB)
->   ```
->   ComfyUI
->   └── models
->       └── LLM        
->           └── Qwen2.5-7B-Instruct      
->           |   ├── config.json
->           |   ├── generation_config.json
->           |   ├── merges.txt
->           |   ├── model-00001-of-00004.safetensors
->           |   ├── model-00002-of-00004.safetensors
->           |   ├── model-00003-of-00004.safetensors
->           |   ├── model-00004-of-00004.safetensors
->           |   ├── model.safetensors.index.json
->           |   ├── tokenizer.json
->           |   ├── tokenizer_config (1).json
->           |   ├── tokenizer_config.json
->           |   ├── vocab.json
->   ```
-
-
-> </details>
-
-------
-
-### Y7 Prompt Enhancer (Flux.2 Klein)
-
-> Takes any basic prompt and enhances it specifically for FLUX.2 [klein] using the Qwen3-8B LLM model or an abliterated version. Features include customizable prompt instructions, thinking mode, and advanced generation parameters.
+> Takes any basic prompt and enhances it using a text encoder that ComfyUI has already loaded, via a `CLIP` input. Downloads nothing, loads nothing, and leaves all VRAM management to ComfyUI. Reasoning is separated from the prompt automatically.
 >
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
->   
->   This node is designed specifically for FLUX.2 [klein] image generation and uses the Qwen3-8B model to transform basic prompts into detailed, high-quality prompts.
->   
->   **Key Features:**
->   
->   - **Qwen3-8B Model**: Uses advanced LLM for prompt enhancement
->   - **Josiefied-Qwen3-8B-abliterated Model**: Abliterated variant of the Qwen3-8B Model
->   - **Thinking Mode**: Enable/disable the model's reasoning process output
->   - **Quantization Support**: Choose between none, 8-bit, or 4-bit quantization (requires bitsandbytes - primarily Linux)
->   - **Platform Support**: Works on CUDA, Apple Silicon (MPS), and CPU
->   - **Advanced Parameters**: Control temperature, top_p, top_k, and max_new_tokens for fine-tuned generation
->   - **Memory Management**: Option to keep model loaded for faster batch processing
->   - **Numerical Stability**: Built-in handling for numerical edge cases during generation
->   
->   **Outputs:**
->   - `thinking_output`: The model's reasoning process (when thinking mode is enabled)
->   - `enhanced_prompt`: The final enhanced prompt for FLUX.2 [klein]
->   
->   **Customizing Prompt Instructions:**
->   
->   To customize how the model enhances prompts:
->   1. Copy `system_messages_example.py`
->   2. Rename it to `system_messages.py`
->   3. Edit the file with your custom instructions
->   4. The node will automatically load your custom version
->   
->   **Model Information:**
->   
->   The HuggingFace transformers version of Qwen3-8B is Required and cannot use the Comfy-Org packaged version.
->   This node performs runtime text generation for prompt enhancement and reasoning using AutoModelForCausalLM and AutoTokenizer. These capabilities—tokenizer access, generation control, and model.generate()—are only available through the HuggingFace transformers API.
->   Comfy-Org’s Qwen models are optimized for inference-only graph execution inside ComfyUI and do not expose the full language-model interfaces required for programmatic text generation outside the standard sampling flow.
->   If Qwen3-8B is not found locally, the node will automatically download it (~16GB) from HuggingFace to models/LLM/Qwen3-8B.
-
->   
->   Manual download location (if needed):
->   https://huggingface.co/Qwen/Qwen3-8B  
->   https://huggingface.co/Goekdeniz-Guelmez/Josiefied-Qwen3-8B-abliterated-v1
->   
+>
+>   Where a typical prompt enhancer node owns its model (downloading it, loading it through HuggingFace transformers, and managing when to free it), this node does none of that. You load a text encoder with a standard `CLIPLoader` and connect it. ComfyUI handles loading, device placement and offloading exactly as it does for any other model in your workflow.
+>
+>   **Supported models**
+>
+>   Any text encoder with a native generation path:
+>
+>   | Model | Variants |
+>   | --- | --- |
+>   | Gemma 4 | E2B, E4B, 31B, 12B unified |
+>   | Gemma 3 | 12B (including the LTX-2 text encoder built on it) |
+>   | Qwen3 | 0.6B, 2B, 4B, 8B |
+>   | Qwen3.5 | 0.8B, 2B, 4B, 9B, 27B |
+>   | Qwen3-VL | 4B, 8B |
+>
+>   **Not supported** — T5 (all sizes), UMT5, CLIP-L, CLIP-G, Gemma 2, LLaMA-3.1. These have no text generation path; the node detects this and tells you, rather than failing with an obscure error deep inside the encoder.
+>
+>   **Model format**
+>
+>   Safetensors only, placed in `models/text_encoders/`. GGUF will **not** work — ComfyUI core has no GGUF loader (`.gguf` is not even a recognised model extension), and for Gemma 4 the tokenizer is embedded inside the safetensors file, so a converted GGUF would be missing it.
+>
+>   For Gemma 4 the `CLIPLoader` `type` dropdown is ignored — the model is detected from the weights themselves, so any value in that dropdown works.
+>
+>   Gemma 4 weights: https://huggingface.co/Comfy-Org/gemma-4/tree/main/text_encoders
+>
 >   ```
 >   ComfyUI
 >   └── models
->       └── LLM
->           └── Qwen3-8B
->               ├── config.json
->               ├── generation_config.json
->               ├── merges.txt
->               ├── model.safetensors.index.json
->               ├── model-00001-of-00004.safetensors
->               ├── model-00002-of-00004.safetensors
->               ├── model-00003-of-00004.safetensors
->               ├── model-00004-of-00004.safetensors
->               ├── tokenizer.json
->               ├── tokenizer_config.json
->               └── vocab.json
->
->           └── Josiefied-Qwen3-8B-abliterated-v1
->               ├── added_tokens.json
->               ├── config.json
->               ├── generation_config.json
->               ├── merges.txt
->               ├── model-00001-of-00004.safetensors
->               ├── model-00002-of-00004.safetensors
->               ├── model-00003-of-00004.safetensors
->               ├── model-00004-of-00004.safetensors
->               ├── model.safetensors.index.json
->               ├── special_tokens_map.json
->               ├── tokenizer_config.json
->               ├── tokenizer.json
->               └── vocab.json
+>       └── text_encoders
+>           └── gemma4_e4b_it_bf16.safetensors
 >   ```
->   
->   **Performance Tips:**
->   
->   - Use quantization (8-bit or 4-bit) if you have limited VRAM
->   - Enable "keep_model_loaded" when processing multiple prompts in succession
->   - Lower temperature values (0.4-0.7) produce more consistent results
->   - Adjust max_new_tokens based on desired prompt length
+>
+>   **Inputs**
+>
+>   - `clip`: A generation-capable text encoder from `CLIPLoader`
+>   - `text`: Your basic prompt. Accepts a connection from any string node.
+>   - `instruction`: The instruction placed before your text. Edit to change the enhancement style.
+>   - `max_length`: Maximum **new** tokens to generate (64–32768, default 2048). Not the context window. Reasoning is spent from the same budget, and the KV cache reserves roughly 84KB of VRAM per token up front.
+>   - `temperature`: 0.0–2.0, default 1.0 (Google's recommended value for Gemma). 0 switches to greedy decoding.
+>   - `top_k`: 0–1000, default 64 (Google's recommended value). 0 disables.
+>   - `top_p`: 0.0–1.0, default 0.95 (Google's recommended value). 1.0 disables.
+>   - `seed`: Change it to re-roll — identical inputs return a cached result.
+>   - `thinking`: Let the model reason before answering.
+>
+>   **Outputs**
+>
+>   - `thinking_output`: The model's reasoning, if it produced any
+>   - `enhanced_prompt`: The enhanced prompt, with all reasoning removed
+>
+>   **On reasoning**
+>
+>   Gemma 4 writes its reasoning into a thought channel, and ComfyUI's decoder deliberately preserves that text instead of discarding it. Turning `thinking` off only *primes* the model to skip reasoning — Gemma 4 often reasons anyway, which is why ComfyUI's own **Generate Text** node can hand back a wall of planning notes with the actual prompt buried at the end.
+>
+>   This node always separates the two, including the awkward case where the model reasons straight past the primed channel and closes it with an unmatched tag. If `enhanced_prompt` comes back empty, the model spent the entire `max_length` budget reasoning — raise it, or lower `temperature`.
 >
 > </details>
 
@@ -512,172 +372,16 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 
 ---
 
-### Y7 Qwen3-VL
-
-> Run vision-language inference using Qwen3-VL models directly within ComfyUI. Supports image analysis and text-only queries with multiple preset instructions and customizable prompts.
->
-> <details>
->   <summary>ℹ️ <i>See More Information</i></summary>
->
->   Uses the HuggingFace `Qwen3VLForConditionalGeneration` model integrated with ComfyUI's memory manager for proper VRAM coordination alongside other loaded models (diffusion models, VAE, etc.).
->
->   **Models Available:**
->
->   - `Qwen/Qwen3-VL-2B-Instruct`
->   - `Qwen/Qwen3-VL-4B-Instruct`
->   - `Qwen/Qwen3-VL-8B-Instruct` (default)
->   - `Qwen/Qwen3-VL-32B-Instruct`
->
->   **Preset Instructions:**
->
->   - **Tags**: Generates a comma-separated list of up to 50 visual tags for text-to-image AI
->   - **Simple Description**: A single concise sentence describing the main subject and setting
->   - **Detailed Description**: A detailed paragraph covering subject, environment, lighting, and composition
->   - **Ultra Detailed Description**: An extended paragraph with micro-details, textures, and lighting analysis
->   - **Cinematic Description**: A film-still style paragraph with camera language and mood
->   - **Detailed Analysis**: Structured output in sections: Subject, People, Environment, Lighting, Camera/Composition, Color/Texture
->   - **Short Story**: A short imaginative story inspired by the image
->   - **Prompt Refine & Expand**: Refines and expands a text prompt for creative image generation
->
->   **Inputs:**
->
->   - `image`: Optional image input — omit for text-only queries
->   - `model_name`: Which Qwen3-VL model to use
->   - `preset_prompt`: Built-in instruction for how the model should analyse the image
->   - `custom_prompt`: If filled, replaces the preset instruction entirely
->   - `max_new_tokens`: Maximum tokens to generate (64–4096, default 512)
->   - `temperature`: Controls randomness (0.0–2.0, default 0.7)
->   - `top_p`: Nucleus sampling threshold (0.0–1.0, default 0.9)
->   - `repetition_penalty`: Penalises repeated tokens (1.0–2.0, default 1.1)
->   - `seed`: Random seed for reproducibility
->   - `keep_model_loaded`: Keep the model in VRAM between runs to skip reloading
->   - `download_model`: Automatically download the selected model from HuggingFace if not found locally
->
->   **Output:**
->
->   - `response`: The model's text response
->
->   **Model Location:**
->
->   Models are stored in `models/LLM/<model-name>`. If `download_model` is enabled and the model is not found locally, it will be downloaded automatically from HuggingFace.
->
->   ```
->   ComfyUI
->   └── models
->       └── LLM
->           └── Qwen3-VL-8B-Instruct
->               ├── config.json
->               ├── generation_config.json
->               ├── model-*.safetensors
->               ├── preprocessor_config.json
->               ├── tokenizer.json
->               └── tokenizer_config.json
->   ```
->
-> </details>
-
----
-
-### Y7 JoyCaption
-
-> Generate image captions using a JoyCaption LLaVA model, with full control over caption style, length, and generation parameters.
->
-> <details>
->   <summary>ℹ️ <i>See More Information</i></summary>
->
->   A variant of [1038lab/ComfyUI-JoyCaption](https://github.com/1038lab/ComfyUI-JoyCaption). Only HuggingFace JoyCaption models are supported.
->
->   **Models** (downloaded automatically to `models/LLM/` on first use):
->
->   - `joycaption-beta-one-fp8` — FP8 Dynamic quantization variant
->   - `joycaption-beta-one` — Latest beta release (default)
->   - `joycaption-alpha-two` — Previous alpha release
->
->   **Caption Styles** (`prompt_style`):
->
->   - `Descriptive`, `Descriptive (Casual)`, `SDXL`, `Flux.2`, `MidJourney`, `Danbooru tag list`, `Art Critic`, `Product Listing`, `Social Media Post`
->
->   **Inputs:**
->
->   - `image`: The image to caption
->   - `model`: Which JoyCaption model to use
->   - `quantization`: Memory precision — `Full Precision (bf16)`, `Balanced (8-bit)`, or `Maximum Savings (4-bit)`
->   - `prompt_style`: Caption style (see above)
->   - `caption_length`: Target length — `any`, `very short`, `short`, `medium`, `long`, `very long`
->   - `max_new_tokens`: Maximum tokens to generate (1–2048, default 512)
->   - `temperature`: Controls randomness (0.0–2.0, default 0.6)
->   - `top_p`: Nucleus sampling threshold (0.0–1.0, default 0.9)
->   - `top_k`: Top-k sampling limit (0 = disabled, range 0–100)
->   - `seed`: Random seed for reproducible results
->   - `custom_prompt`: If filled, replaces the built-in prompt entirely
->   - `memory_management`: How to handle the model between runs:
->     - `Keep in Memory` — stays loaded (fastest for repeated runs)
->     - `Clear After Run` — frees VRAM immediately after each run
->     - `Global Cache` — shared cache across multiple JoyCaption node instances
->   - `extra_options` *(optional)*: Connect a **JoyCaption Extra Options** node to add caption modifiers
->
->   **Outputs:**
->
->   - `PROMPT`: The prompt sent to the model (useful for debugging)
->   - `STRING`: The generated caption text
->
-> </details>
-
----
-
-### Y7 JoyCaption Extra Options
-
-> Optional caption modifiers — connect to the JoyCaption node to refine what the model includes or excludes in its output.
->
-> <details>
->   <summary>ℹ️ <i>See More Information</i></summary>
->
->   Each toggle appends an instruction to the caption prompt. Enable only the options relevant to your use case.
->
->   | Option | Effect |
->   |---|---|
->   | Exclude People Info | Omit fixed attributes (ethnicity, gender) but keep changeable ones (hair, clothing) |
->   | Include Lighting | Describe lighting conditions |
->   | Include Camera Angle | Describe camera angle |
->   | Include Watermark | Note whether a watermark is present |
->   | Include JPEG Artifacts | Note whether JPEG artifacts are present |
->   | Include EXIF | Describe likely camera settings (aperture, shutter speed, ISO, etc.) |
->   | Exclude Sexual | Keep the caption PG |
->   | Exclude Image Resolution | Do not mention image resolution |
->   | Include Aesthetic Quality | Rate the subjective aesthetic quality (low to very high) |
->   | Include Composition Style | Describe composition style (leading lines, rule of thirds, etc.) |
->   | Exclude Text | Do not mention any text visible in the image |
->   | Specify Depth Field | Describe depth of field and background focus |
->   | Specify Lighting Sources | Mention likely artificial or natural light sources |
->   | Do Not Use Ambiguous Language | Avoid vague phrasing |
->   | Include NSFW | State whether the image is SFW, suggestive, or NSFW |
->   | Only Describe Most Important Elements | Focus only on the most prominent elements |
->   | Do Not Include Artist Name or Title | Omit artist name and artwork title |
->   | Identify Image Orientation | Note portrait, landscape, or square orientation |
->   | Include Character Age | Describe the ages of people/characters |
->   | Include Camera Shot Type | Specify shot type (close-up, medium shot, wide shot, etc.) |
->   | Exclude Mood Feeling | Do not describe mood or emotional tone |
->   | Include Camera Vantage Height | Specify vantage height (eye-level, bird's-eye, worm's-eye, etc.) |
->   | Mention Watermark | Explicitly mention any watermark present |
->   | Avoid Meta Descriptive Phrases | Skip phrases like "This image shows…" for cleaner T2I prompts |
->   | Refer Character Name | Refer to people/characters by the name in `character_name` |
->
->   The `character_name` field is used when **Refer Character Name** is enabled.
->
-> </details>
-
----
-
 ### Y7 Image Batch Path
 
-> Load a batch of images from a directory and output them as a list of image tensors with matching file paths. Designed to pair with Caption Saver and JoyCaption for batch captioning workflows.
+> Load a batch of images from a directory and output them as a list of image tensors with matching file paths. Designed to pair with Caption Saver and a VLM node for batch captioning workflows.
 >
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >
 >   Supports jpg, jpeg, png, and webp. Images are EXIF-transposed and converted to RGB float32 tensors.
 >
->   Connect `IMAGE` to JoyCaption (or any other VLM node) and `IMAGE_PATH` to Caption Saver. The path list tells Caption Saver exactly where to write each `.txt` file.
+>   Connect `IMAGE` to a VLM node and `IMAGE_PATH` to Caption Saver. The path list tells Caption Saver exactly where to write each `.txt` file.
 >
 >   **Inputs:**
 >
@@ -704,9 +408,9 @@ If you're running ComfyUI inside WSL (Windows Subsystem for Linux), you should b
 > <details>
 >   <summary>ℹ️ <i>See More Information</i></summary>
 >
->   Designed to pair with **Image Batch Path** and **JoyCaption**: connect `IMAGE_PATH` from Image Batch Path and the caption `STRING` from JoyCaption.
+>   Designed to pair with **Image Batch Path** and a VLM node: connect `IMAGE_PATH` from Image Batch Path and the caption `STRING` from the VLM node.
 >
->   Compatible with any node that outputs a STRING — not limited to JoyCaption. Examples: Florence2, MiniCPM, LLaVA, Qwen-VL, etc.
+>   Compatible with any node that outputs a STRING. Examples: Florence2, MiniCPM, LLaVA, Qwen-VL, etc.
 >
 >   **Inputs:**
 >

@@ -13,7 +13,7 @@ from PIL import Image, ImageOps
 # tensors and a matching list of their full file paths. Supports jpg, jpeg, png,
 # and webp. Images are EXIF-transposed and converted to RGB float32 tensors.
 # Pair with CaptionSaver — the IMAGE_PATH output tells CaptionSaver where to
-# write each .txt file, and IMAGE feeds into JoyCaption for captioning.
+# write each .txt file, and IMAGE feeds into a VLM node for captioning.
 class Y7Nodes_ImageBatchPath:
     @classmethod
     def INPUT_TYPES(cls):
@@ -83,11 +83,11 @@ class Y7Nodes_ImageBatchPath:
 
 # Saves a caption string as a .txt file next to the source image, using the
 # same filename stem (e.g. cat.jpg -> cat.txt). Designed to be paired with
-# ImageBatchPath: connect IMAGE_PATH here and STRING from JoyCaption.
+# ImageBatchPath: connect IMAGE_PATH here and STRING from a VLM node.
 # The overwrite toggle controls whether existing .txt files are replaced or
 # suffixed with a counter (cat_01.txt, cat_02.txt, etc.).
-# Compatible with any VLM node that outputs a STRING or list of STRINGs —
-# not just JoyCaption. Examples: Florence2, MiniCPM, LLaVA, Qwen-VL, etc.
+# Compatible with any VLM node that outputs a STRING or list of STRINGs.
+# Examples: Florence2, MiniCPM, LLaVA, Qwen-VL, etc.
 class Y7Nodes_CaptionSaver:
     @classmethod
     def INPUT_TYPES(cls):
