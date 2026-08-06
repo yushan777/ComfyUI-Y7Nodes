@@ -267,7 +267,7 @@ class Y7Nodes_ImageSizePresets:
 
     def generate(self, preset, dimension, custom_w, custom_h):
         try:
-            if dimension == "Custom":
+            if preset == "Custom*" or dimension == "Custom":
                 return (custom_w, custom_h)
 
             # Get dims for the selected preset

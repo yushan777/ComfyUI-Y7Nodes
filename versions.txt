@@ -1,3 +1,6 @@
+1.0.53
+- Fixed bug in Image Size Presets node.
+
 1.0.52
 - Removed joycaption node.
 - Removed Qwen-VL node. No longer needed since there is now native support for VL functionality using Load Clip + Generate Text nodes.
