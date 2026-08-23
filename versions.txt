@@ -1,3 +1,9 @@
+1.0.54
+- Added clone of Resolution Selector with a few tweaks 
+    - More grandular step for megapixels to accomodate MiniMax H3's recommended 0.98MP at a multiple of 32px 
+    - Displays width and height outputs on the node
+    - V3 schema node. 
+
 1.0.53
 - Fixed bug in Image Size Presets node.
 

@@ -20,6 +20,7 @@ from .nodes.caption_tools import Y7Nodes_ImageBatchPath, Y7Nodes_CaptionSaver
 from .nodes.load_image import Y7Nodes_LoadImage
 from .nodes.image_stitcher import Y7Nodes_ImageStitcher
 from .nodes.image_compare import Y7Nodes_ImageCompare
+from .nodes.resolutionselector import Y7Nodes_ResolutionSelector
 
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageSizePresets": Y7Nodes_ImageSizePresets,
@@ -44,6 +45,7 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_LoadImage": Y7Nodes_LoadImage,
     "Y7Nodes_ImageStitcher": Y7Nodes_ImageStitcher,
     "Y7Nodes_ImageCompare": Y7Nodes_ImageCompare,
+    "Y7Nodes_ResolutionSelector": Y7Nodes_ResolutionSelector,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageSizePresets" : "Y7 Image Size (Presets)",

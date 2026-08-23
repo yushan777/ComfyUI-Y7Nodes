@@ -439,6 +439,30 @@ If you just need one text input then I recommend using [ImagineerNL's original n
 
 ---
 
+### Y7 Resolution Selector
+
+> Calculate width and height from an aspect ratio and a megapixel target, rounded to the nearest multiple.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   A clone of ComfyUI's built-in V3 `ResolutionSelector` node, with a finer-grained `megapixels` step (0.01 instead of 0.1) and the resolution displayed directly on the node after execution.
+>
+>   **Inputs:**
+>
+>   - `aspect_ratio`: The target aspect ratio (e.g. `1:1 (Square)`, `16:9 (Widescreen)`)
+>   - `megapixels`: Target total megapixels (default: 1.0, range: 0.1–16.0)
+>   - `multiple`: Rounds the result to the nearest multiple of this value (default: 8)
+>
+>   **Outputs:**
+>
+>   - `width`: Calculated width in pixels (INT)
+>   - `height`: Calculated height in pixels (INT)
+>
+> </details>
+
+---
+
 ### Y7 Scale Image By
 
 > Scales an image by a multiplier while preserving aspect ratio.
