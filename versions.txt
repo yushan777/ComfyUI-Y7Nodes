@@ -1,3 +1,6 @@
+1.0.55
+- fixes
+
 1.0.54
 - Added clone of Resolution Selector with a few tweaks 
     - More grandular step for megapixels to accomodate MiniMax H3's recommended 0.98MP at a multiple of 32px 
