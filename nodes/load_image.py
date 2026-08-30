@@ -5,13 +5,14 @@ import torch
 import numpy as np
 from PIL import Image, ImageOps
 import folder_paths
+from comfy_api.latest import io
 
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif", ".tif", ".tiff"}
 
 
-class Y7Nodes_LoadImage:
+class Y7Nodes_LoadImage(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
+    def define_schema(cls):
         input_dir = folder_paths.get_input_directory()
 
         exclude_files = {"Thumbs.db", "*.DS_Store", "desktop.ini", "*.lock"}
@@ -27,18 +28,25 @@ class Y7Nodes_LoadImage:
                 relpath = relpath.replace("\\", "/")
                 file_list.append(relpath)
 
-        return {
-            "required": {
-                "image": (sorted(file_list), {"image_upload": True})
-            },
-        }
+        return io.Schema(
+            node_id="Y7Nodes_LoadImage",
+            display_name="Y7 Load Image (subfolders)",
+            category="Y7Nodes/image",
+            inputs=[
+                io.Combo.Input(
+                    "image",
+                    options=sorted(file_list),
+                    upload=io.UploadType.image,
+                ),
+            ],
+            outputs=[
+                io.Image.Output("image"),
+                io.Mask.Output("mask"),
+            ],
+        )
 
-    CATEGORY = "Y7Nodes/image"
-    RETURN_TYPES = ("IMAGE", "MASK")
-    RETURN_NAMES = ("image", "mask")
-    FUNCTION = "execute"
-
-    def execute(self, image):
+    @classmethod
+    def execute(cls, image: str) -> io.NodeOutput:
         image_path = folder_paths.get_annotated_filepath(image)
 
         img = Image.open(image_path)
@@ -52,10 +60,10 @@ class Y7Nodes_LoadImage:
         else:
             mask = torch.zeros((64, 64), dtype=torch.float32, device="cpu")
 
-        return image_tensor, mask.unsqueeze(0)
+        return io.NodeOutput(image_tensor, mask.unsqueeze(0))
 
     @classmethod
-    def IS_CHANGED(cls, image):
+    def fingerprint_inputs(cls, image):
         image_path = folder_paths.get_annotated_filepath(image)
         m = hashlib.sha256()
         with open(image_path, "rb") as f:
@@ -63,7 +71,7 @@ class Y7Nodes_LoadImage:
         return m.digest().hex()
 
     @classmethod
-    def VALIDATE_INPUTS(cls, image):
+    def validate_inputs(cls, image):
         if not folder_paths.exists_annotated_filepath(image):
             return "Invalid image file: {}".format(image)
         return True
