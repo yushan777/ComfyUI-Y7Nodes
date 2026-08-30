@@ -21,6 +21,7 @@ from .nodes.load_image import Y7Nodes_LoadImage
 from .nodes.image_stitcher import Y7Nodes_ImageStitcher
 from .nodes.image_compare import Y7Nodes_ImageCompare
 from .nodes.resolutionselector import Y7Nodes_ResolutionSelector
+from .nodes.image_pad_for_outpaint import Y7Nodes_ImagePadForOutpaint
 
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageSizePresets": Y7Nodes_ImageSizePresets,
@@ -46,6 +47,7 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageStitcher": Y7Nodes_ImageStitcher,
     "Y7Nodes_ImageCompare": Y7Nodes_ImageCompare,
     "Y7Nodes_ResolutionSelector": Y7Nodes_ResolutionSelector,
+    "Y7Nodes_ImagePadForOutpaint": Y7Nodes_ImagePadForOutpaint,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageSizePresets" : "Y7 Image Size (Presets)",
@@ -67,9 +69,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ScaleImageBy": "Y7 Scale Image By",
     "Y7Nodes_ImageBatchPath": "Y7 Image Batch Path",
     "Y7Nodes_CaptionSaver": "Y7 Caption Saver",
-    "Y7Nodes_LoadImage": "Y7 Load Image",
+    "Y7Nodes_LoadImage": "Y7 Load Image (subfolders)",
     "Y7Nodes_ImageStitcher": "Y7 Image Stitcher",
     "Y7Nodes_ImageCompare": "Y7 Image Compare",
+    "Y7Nodes_ImagePadForOutpaint": "Y7 Pad Image for Outpainting",
 }
 
 # Apply HTML-formatted documentation to node classes

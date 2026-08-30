@@ -6,6 +6,8 @@ import numpy as np
 from PIL import Image, ImageOps
 import folder_paths
 
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif", ".tif", ".tiff"}
+
 
 class Y7Nodes_LoadImage:
     @classmethod
@@ -19,6 +21,7 @@ class Y7Nodes_LoadImage:
         for root, dirs, files in os.walk(input_dir, followlinks=True):
             dirs[:] = [d for d in dirs if not any(fnmatch.fnmatch(d, ex) for ex in exclude_folders)]
             files = [f for f in files if not any(fnmatch.fnmatch(f, ex) for ex in exclude_files)]
+            files = [f for f in files if os.path.splitext(f)[1].lower() in IMAGE_EXTENSIONS]
             for file in files:
                 relpath = os.path.relpath(os.path.join(root, file), start=input_dir)
                 relpath = relpath.replace("\\", "/")

@@ -204,6 +204,20 @@ descriptions = {
         normal("The right panel also shows the total megapixel count (e.g. `1.0MP` at 1024×1024)."),
     ],
 
+    "Y7Nodes_ImagePadForOutpaint": [
+        "Pad Image for Outpainting",
+        short_desc("Clone of the built-in Pad Image for Outpainting node, with a `step` input that snaps each padding value to a chosen multiple."),
+        normal("Pads an image on any/all sides ready for outpainting, generating a feathered mask over the new regions."),
+        normal("Inputs:"),
+        normal("- `image`: The input image to pad", 1),
+        normal("- `left` / `top` / `right` / `bottom`: Pixels to add to each edge", 1),
+        normal("- `feathering`: Width of the soft gradient at the border between original and padded regions", 1),
+        normal("- `step`: Each of `left`/`top`/`right`/`bottom` is independently snapped to the nearest multiple of this value, ties rounding up, before padding is applied (default: 8)", 1),
+        normal("Outputs:"),
+        normal("- `IMAGE`: The padded image", 1),
+        normal("- `MASK`: Mask covering the padded regions, feathered at the border", 1),
+    ],
+
     "Y7Nodes_CropToNearestMultiple": [
         "Crop to Nearest Multiple",
         short_desc("Crops images to ensure dimensions are divisible by a specified multiple value - default 16px. You can always use a calculator if you prefer."),
