@@ -22,6 +22,8 @@ from .nodes.image_stitcher import Y7Nodes_ImageStitcher
 from .nodes.image_compare import Y7Nodes_ImageCompare
 from .nodes.resolutionselector import Y7Nodes_ResolutionSelector
 from .nodes.image_pad_for_outpaint import Y7Nodes_ImagePadForOutpaint
+from .nodes.flux2_klein_edit import Y7Nodes_Flux2KleinEdit1
+from .nodes.flux2_sampler import Y7Nodes_Flux2Sampler
 
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageSizePresets": Y7Nodes_ImageSizePresets,
@@ -48,6 +50,8 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageCompare": Y7Nodes_ImageCompare,
     "Y7Nodes_ResolutionSelector": Y7Nodes_ResolutionSelector,
     "Y7Nodes_ImagePadForOutpaint": Y7Nodes_ImagePadForOutpaint,
+    "Y7Nodes_Flux2KleinEdit1": Y7Nodes_Flux2KleinEdit1,
+    "Y7Nodes_Flux2Sampler": Y7Nodes_Flux2Sampler,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageSizePresets" : "Y7 Image Size (Presets)",

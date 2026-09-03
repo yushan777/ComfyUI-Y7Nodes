@@ -416,6 +416,52 @@ descriptions = {
         normal("This node has no outputs — it is a terminal/output node."),
     ],
 
+    "Y7Nodes_Flux2KleinEdit1": [
+        "Y7 Flux.2 Klein Edit 1",
+        short_desc("Loads an image on-node and prepares Klein edit conditioning (reference latent + optional mask-driven inpaint conditioning)."),
+        normal("Replaces the usual chain of Load Image → downscale → VAE Encode → mask processing → ReferenceLatent → conditioning patch nodes with a single node. Paint a mask directly on the image (right-click → Open in MaskEditor) to drive inpaint-style editing; leave it unpainted for a plain whole-image edit."),
+        normal("Works with all flux.2-klein variants (base, distilled, 4B/8B text encoder), since ComfyUI routes them all through the same Flux2 model class."),
+        normal("Inputs:"),
+        normal("- `downscale_factor`: Shrinks the image (and mask) before encoding, `0.25`–`1.0`. Lowers VRAM use and latent size on large sources; `1.0` keeps the original resolution", 1),
+        normal("- `crop_2_nearest_16px`: Centre-crops the image (and mask) down to the nearest multiple of 16. Flux.2 works best on dimensions that are multiples of 16 and the edit pipeline rounds them down anyway, so this makes what gets encoded match what the model actually sees. No-op if the image is already aligned", 1),
+        normal("- `expand_mask`: Dilates the mask outward by this many pixels, so the edit region covers a little more than what was painted. `0` disables", 1),
+        normal("- `feather_mask`: Gaussian-blurs the mask edges by this radius for a smoother blend between edited and preserved areas. `0` disables", 1),
+        normal("- `binary_mask`: Hard-thresholds the finished mask to pure black/white, cutting at `0.5`. Applied last, after expand and feather, so the result is always crisp with no grey ramp", 1),
+        normal("- `positive` (optional): Positive conditioning to patch. Left as an empty list if not connected", 1),
+        normal("- `negative` (optional): Negative conditioning, patched the same way as positive", 1),
+        normal("Outputs:"),
+        normal("- `reference_latent`: VAE-encoded latent of the processed image, for use as the edit model's reference latent", 1),
+        normal("- `positive`: Conditioning with `reference_latents` and `concat_latent_image` set (plus `concat_mask` when a mask was painted)", 1),
+        normal("- `negative`: Conditioning patched the same way as positive", 1),
+        normal("- `preview_image`: The image after downscale/crop, for on-canvas preview", 1),
+        normal("- `preview_mask`: The mask after expand/feather/binarize. All-zero if no mask was painted", 1),
+        normal("Notes:"),
+        normal("- When a mask is present, masked regions are replaced with neutral grey in the concat conditioning, so Klein keeps the surrounding context as reference", 1),
+        normal("- `crop_2_nearest_16px` also snaps the `downscale_factor` target to 16, so a downscale followed by a crop doesn't trim twice", 1),
+        normal("- Mask processing runs in widget order: expand → feather → binarize. With `binary_mask` on, feathering still shapes the edge (rounding corners, smoothing jagged strokes) but the final cut leaves no soft gradient", 1),
+    ],
+
+    "Y7Nodes_Flux2Sampler": [
+        "Flux.2 Sampler",
+        short_desc("All-in-one Flux.2 sampler: RandomNoise + KSamplerSelect + Flux2Scheduler + CFGGuider + SamplerCustomAdvanced in a single node."),
+        normal("Replaces the five-node chain normally needed to sample a Flux.2 or Klein model. Feed it a model, a starting latent and conditioning, and it returns the denoised latent ready for VAE decode."),
+        normal("There are deliberately no `width`/`height` widgets: the Flux.2 sigma schedule is derived from `latent_image`'s own dimensions, so it can never drift out of sync with the latent actually being sampled."),
+        normal("Inputs:"),
+        normal("- `model`: Diffusion model to sample with", 1),
+        normal("- `latent_image`: Starting latent to denoise — e.g. from an Empty Flux.2 Latent Image, or the `reference_latent` output of the Klein Edit node. Its dimensions also set the resolution used for the sigma schedule", 1),
+        normal("- `positive`: Positive conditioning (what to steer generation towards)", 1),
+        normal("- `negative`: Negative conditioning (what to steer away from). Effectively ignored when `cfg` is `1.0`", 1),
+        normal("- `seed`: Seed for the initial noise, with the standard randomize/increment/decrement/fixed control", 1),
+        normal("- `cfg`: Classifier-free guidance scale. Klein checkpoints are usually guidance-distilled, so the default `1.0` (negative conditioning skipped) is normally what you want. Raise it only on models that expect real CFG", 1),
+        normal("- `sampler_name`: Which k-diffusion sampler algorithm to step with. `euler` is the default", 1),
+        normal("- `steps`: Number of sampling steps. Distilled Klein checkpoints commonly need only ~4; non-distilled Flux.2 wants considerably more", 1),
+        normal("Outputs:"),
+        normal("- `output`: The denoised latent, ready for VAE decode", 1),
+        normal("Notes:"),
+        normal("- Any `noise_mask` carried on the incoming latent (as set by the Klein Edit node when a mask is painted) is honoured, so inpaint-style edits work without extra wiring", 1),
+        normal("- The Flux.2 sigma schedule math is vendored from `Flux2Scheduler`, so this node doesn't depend on ComfyUI's internal `comfy_extras` module", 1),
+    ],
+
     # Add more node descriptions here
 }
 
@@ -452,6 +498,32 @@ def as_html(entry, depth=0):
         return html
     return str(entry)
 
+def _apply_v3_description(node_cls, html):
+    """Attach documentation HTML to a V3 (io.ComfyNode) node class.
+
+    V3 nodes don't serve the DESCRIPTION class attribute: ComfyUI builds their node info from a
+    fresh define_schema() call (Schema.get_v1_info uses schema.description), and DESCRIPTION itself
+    is a classproperty backed by _DESCRIPTION. Assigning DESCRIPTION on such a class silently
+    shadows the classproperty and is then ignored by the frontend, so patch the schema on its way
+    out of define_schema instead.
+    """
+    node_cls._y7_doc_html = html
+    node_cls._DESCRIPTION = html  # so cls.DESCRIPTION reads back the docs too
+
+    if "_y7_doc_patched" in node_cls.__dict__:
+        return  # already wrapped; the refreshed _y7_doc_html above is all that's needed
+
+    original_define_schema = node_cls.define_schema
+
+    def define_schema(cls):
+        schema = original_define_schema()
+        schema.description = cls._y7_doc_html
+        return schema
+
+    node_cls.define_schema = classmethod(define_schema)
+    node_cls._y7_doc_patched = True
+
+
 def format_descriptions(nodes):
     """Applies HTML documentation to node classes"""
     logger.info(f"Formatting descriptions for nodes: {list(nodes.keys())}")
@@ -460,9 +532,13 @@ def format_descriptions(nodes):
     for k in descriptions:
         if k in nodes:
             logger.info(f"Setting DESCRIPTION for {k}")
-            nodes[k].DESCRIPTION = as_html(descriptions[k])
-            # Also set a direct description property for easier access
-            nodes[k].description = as_html(descriptions[k])
+            html = as_html(descriptions[k])
+            if hasattr(nodes[k], "define_schema"):
+                _apply_v3_description(nodes[k], html)
+            else:
+                nodes[k].DESCRIPTION = html
+                # Also set a direct description property for easier access
+                nodes[k].description = html
         else:
             logger.warning(f"Node {k} has a description but is not in the nodes dictionary")
     
