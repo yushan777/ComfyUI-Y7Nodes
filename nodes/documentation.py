@@ -416,8 +416,8 @@ descriptions = {
         normal("This node has no outputs — it is a terminal/output node."),
     ],
 
-    "Y7Nodes_Flux2KleinEdit1": [
-        "Y7 Flux.2 Klein Edit 1",
+    "Y7Nodes_Flux2KleinEdit_Ref1": [
+        "Y7 Flux.2 Klein Edit Ref 1",
         short_desc("Loads an image on-node and prepares Klein edit conditioning (reference latent + optional mask-driven inpaint conditioning)."),
         normal("Replaces the usual chain of Load Image → downscale → VAE Encode → mask processing → ReferenceLatent → conditioning patch nodes with a single node. Paint a mask directly on the image (right-click → Open in MaskEditor) to drive inpaint-style editing; leave it unpainted for a plain whole-image edit."),
         normal("Works with all flux.2-klein variants (base, distilled, 4B/8B text encoder), since ComfyUI routes them all through the same Flux2 model class."),
@@ -439,6 +439,36 @@ descriptions = {
         normal("- When a mask is present, masked regions are replaced with neutral grey in the concat conditioning, so Klein keeps the surrounding context as reference", 1),
         normal("- `crop_2_nearest_16px` also snaps the `downscale_factor` target to 16, so a downscale followed by a crop doesn't trim twice", 1),
         normal("- Mask processing runs in widget order: expand → feather → binarize. With `binary_mask` on, feathering still shapes the edge (rounding corners, smoothing jagged strokes) but the final cut leaves no soft gradient", 1),
+    ],
+
+    "Y7Nodes_Flux2KleinEdit_MultiRef": [
+        "Y7 Flux.2 Klein Edit Multi-Ref",
+        short_desc("Loads the edit image on-node, takes extra reference images on growable sockets, and prepares Klein edit conditioning (reference latents + optional mask-driven inpaint conditioning)."),
+        normal("Same as the single-reference Klein Edit node, but Flux.2 / Klein accepts a *list* of reference latents, so extra images can be fed in as additional visual context — a character sheet, a style reference, a product shot — alongside the image actually being edited."),
+        normal("Paint a mask directly on the on-node image (right-click → Open in MaskEditor) to drive inpaint-style editing; leave it unpainted for a plain whole-image edit."),
+        normal("The extra references are IMAGE sockets rather than on-node file pickers because the mask editor is hard-wired to the widget named `image`, so only one on-node picker can ever carry a painted mask. As sockets they can come from anywhere — Load Image, an upscaler, another Y7 node."),
+        normal("Inputs:"),
+        normal("- `image`: The image being edited, picked on the node. This is the only image a mask applies to, and it always leads the reference list", 1),
+        normal("- `downscale_factor`: Shrinks the image (and mask) before encoding, `0.25`–`1.0`. Also applied to every reference image, since each one costs the model context tokens. `1.0` keeps the original resolution", 1),
+        normal("- `crop_2_nearest_16px`: Centre-crops the image (and mask) and every reference image down to the nearest multiple of 16, which Flux.2 prefers. No-op if the dimensions are already aligned", 1),
+        normal("- `expand_mask`: Dilates the mask outward by this many pixels. `0` disables", 1),
+        normal("- `feather_mask`: Gaussian-blurs the mask edges by this radius. `0` disables", 1),
+        normal("- `binary_mask`: Hard-thresholds the finished mask to pure black/white at `0.5`, applied last so the result is crisp", 1),
+        normal("- `ref_image_2` … `ref_image_8` (optional): Additional reference images. One empty socket is shown to start with and a new one appears each time you connect the last, up to eight", 1),
+        normal("- `positive` (optional): Positive conditioning to patch. Left as an empty list if not connected", 1),
+        normal("- `negative` (optional): Negative conditioning, patched the same way as positive", 1),
+        normal("Outputs:"),
+        normal("- `reference_latent`: VAE-encoded latent of the edited image only — the extra references go onto the conditioning, not into this latent", 1),
+        normal("- `positive`: Conditioning with `reference_latents` (edited image first, then each reference in socket order) and `concat_latent_image` set, plus `concat_mask` when a mask was painted", 1),
+        normal("- `negative`: Conditioning patched the same way as positive", 1),
+        normal("- `preview_image`: The edited image after downscale/crop, for on-canvas preview", 1),
+        normal("- `preview_mask`: The mask after expand/feather/binarize. All-zero if no mask was painted", 1),
+        normal("- `ref_count`: How many reference latents ended up on the conditioning, counting the edited image", 1),
+        normal("Notes:"),
+        normal("- Reference order is edited image first, then `ref_image_2`, `ref_image_3`, … in socket order", 1),
+        normal("- A socket carrying a batch of images is split into one reference latent per image, since the model treats each list entry as a separate reference rather than as a batch", 1),
+        normal("- Only the edited image feeds the concat (inpaint) conditioning: `concat_latent_image` has to line up pixel-for-pixel with the latent being denoised, which the extra references do not", 1),
+        normal("- Every reference image adds tokens to the model's context, so keep them modestly sized (the shared `downscale_factor` helps)", 1),
     ],
 
     "Y7Nodes_Flux2Sampler": [

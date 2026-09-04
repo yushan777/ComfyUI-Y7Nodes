@@ -1,4 +1,4 @@
-# All-in-one image-editing node for Flux.2 Klein workflows.
+# All-in-one image-editing node for Flux.2 Klein workflows for 1 Reference Image.
 #
 # Normally, setting up a Klein edit means wiring together several separate nodes: load the
 # source image, optionally downscale it, VAE-encode it for the reference latent, process the
@@ -31,7 +31,7 @@ from comfy_api.latest import io
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif", ".tif", ".tiff"}
 
 
-class Y7Nodes_Flux2KleinEdit1(io.ComfyNode):
+class Y7Nodes_Flux2KleinEdit_Ref1(io.ComfyNode):
     """Loads an image directly on-node and prepares minimal Klein edit conditioning."""
 
     @classmethod
@@ -50,8 +50,8 @@ class Y7Nodes_Flux2KleinEdit1(io.ComfyNode):
                 file_list.append(relpath.replace("\\", "/"))
 
         return io.Schema(
-            node_id="Y7Nodes_Flux2KleinEdit1",
-            display_name="Y7 Flux.2 Klein Edit 1",
+            node_id="Y7Nodes_Flux2KleinEdit_Ref1",
+            display_name="Y7 Flux.2 Klein Edit Ref 1",
             category="Y7Nodes/Klein",
             description="Loads an image directly on the node and prepares minimal Klein edit conditioning "
                          "(reference latent, plus optional mask-driven inpaint conditioning).",

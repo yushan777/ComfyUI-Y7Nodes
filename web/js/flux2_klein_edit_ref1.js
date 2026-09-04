@@ -6,7 +6,7 @@ const DEFAULT_NODE_HEIGHT = 280;
 app.registerExtension({
     name: "Y7Nodes.Flux2KleinEdit1",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
-        if (nodeData.name === "Y7Nodes_Flux2KleinEdit1") {
+        if (nodeData.name === "Y7Nodes_Flux2KleinEdit_Ref1") {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
 
             nodeType.prototype.onNodeCreated = function() {
