@@ -11,6 +11,15 @@
 #   reference_latents[0]  -> the on-node `image` (the one being edited, and the only one a mask applies to)
 #   reference_latents[1:] -> `ref_image_2`, `ref_image_3`, ... in socket order
 #
+# Prompting: there is no special syntax for addressing the references. Klein taps the Qwen3-VL LM with
+# the visual tower unused (comfy/sd.py: "Flux2 Klein reuses the Qwen3-VL LM ...; visual unused"), so the
+# text encoder never sees the images at all - they only reach the transformer as latent tokens appended
+# to the sequence, in list order. Refer to them in plain English by position, always paired with a noun:
+#   "Have the man in Figure 1 put on the clothes from Figure 2, and change the background to a savannah"
+# `Figure N` is the wording in ComfyUI's own multi-reference Klein template; `image 1` / `the first image`
+# is the same kind of plain positional reference. Neither is a real token, so both are worth trying if a
+# prompt is not binding to the reference you meant.
+#
 # The extra references are IMAGE sockets rather than on-node file pickers, for two reasons:
 #   - the mask editor is hard-wired to the widget literally named "image" (it looks the widget up by
 #     name in ComfyApp.pasteFromClipspace), so only one on-node picker can ever carry a painted mask;
