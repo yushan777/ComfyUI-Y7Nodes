@@ -456,7 +456,7 @@ descriptions = {
         normal("- Say what to preserve as well as what to change: \"...preserve her facial identity, hairstyle and proportions from Figure 1\". Reference images are context, not constraints — nothing forces the model to keep them", 1),
         normal("Inputs:"),
         normal("- `image`: The image being edited, picked on the node. This is the only image a mask applies to, and it always leads the reference list", 1),
-        normal("- `downscale_factor`: Shrinks the image (and mask) before encoding, `0.25`–`1.0`. Also applied to every reference image, since each one costs the model context tokens. `1.0` keeps the original resolution", 1),
+        normal("- `target_megapixels`: Resamples the image (and mask) to roughly this many megapixels before encoding, same maths as `ImageScaleToTotalPixels`. Applied independently to every reference image too, so each one lands on the budget whether it has to shrink or grow. `0` keeps every image at its original resolution", 1),
         normal("- `crop_2_nearest_16px`: Centre-crops the image (and mask) and every reference image down to the nearest multiple of 16, which Flux.2 prefers. No-op if the dimensions are already aligned", 1),
         normal("- `expand_mask`: Dilates the mask outward by this many pixels. `0` disables", 1),
         normal("- `feather_mask`: Gaussian-blurs the mask edges by this radius. `0` disables", 1),
@@ -468,7 +468,7 @@ descriptions = {
         normal("- `reference_latent`: VAE-encoded latent of the edited image only — the extra references go onto the conditioning, not into this latent", 1),
         normal("- `positive`: Conditioning with `reference_latents` (edited image first, then each reference in socket order) and `concat_latent_image` set, plus `concat_mask` when a mask was painted", 1),
         normal("- `negative`: Conditioning patched the same way as positive", 1),
-        normal("- `preview_image`: The edited image after downscale/crop, for on-canvas preview", 1),
+        normal("- `preview_image`: The edited image after resize/crop, for on-canvas preview", 1),
         normal("- `preview_mask`: The mask after expand/feather/binarize. All-zero if no mask was painted", 1),
         normal("- `ref_count`: How many reference latents ended up on the conditioning, counting the edited image", 1),
         normal("Notes:"),
@@ -476,7 +476,8 @@ descriptions = {
         normal("- That is how the model's inpaint conditioning works, not an arbitrary node choice: a mask drives the `concat_latent_image` / `concat_mask` inpaint conditioning, which has to line up pixel-for-pixel with the latent being denoised. The extra references are arbitrary images of arbitrary size, so a mask on one would have nothing to align to", 1),
         normal("- Reference order is edited image first, then `ref_image_2`, `ref_image_3`, … in socket order", 1),
         normal("- A socket carrying a batch of images is split into one reference latent per image, since the model treats each list entry as a separate reference rather than as a batch", 1),
-        normal("- Every reference image adds tokens to the model's context, so keep them modestly sized (the shared `downscale_factor` helps)", 1),
+        normal("- Flux.2 Klein is trained around 1.0 MP. Sampling far above that — an 8 MP source at `target_megapixels` 0 — degrades badly at the low step counts the distilled checkpoints use, so leave the default at `1.0` unless you have a reason not to", 1),
+        normal("- Every reference image adds tokens to the model's context, so `target_megapixels` is the lever for both quality and VRAM: it caps the big images and, just as importantly, brings undersized references up to a resolution that actually contributes detail", 1),
     ],
 
     "Y7Nodes_Flux2Sampler": [

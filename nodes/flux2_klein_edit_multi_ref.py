@@ -40,6 +40,7 @@ import os
 import torch
 import torch.nn.functional as F
 
+import comfy.utils
 import folder_paths
 import node_helpers
 import nodes
@@ -102,12 +103,16 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
                 # write-back silently no-ops, the widget keeps the previous filename, and execute() reads an image
                 # whose painted mask is missing.
                 io.Combo.Input("image", options=sorted(file_list), upload=io.UploadType.image),
-                # Shrinks the image (and its mask) before encoding, clamped to 0.25-1.0. Useful to cut VRAM/latent
-                # size for large source images; 1.0 leaves the image at its original resolution.
-                # Also applied to every connected reference image, since each one costs the model context tokens.
+                # Resamples the image (and its mask) to this pixel budget before encoding - the same maths as
+                # ImageScaleToTotalPixels, and the reason it is a target rather than a relative factor: Klein is
+                # trained around 1 MP, and a straight multiplier cannot bring an 8 MP photo and a 0.2 MP reference
+                # to the same scale. Applied independently to every image, so each one lands on the budget
+                # whether it has to shrink or grow. 0 leaves every image at its original resolution.
                 io.Float.Input(
-                    "downscale_factor", default=1.0, min=0.25, max=1.0, step=0.05,
-                    tooltip="Downscale the source image and every reference image before encoding (1.0 = no downscale).",
+                    "target_megapixels", default=1.0, min=0.0, max=16.0, step=0.05,
+                    tooltip="Resample the source image and every reference image to roughly this many megapixels "
+                            "before encoding (0 = leave at original resolution). Flux.2 Klein is trained around "
+                            "1.0 MP; sampling far above that degrades quality badly at low step counts.",
                 ),
                 # Flux.2 works best on dimensions that are multiples of 16; the image-edit pipeline silently
                 # rounds odd sizes down anyway. When on, the image (and its mask), plus every reference image,
@@ -152,14 +157,14 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
                 io.Conditioning.Input("negative", optional=True),
             ],
             outputs=[
-                # VAE-encoded latent of the (downscaled) source image, for use as an edit-model reference latent.
+                # VAE-encoded latent of the (resampled) source image, for use as an edit-model reference latent.
                 # Only the edited image - the extra references go onto the conditioning, not into this latent.
                 io.Latent.Output(display_name="reference_latent"),
                 # Positive conditioning with reference_latents/concat_latent_image (and concat_mask if a mask was used) set.
                 io.Conditioning.Output(display_name="positive"),
                 # Negative conditioning, extended the same way as positive.
                 io.Conditioning.Output(display_name="negative"),
-                # The (possibly downscaled) source image, for on-canvas preview.
+                # The (possibly resampled) source image, for on-canvas preview.
                 io.Image.Output(display_name="preview_image"),
                 # The processed mask (after binary/expand/feather), for on-canvas preview. All-zero if no mask was painted.
                 io.Mask.Output(display_name="preview_mask"),
@@ -174,7 +179,7 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
         cls,
         vae,
         image,
-        downscale_factor=1.0,
+        target_megapixels=1.0,
         crop_2_nearest_16px=True,
         expand_mask=0,
         feather_mask=0,
@@ -185,29 +190,25 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
     ) -> io.NodeOutput:
         # `image` arrives as the selected filename and is rebound to the loaded tensor.
         image, mask = nodes.LoadImage().load_image(image)
-        downscale_factor = cls._sanitize_downscale(downscale_factor)
+        target_megapixels = cls._sanitize_megapixels(target_megapixels)
 
-        # When cropping to multiples of 16 is requested, snap the downscale target to 16 as well, so the
+        # When cropping to multiples of 16 is requested, snap the resize target to 16 as well, so the
         # crop below has nothing left to trim instead of shaving another 8 pixels off a just-resized image.
         align = 16 if crop_2_nearest_16px else 8
-        if downscale_factor < 1.0:
-            scaled_width = max(align, int((image.shape[2] * downscale_factor) // align) * align)
-            scaled_height = max(align, int((image.shape[1] * downscale_factor) // align) * align)
-            image = F.interpolate(
-                image.movedim(-1, 1),
-                size=(scaled_height, scaled_width),
-                mode="bilinear",
-                align_corners=False,
-            ).movedim(1, -1)
+        if target_megapixels > 0.0:
+            scaled_height, scaled_width = cls._target_size(image, target_megapixels, align)
+            image = cls._resample(image, scaled_width, scaled_height)
             if mask is not None and torch.count_nonzero(mask) > 0:
                 if mask.dim() == 2:
                     mask = mask.unsqueeze(0)
+                # The mask stays on bilinear rather than the image's lanczos: lanczos round-trips through
+                # 8-bit PIL, and can overshoot past 0/1 on a hard edge.
                 mask = F.interpolate(
                     mask.unsqueeze(1),
                     size=(scaled_height, scaled_width),
                     mode="bilinear",
                     align_corners=False,
-                ).squeeze(1)
+                ).squeeze(1).clamp(0.0, 1.0)
 
         if crop_2_nearest_16px:
             image, mask = cls._crop_to_multiple(image, mask, 16)
@@ -218,7 +219,7 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
         result = {"samples": latent}
 
         # Extra references, encoded one latent per source image and kept in socket order.
-        ref_latents = cls._encode_reference_images(vae, ref_images, downscale_factor, crop_2_nearest_16px)
+        ref_latents = cls._encode_reference_images(vae, ref_images, target_megapixels, crop_2_nearest_16px)
         # The edited image always leads the list; Flux.2 reads the whole list as visual context.
         all_reference_latents = [latent] + ref_latents
 
@@ -292,20 +293,45 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
         return io.NodeOutput(result, positive, negative, image, preview_mask, len(all_reference_latents))
 
     @staticmethod
-    def _sanitize_downscale(downscale_factor):
-        """Coerce the downscale widget to a usable float in 0.25-1.0, falling back to 1.0 (no downscale)."""
-        if downscale_factor is None:
+    def _sanitize_megapixels(target_megapixels):
+        """Coerce the megapixel widget to 0.0 (off) or a usable float up to 16.0, falling back to 1.0."""
+        if target_megapixels is None:
             return 1.0
         try:
-            downscale_factor = float(downscale_factor)
+            target_megapixels = float(target_megapixels)
         except (TypeError, ValueError):
             return 1.0
-        if not math.isfinite(downscale_factor):
-            return 1.0
-        return max(0.25, min(1.0, downscale_factor))
+        if not math.isfinite(target_megapixels) or target_megapixels <= 0.0:
+            return 0.0
+        return min(16.0, target_megapixels)
+
+    @staticmethod
+    def _target_size(image, target_megapixels, align):
+        """Dimensions that put a (B,H,W,C) image on the megapixel budget, rounded to a multiple of `align`.
+
+        Megapixels are counted as 1024*1024, matching ImageScaleToTotalPixels, so a value copied from that
+        node lands on the same size. Rounding is to the *nearest* multiple rather than down, so the result
+        keeps the aspect ratio and needs no further cropping.
+        """
+        height, width = image.shape[1], image.shape[2]
+        scale_by = math.sqrt((target_megapixels * 1024 * 1024) / (width * height))
+        new_width = max(align, round(width * scale_by / align) * align)
+        new_height = max(align, round(height * scale_by / align) * align)
+        return new_height, new_width
+
+    @staticmethod
+    def _resample(image, width, height):
+        """Resize a (B,H,W,C) image, skipping the work when it is already the right size."""
+        if (image.shape[1], image.shape[2]) == (height, width):
+            return image
+        # lanczos both ways: these images are usually being shrunk by a large factor, where bilinear
+        # aliases badly, and the reference images are sometimes being grown instead.
+        return comfy.utils.common_upscale(
+            image.movedim(-1, 1), width, height, "lanczos", "disabled",
+        ).movedim(1, -1)
 
     @classmethod
-    def _encode_reference_images(cls, vae, ref_images, downscale_factor, crop_2_nearest_16px):
+    def _encode_reference_images(cls, vae, ref_images, target_megapixels, crop_2_nearest_16px):
         """VAE-encode every connected reference socket into its own latent, in socket order.
 
         `ref_images` is the Autogrow dict ({"ref_image_2": tensor, ...}); only connected sockets are
@@ -320,7 +346,7 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
         for ref_image in ref_images.values():
             if ref_image is None:
                 continue
-            ref_image = cls._prepare_reference_image(ref_image, downscale_factor, crop_2_nearest_16px)
+            ref_image = cls._prepare_reference_image(ref_image, target_megapixels, crop_2_nearest_16px)
             encoded = vae.encode(ref_image[:, :, :, :3])
             for i in range(encoded.shape[0]):
                 latents.append(encoded[i:i + 1])
@@ -328,19 +354,18 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
         return latents
 
     @classmethod
-    def _prepare_reference_image(cls, ref_image, downscale_factor, crop_2_nearest_16px):
-        """Apply the same downscale / 16px alignment to a reference image as to the edited image."""
+    def _prepare_reference_image(cls, ref_image, target_megapixels, crop_2_nearest_16px):
+        """Put a reference image on the same megapixel budget / 16px alignment as the edited image.
+
+        The budget is applied per image, not as a shared multiplier, so a reference smaller than the
+        target is scaled *up* to it - a 0.2 MP reference next to a 1 MP edit image contributes almost
+        nothing at its native size.
+        """
         align = 16 if crop_2_nearest_16px else 8
 
-        if downscale_factor < 1.0:
-            scaled_width = max(align, int((ref_image.shape[2] * downscale_factor) // align) * align)
-            scaled_height = max(align, int((ref_image.shape[1] * downscale_factor) // align) * align)
-            ref_image = F.interpolate(
-                ref_image.movedim(-1, 1),
-                size=(scaled_height, scaled_width),
-                mode="bilinear",
-                align_corners=False,
-            ).movedim(1, -1)
+        if target_megapixels > 0.0:
+            scaled_height, scaled_width = cls._target_size(ref_image, target_megapixels, align)
+            ref_image = cls._resample(ref_image, scaled_width, scaled_height)
 
         if crop_2_nearest_16px:
             ref_image, _ = cls._crop_to_multiple(ref_image, None, 16)
