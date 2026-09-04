@@ -1,11 +1,10 @@
 # All-in-one image-editing node for Flux.2 Klein workflows with multiple reference images.
 #
-# Same idea as the single-reference node (flux2_klein_edit_ref1.py): pick the image to edit on the
-# node itself, paint a mask on it, and get back a ready-to-sample reference latent plus patched
-# positive/negative conditioning. The difference is the extra reference images: Flux.2 / Klein accepts
-# a *list* of reference latents on the conditioning, so extra images can be fed in as additional
-# visual context (a character sheet, a style reference, a product shot...) alongside the image
-# actually being edited.
+# Pick the image to edit on the node itself, paint a mask on it, and get back a ready-to-sample
+# reference latent plus patched positive/negative conditioning. On top of that, Flux.2 / Klein
+# accepts a *list* of reference latents on the conditioning, so extra images can be wired in as
+# additional visual context (a character sheet, a style reference, a product shot...) alongside
+# the image actually being edited.
 #
 # Layout of the reference list handed to the model:
 #   reference_latents[0]  -> the on-node `image` (the one being edited, and the only one a mask applies to)
@@ -29,10 +28,10 @@
 # `ref_image_2` slot is shown to begin with and a new slot appears each time one is connected,
 # up to ref_image_8.
 #
-# Model coverage: as with the single-reference node, this works with all flux.2-klein variants
-# (base, distilled, 4B/8B text encoder). ComfyUI routes every Klein/Flux.2 checkpoint through the
-# same Flux2 model class (comfy/model_base.py), which reads reference_latents/concat_latent_image/
-# concat_mask identically regardless of backbone size or distillation.
+# Model coverage: this works with all flux.2-klein variants (base, distilled, 4B/8B text encoder).
+# ComfyUI routes every Klein/Flux.2 checkpoint through the same Flux2 model class
+# (comfy/model_base.py), which reads reference_latents/concat_latent_image/concat_mask identically
+# regardless of backbone size or distillation.
 import fnmatch
 import math
 import os
@@ -78,7 +77,8 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
             input=io.Image.Input(
                 "ref_image",
                 optional=True,
-                tooltip="Extra reference image, VAE-encoded and appended to the conditioning's reference latents.",
+                tooltip="An extra picture for the model to look at. It is not edited, and it never appears "
+                        "in your result directly.",
             ),
             names=REF_IMAGE_NAMES,
             min=1,
@@ -106,13 +106,34 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
                 # Resamples the image (and its mask) to this pixel budget before encoding - the same maths as
                 # ImageScaleToTotalPixels, and the reason it is a target rather than a relative factor: Klein is
                 # trained around 1 MP, and a straight multiplier cannot bring an 8 MP photo and a 0.2 MP reference
-                # to the same scale. Applied independently to every image, so each one lands on the budget
-                # whether it has to shrink or grow. 0 leaves every image at its original resolution.
+                # to the same scale. This one governs the edited image, which is the latent actually being
+                # denoised, so it also sets the output resolution. 0 leaves it at its original resolution.
                 io.Float.Input(
                     "target_megapixels", default=1.0, min=0.0, max=16.0, step=0.05,
-                    tooltip="Resample the source image and every reference image to roughly this many megapixels "
-                            "before encoding (0 = leave at original resolution). Flux.2 Klein is trained around "
-                            "1.0 MP; sampling far above that degrades quality badly at low step counts.",
+                    tooltip="How big to make the picture you are editing. A megapixel is a million pixels, "
+                            "so 1.0 resizes it to about a million pixels while keeping its shape - nothing "
+                            "gets stretched or squashed. This decides how big your finished picture comes out. "
+                            "0 = leave it at its original size. Klein is built for around 1.0; going much "
+                            "higher usually makes things worse rather than better.",
+                ),
+                # Separate budget for the reference sockets, because they are not the same job as the edited
+                # image: references only supply visual context, never output pixels, so they rarely need parity
+                # with it. Splitting them also makes the total context size steerable - the budget is per image,
+                # so eight sockets at 1 MP is 9 MP of latent tokens on the conditioning, not 1.
+                # Deliberately the same range, default and rule as target_megapixels (0 = leave alone, above
+                # 0 = that budget) rather than a sentinel for "follow the other widget": two widgets that read
+                # identically are easier to reason about than one with an extra hidden mode, and the coupling
+                # that sentinel bought back is the thing this widget exists to break.
+                io.Float.Input(
+                    "ref_megapixels", default=1.0, min=0.0, max=16.0, step=0.05,
+                    tooltip="How big to make each reference picture. Works exactly like target_megapixels, "
+                            "but these pictures are only there to be looked at, so this does not change how "
+                            "big your finished picture comes out. 0 = leave them at their original size. "
+                            "It applies to each picture separately, so they add up: one picture plus six "
+                            "references, all at 1.0, is seven megapixels of work rather than one, and that is "
+                            "what uses your video memory and your time. If you run slow or run out of memory, "
+                            "turn this down first - try 0.5. A face or a style still comes through fine at "
+                            "half the size, and your result stays just as big.",
                 ),
                 # Flux.2 works best on dimensions that are multiples of 16; the image-edit pipeline silently
                 # rounds odd sizes down anyway. When on, the image (and its mask), plus every reference image,
@@ -120,35 +141,40 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
                 # matches what the model sees. No-op when the image is already aligned.
                 io.Boolean.Input(
                     "crop_2_nearest_16px", default=True,
-                    tooltip="Centre-crop the image (and mask) and every reference image down to the nearest "
-                            "multiple of 16, which Flux.2 prefers. No-op if the dimensions are already multiples of 16.",
+                    tooltip="Trims a few pixels off the edges so the width and height divide by 16, which "
+                            "Flux.2 works best with. Applies to the picture you are editing, its mask, and "
+                            "every reference picture. Does nothing if the sizes already divide by 16.",
                 ),
                 # Grows the mask outward by this many pixels (dilation) so the edit region covers a bit more
                 # than what was painted. 0 disables expansion.
                 io.Int.Input(
                     "expand_mask", default=0, min=0, max=256, step=1,
-                    tooltip="Dilate (expand) the mask by this many pixels.",
+                    tooltip="Grows the area you painted outwards by this many pixels, so the change covers "
+                            "a little more than you painted. 0 turns it off.",
                 ),
                 # Softens the mask edges with a Gaussian blur of this radius, for a smoother blend between the
                 # edited and preserved regions. 0 disables feathering.
                 io.Int.Input(
                     "feather_mask", default=0, min=0, max=256, step=1,
-                    tooltip="Feather (Gaussian blur) the mask by this radius.",
+                    tooltip="Softens the edge of the area you painted, so the change blends into the rest "
+                            "of the picture more smoothly. 0 turns it off.",
                 ),
                 # Applied last, after expand/feather, so it always produces a hard-edged mask: everything at or
                 # above 0.5 becomes fully opaque, everything below fully transparent. Feathering still shapes the
                 # edge (rounding corners, smoothing jagged strokes) before the cut, but leaves no grey ramp.
                 io.Boolean.Input(
                     "binary_mask", default=False,
-                    tooltip="Hard-threshold the finished mask to pure black/white (cut at 0.5). Applied after "
-                            "expand/feather, so the result is always crisp with no soft edge.",
+                    tooltip="Makes the mask edge hard again after expanding and feathering, so you get a "
+                            "crisp cut instead of a soft blend.",
                 ),
                 # Growable IMAGE sockets (ref_image_2 ... ref_image_8). Each connected image is encoded and
                 # appended, in socket order, after the on-node image's latent in `reference_latents`.
                 io.Autogrow.Input(
                     "ref_images", template=ref_images_template,
-                    tooltip="Additional reference images. Each connected socket is VAE-encoded and appended to "
-                            "the conditioning's reference latents, after the on-node image.",
+                    tooltip="Extra pictures for the model to look at, on top of the one you are editing. "
+                            "Connect one and another empty socket appears, up to seven in total. Refer to "
+                            "them in your prompt by number - the one on the node is 1, ref_image_2 is 2, and "
+                            "so on.",
                 ),
                 # Optional positive conditioning to extend with the reference latents / mask-based concat data.
                 # Passed through untouched (as an empty list) if not connected.
@@ -180,6 +206,7 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
         vae,
         image,
         target_megapixels=1.0,
+        ref_megapixels=1.0,
         crop_2_nearest_16px=True,
         expand_mask=0,
         feather_mask=0,
@@ -191,6 +218,7 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
         # `image` arrives as the selected filename and is rebound to the loaded tensor.
         image, mask = nodes.LoadImage().load_image(image)
         target_megapixels = cls._sanitize_megapixels(target_megapixels)
+        ref_megapixels = cls._sanitize_megapixels(ref_megapixels)
 
         # When cropping to multiples of 16 is requested, snap the resize target to 16 as well, so the
         # crop below has nothing left to trim instead of shaving another 8 pixels off a just-resized image.
@@ -219,7 +247,7 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
         result = {"samples": latent}
 
         # Extra references, encoded one latent per source image and kept in socket order.
-        ref_latents = cls._encode_reference_images(vae, ref_images, target_megapixels, crop_2_nearest_16px)
+        ref_latents = cls._encode_reference_images(vae, ref_images, ref_megapixels, crop_2_nearest_16px)
         # The edited image always leads the list; Flux.2 reads the whole list as visual context.
         all_reference_latents = [latent] + ref_latents
 
@@ -294,7 +322,11 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
 
     @staticmethod
     def _sanitize_megapixels(target_megapixels):
-        """Coerce the megapixel widget to 0.0 (off) or a usable float up to 16.0, falling back to 1.0."""
+        """Coerce either megapixel widget to 0.0 (off) or a usable float up to 16.0, falling back to 1.0.
+
+        Shared by target_megapixels and ref_megapixels: the two widgets have the same range and the same
+        meaning, so they get the same coercion.
+        """
         if target_megapixels is None:
             return 1.0
         try:
@@ -331,7 +363,7 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
         ).movedim(1, -1)
 
     @classmethod
-    def _encode_reference_images(cls, vae, ref_images, target_megapixels, crop_2_nearest_16px):
+    def _encode_reference_images(cls, vae, ref_images, ref_megapixels, crop_2_nearest_16px):
         """VAE-encode every connected reference socket into its own latent, in socket order.
 
         `ref_images` is the Autogrow dict ({"ref_image_2": tensor, ...}); only connected sockets are
@@ -346,7 +378,7 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
         for ref_image in ref_images.values():
             if ref_image is None:
                 continue
-            ref_image = cls._prepare_reference_image(ref_image, target_megapixels, crop_2_nearest_16px)
+            ref_image = cls._prepare_reference_image(ref_image, ref_megapixels, crop_2_nearest_16px)
             encoded = vae.encode(ref_image[:, :, :, :3])
             for i in range(encoded.shape[0]):
                 latents.append(encoded[i:i + 1])
@@ -354,17 +386,19 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
         return latents
 
     @classmethod
-    def _prepare_reference_image(cls, ref_image, target_megapixels, crop_2_nearest_16px):
-        """Put a reference image on the same megapixel budget / 16px alignment as the edited image.
+    def _prepare_reference_image(cls, ref_image, ref_megapixels, crop_2_nearest_16px):
+        """Put a reference image on the `ref_megapixels` budget and the same 16px alignment as the edited image.
 
-        The budget is applied per image, not as a shared multiplier, so a reference smaller than the
-        target is scaled *up* to it - a 0.2 MP reference next to a 1 MP edit image contributes almost
-        nothing at its native size.
+        The budget is applied per image, not as a shared multiplier, so a reference smaller than it is
+        scaled *up* - a 0.2 MP reference next to a 1 MP edit image contributes almost nothing at its
+        native size. That upscale is not free, though: it is interpolated detail costing real latent
+        tokens, and lanczos rings on the hard edges of logos and line art, which is a reason to give
+        references a smaller budget than the edited image rather than blanket parity.
         """
         align = 16 if crop_2_nearest_16px else 8
 
-        if target_megapixels > 0.0:
-            scaled_height, scaled_width = cls._target_size(ref_image, target_megapixels, align)
+        if ref_megapixels > 0.0:
+            scaled_height, scaled_width = cls._target_size(ref_image, ref_megapixels, align)
             ref_image = cls._resample(ref_image, scaled_width, scaled_height)
 
         if crop_2_nearest_16px:

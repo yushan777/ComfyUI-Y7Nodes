@@ -1,7 +1,7 @@
 import { app } from "../../../scripts/app.js";
 
 const DEFAULT_NODE_WIDTH = 340;
-// Slightly taller than the single-reference node to leave room for the growable ref_image sockets.
+// Tall enough to leave room for the growable ref_image sockets.
 const DEFAULT_NODE_HEIGHT = 320;
 
 app.registerExtension({
