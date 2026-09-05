@@ -1,5 +1,10 @@
+1.0.57
+- updated pad-image-for-outpainting with extras + updated to V3 schema
+- added Flux.2 nodes 
+
+
 1.0.56
-- updated Load Image (subfolders) node
+- updated Load Image (subfolders) node to V3 schema
 
 1.0.55
 - fixes

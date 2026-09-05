@@ -1,5 +1,6 @@
 import torch
 import torch.nn.functional as F
+from comfy_api.latest import io
 
 MAX_RESOLUTION = 16384
 
@@ -109,7 +110,7 @@ def _feather_mask(d2, d3, left, top, right, bottom, feathering):
     return v * v
 
 
-class Y7Nodes_ImagePadForOutpaint:
+class Y7Nodes_ImagePadForOutpaint(io.ComfyNode):
     """
     Pad an image ready for outpainting.
 
@@ -120,55 +121,89 @@ class Y7Nodes_ImagePadForOutpaint:
     """
 
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "image": ("IMAGE",),
-                "step": ("INT", {
-                    "default": 16,
-                    "min": 1,
-                    "max": 1024,
-                    "step": 1,
-                    "tooltip": "Padding is rounded to a multiple of this number, so the "
-                               "final image stays a size the model is happy with. Also "
-                               "sets how far the +/- arrows move each side.",
-                }),
-                "fill": (FILL_MODES, {
-                    "default": "grey",
-                    "tooltip": "What to put in the new area before outpainting. "
-                               "grey: flat 50% grey, same as the built-in node. "
-                               "edge replicate: smears the outermost pixels outwards. "
-                               "mirror: reflects the image back on itself. "
-                               "blurred edge: a soft blur of the nearby colours. "
-                               "noise: random noise in the image's own colours. "
-                               "It all gets painted over anyway, but a plausible starting "
-                               "colour usually gives a better outpaint than flat grey.",
-                }),
-                "feathering": ("INT", {
-                    "default": 40, "min": 0, "max": MAX_RESOLUTION, "step": 1,
-                    "advanced": True,
-                    "tooltip": "Width in pixels of the soft fade at the join between the "
-                               "original image and the new area. 0 gives a hard edge.",
-                }),
-                "left": ("INT", {"default": 0, "min": 0, "max": MAX_RESOLUTION, "step": 1,
-                                 "tooltip": "Pixels to add to the left edge."}),
-                "top": ("INT", {"default": 0, "min": 0, "max": MAX_RESOLUTION, "step": 1,
-                                "tooltip": "Pixels to add to the top edge."}),
-                "right": ("INT", {"default": 0, "min": 0, "max": MAX_RESOLUTION, "step": 1,
-                                  "tooltip": "Pixels to add to the right edge."}),
-                "bottom": ("INT", {"default": 0, "min": 0, "max": MAX_RESOLUTION, "step": 1,
-                                   "tooltip": "Pixels to add to the bottom edge."}),
-            }
-        }
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_ImagePadForOutpaint",
+            display_name="Y7 Pad Image for Outpainting",
+            category="Y7Nodes/Image",
+            description="Pad an image ready for outpainting, with the padding snapped to a "
+                        "chosen step and a choice of what to fill the new area with.",
+            is_output_node=True,
+            inputs=[
+                io.Image.Input("image"),
+                io.Int.Input(
+                    "step",
+                    default=16,
+                    min=1,
+                    max=1024,
+                    step=1,
+                    tooltip="Padding is rounded to a multiple of this number, so the "
+                            "final image stays a size the model is happy with. Also "
+                            "sets how far the +/- arrows move each side.",
+                ),
+                io.Combo.Input(
+                    "fill",
+                    options=FILL_MODES,
+                    default="grey",
+                    tooltip="What to put in the new area before outpainting. "
+                            "grey: flat 50% grey, same as the built-in node. "
+                            "edge replicate: smears the outermost pixels outwards. "
+                            "mirror: reflects the image back on itself. "
+                            "blurred edge: a soft blur of the nearby colours. "
+                            "noise: random noise in the image's own colours. "
+                            "It all gets painted over anyway, but a plausible starting "
+                            "colour usually gives a better outpaint than flat grey.",
+                ),
+                io.Int.Input(
+                    "feathering",
+                    default=40,
+                    min=0,
+                    max=MAX_RESOLUTION,
+                    step=1,
+                    advanced=True,
+                    tooltip="Width in pixels of the soft fade at the join between the "
+                            "original image and the new area. 0 gives a hard edge.",
+                ),
+                io.Int.Input(
+                    "left", default=0, min=0, max=MAX_RESOLUTION, step=1,
+                    tooltip="Pixels to add to the left edge.",
+                ),
+                io.Int.Input(
+                    "top", default=0, min=0, max=MAX_RESOLUTION, step=1,
+                    tooltip="Pixels to add to the top edge.",
+                ),
+                io.Int.Input(
+                    "right", default=0, min=0, max=MAX_RESOLUTION, step=1,
+                    tooltip="Pixels to add to the right edge.",
+                ),
+                io.Int.Input(
+                    "bottom", default=0, min=0, max=MAX_RESOLUTION, step=1,
+                    tooltip="Pixels to add to the bottom edge.",
+                ),
+            ],
+            outputs=[
+                io.Image.Output(
+                    id="image_original",
+                    display_name="image (original)",
+                    tooltip="The image exactly as it came in, unpadded.",
+                ),
+                io.Image.Output(
+                    id="image_padded",
+                    display_name="image (padded)",
+                    tooltip="The image on the enlarged canvas, with the new area filled.",
+                ),
+                io.Mask.Output(
+                    id="mask",
+                    tooltip="White over the new area, black over the original image, with "
+                            "the feathered ramp in between.",
+                ),
+                io.Int.Output(id="width", tooltip="Width of the padded image."),
+                io.Int.Output(id="height", tooltip="Height of the padded image."),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE", "IMAGE", "MASK", "INT", "INT")
-    RETURN_NAMES = ("image (original)", "image (padded)", "mask", "width", "height")
-    FUNCTION = "expand_image"
-    OUTPUT_NODE = True
-
-    CATEGORY = "Y7Nodes/Image"
-
-    def expand_image(self, image, step, fill, feathering, left, top, right, bottom):
+    @classmethod
+    def execute(cls, image, step, fill, feathering, left, top, right, bottom) -> io.NodeOutput:
         d1, d2, d3, d4 = image.size()
 
         left, top, right, bottom = resolve_padding(left, top, right, bottom, step)
@@ -183,13 +218,19 @@ class Y7Nodes_ImagePadForOutpaint:
 
         new_w, new_h = d3 + left + right, d2 + top + bottom
 
-        return {
-            "ui": {
+        return io.NodeOutput(
+            image,
+            new_image,
+            mask.unsqueeze(0),
+            new_w,
+            new_h,
+            # Read by web/js/image_pad_for_outpaint.js: "src" is the size of the incoming
+            # image, used to draw the before -> after line on the node itself.
+            ui={
                 "text": [
                     f"{d3} x {d2}  ->  {new_w} x {new_h}",
                     f"L {left}   T {top}   R {right}   B {bottom}",
                 ],
                 "src": [d3, d2],
             },
-            "result": (image, new_image, mask.unsqueeze(0), new_w, new_h),
-        }
+        )

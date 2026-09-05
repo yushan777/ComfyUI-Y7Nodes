@@ -75,7 +75,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_CaptionSaver": "Y7 Caption Saver",
     "Y7Nodes_ImageStitcher": "Y7 Image Stitcher",
     "Y7Nodes_ImageCompare": "Y7 Image Compare",
-    "Y7Nodes_ImagePadForOutpaint": "Y7 Pad Image for Outpainting",
 }
 
 # Apply HTML-formatted documentation to node classes
