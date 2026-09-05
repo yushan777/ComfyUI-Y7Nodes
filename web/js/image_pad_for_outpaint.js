@@ -194,26 +194,24 @@ app.registerExtension({
             const byName = (name) => this.widgets?.find((w) => w.name === name);
             const src = this.y7GetSourceSize();
 
-            let line1;
-            let line2 = "";
-
+            // Nothing to report until an image is connected.
             if (!src) {
-                line1 = "connect an image";
-            } else {
-                const pad = {
-                    left: byName("left")?.value ?? 0,
-                    top: byName("top")?.value ?? 0,
-                    right: byName("right")?.value ?? 0,
-                    bottom: byName("bottom")?.value ?? 0,
-                };
-                const step = Math.max(1, Math.round(byName("step")?.value ?? 1));
-                const p = resolvePadding(pad, step);
-                const newW = src.w + p.left + p.right;
-                const newH = src.h + p.top + p.bottom;
-
-                line1 = `${src.w} x ${src.h}  →  ${newW} x ${newH}`;
-                line2 = `L ${p.left}   T ${p.top}   R ${p.right}   B ${p.bottom}`;
+                return r;
             }
+
+            const pad = {
+                left: byName("left")?.value ?? 0,
+                top: byName("top")?.value ?? 0,
+                right: byName("right")?.value ?? 0,
+                bottom: byName("bottom")?.value ?? 0,
+            };
+            const step = Math.max(1, Math.round(byName("step")?.value ?? 1));
+            const p = resolvePadding(pad, step);
+            const newW = src.w + p.left + p.right;
+            const newH = src.h + p.top + p.bottom;
+
+            const line1 = `${src.w} x ${src.h}  →  ${newW} x ${newH}`;
+            const line2 = `L ${p.left}   T ${p.top}   R ${p.right}   B ${p.bottom}`;
 
             ctx.save();
             ctx.textAlign = "center";
