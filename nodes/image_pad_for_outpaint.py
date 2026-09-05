@@ -26,14 +26,14 @@ def resolve_padding(left, top, right, bottom, step):
     )
 
 
-def _replicate_index(length, before, after):
+def _replicate_index(length, before, after, device):
     """Indices into a row/column of `length` px that clamp to the edge outside it."""
-    return torch.arange(-before, length + after).clamp(0, length - 1)
+    return torch.arange(-before, length + after, device=device).clamp(0, length - 1)
 
 
-def _mirror_index(length, before, after):
+def _mirror_index(length, before, after, device):
     """Indices into a row/column of `length` px that reflect back inside it."""
-    idx = torch.arange(-before, length + after)
+    idx = torch.arange(-before, length + after, device=device)
     if length == 1:
         return torch.zeros_like(idx)
     period = 2 * length - 2
@@ -48,19 +48,22 @@ def _fill_canvas(image, left, top, right, bottom, fill):
     """
     d1, d2, d3, d4 = image.size()
     new_h, new_w = d2 + top + bottom, d3 + left + right
+    # Every fill mode must land on the same device as the incoming image, otherwise
+    # the padded image and the mask disagree and downstream nodes blow up.
+    device = image.device
 
     if fill == "grey":
-        return torch.ones((d1, new_h, new_w, d4), dtype=torch.float32) * 0.5
+        return torch.ones((d1, new_h, new_w, d4), dtype=torch.float32, device=device) * 0.5
 
     if fill == "noise":
         mean = image.mean(dim=(1, 2), keepdim=True)
         std = image.std(dim=(1, 2), keepdim=True)
-        noise = torch.randn((d1, new_h, new_w, d4), dtype=torch.float32)
+        noise = torch.randn((d1, new_h, new_w, d4), dtype=torch.float32, device=device)
         return (noise * std * 0.5 + mean).clamp(0.0, 1.0)
 
     index = _mirror_index if fill == "mirror" else _replicate_index
-    rows = index(d2, top, bottom)
-    cols = index(d3, left, right)
+    rows = index(d2, top, bottom, device)
+    cols = index(d3, left, right, device)
     canvas = image[:, rows][:, :, cols].float()
 
     if fill == "blurred edge":
@@ -79,12 +82,12 @@ def _fill_canvas(image, left, top, right, bottom, fill):
     return canvas.contiguous()
 
 
-def _feather_mask(d2, d3, left, top, right, bottom, feathering):
+def _feather_mask(d2, d3, left, top, right, bottom, feathering, device):
     """
     The soft ramp painted over the original image region, matching the built-in node's
     falloff but computed with tensor ops instead of a per-pixel Python loop.
     """
-    t = torch.zeros((d2, d3), dtype=torch.float32)
+    t = torch.zeros((d2, d3), dtype=torch.float32, device=device)
 
     # The built-in silently skips feathering once it no longer fits; clamp instead so
     # a large value still gives the widest ramp the image can hold.
@@ -92,13 +95,13 @@ def _feather_mask(d2, d3, left, top, right, bottom, feathering):
     if f <= 0:
         return t
 
-    ii = torch.arange(d2, dtype=torch.float32).view(-1, 1).expand(d2, d3)
-    jj = torch.arange(d3, dtype=torch.float32).view(1, -1).expand(d2, d3)
+    ii = torch.arange(d2, dtype=torch.float32, device=device).view(-1, 1).expand(d2, d3)
+    jj = torch.arange(d3, dtype=torch.float32, device=device).view(1, -1).expand(d2, d3)
 
     # A side with no padding contributes no falloff, so it is given a distance
     # large enough to never win the min().
-    big_v = torch.full((d2, d3), float(d2))
-    big_h = torch.full((d2, d3), float(d3))
+    big_v = torch.full((d2, d3), float(d2), device=device)
+    big_h = torch.full((d2, d3), float(d3), device=device)
 
     dt = ii if top != 0 else big_v
     db = (d2 - ii) if bottom != 0 else big_v
@@ -211,17 +214,25 @@ class Y7Nodes_ImagePadForOutpaint(io.ComfyNode):
         new_image = _fill_canvas(image, left, top, right, bottom, fill)
         new_image[:, top:top + d2, left:left + d3, :] = image
 
-        mask = torch.ones((d2 + top + bottom, d3 + left + right), dtype=torch.float32)
+        mask = torch.ones(
+            (d2 + top + bottom, d3 + left + right),
+            dtype=torch.float32,
+            device=image.device,
+        )
         mask[top:top + d2, left:left + d3] = _feather_mask(
-            d2, d3, left, top, right, bottom, feathering
+            d2, d3, left, top, right, bottom, feathering, image.device
         )
 
         new_w, new_h = d3 + left + right, d2 + top + bottom
 
+        # The work above runs on whatever device the image arrived on, but IMAGE and
+        # MASK are expected to travel on the CPU, so hand every tensor back on the CPU.
+        # Otherwise a GPU image in gives GPU outputs, which then refuse to combine with
+        # the CPU tensors other nodes produce. .cpu() is a no-op if it is already there.
         return io.NodeOutput(
-            image,
-            new_image,
-            mask.unsqueeze(0),
+            image.cpu(),
+            new_image.cpu(),
+            mask.unsqueeze(0).cpu(),
             new_w,
             new_h,
             # Read by web/js/image_pad_for_outpaint.js: "src" is the size of the incoming
