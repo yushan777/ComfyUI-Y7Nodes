@@ -4,7 +4,6 @@ import json
 from transformers import T5Tokenizer
 from ..utils.logger import logger
 from ..utils.colored_print import color, style
-from .documentation import descriptions, as_html
 
 # This node has 1 backend input and 1 backend output 
 # other widgets (frontend) are added in the corresponding javascript file

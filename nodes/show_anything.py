@@ -3,7 +3,6 @@ import json
 import torch
 from ..utils.logger import logger
 from ..utils.colored_print import color, style
-from .documentation import descriptions, as_html
 
 
 # Code based on :

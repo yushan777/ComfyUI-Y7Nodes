@@ -1,6 +1,5 @@
 import torch
 import torch.nn.functional as F
-from .documentation import descriptions, as_html
 
 
 class Y7Nodes_ImageStitcher:
