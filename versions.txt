@@ -1,6 +1,7 @@
 1.0.57
 - updated pad-image-for-outpainting with extras + updated to V3 schema
-- added Flux.2 nodes 
+- added Flux.2 Klein Edit Multi-Ref All-In-One node
+- added Flux.2 Sampler All-In-One node
 
 
 1.0.56
