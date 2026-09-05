@@ -89,6 +89,22 @@ class Y7Nodes_Flux2Sampler(io.ComfyNode):
                 io.Combo.Input("sampler_name", options=comfy.samplers.SAMPLER_NAMES, default="euler"),
                 # Number of sampling steps. Distilled Klein checkpoints commonly only need ~4.
                 io.Int.Input("steps", default=4, min=1, max=4096),
+                # How much of the schedule to actually run. 1.0 denoises from pure noise (normal
+                # text-to-image). Lower values start part-way down the schedule, keeping more of the
+                # incoming latent.
+                io.Float.Input(
+                    "denoise",
+                    default=1.0,
+                    min=0.0,
+                    max=1.0,
+                    step=0.01,
+                    tooltip="How much of the latent to redo. 1.0 = start from pure noise (normal "
+                            "generation); 0 returns the latent untouched. Matches SplitSigmasDenoise. "
+                            "Note it shortens the run as well as the noise level, so at 4 steps only a "
+                            "handful of settings are reachable, and Flux.2's schedule means even 0.5 "
+                            "keeps under 10% of the incoming image - leave it at 1.0 unless you know "
+                            "you want this.",
+                ),
             ],
             outputs=[
                 # Denoised latent, ready for VAE decode.
@@ -97,7 +113,7 @@ class Y7Nodes_Flux2Sampler(io.ComfyNode):
         )
 
     @classmethod
-    def execute(cls, model, latent_image, positive, negative, seed, cfg, sampler_name, steps) -> io.NodeOutput:
+    def execute(cls, model, latent_image, positive, negative, seed, cfg, sampler_name, steps, denoise=1.0) -> io.NodeOutput:
         guider = comfy.samplers.CFGGuider(model)
         guider.set_conds(positive, negative)
         guider.set_cfg(cfg)
@@ -115,6 +131,18 @@ class Y7Nodes_Flux2Sampler(io.ComfyNode):
         # spatial dims *are* the token grid the sigma schedule needs - no width/height widgets to keep in sync.
         seq_len = samples.shape[-2] * samples.shape[-1]
         sigmas = _flux2_sigma_schedule(steps, seq_len)
+
+        # Same trimming SplitSigmasDenoise does to a Flux2Scheduler schedule: keep the tail of the
+        # schedule (its low_sigmas output) so sampling starts part-way down instead of at full noise.
+        # Note this *spends* steps: the schedule is built for `steps` and then shortened, so denoise
+        # 0.5 runs half as many steps. See the denoise tooltip for why that limits its usefulness.
+        if denoise < 1.0:
+            run_steps = round(steps * denoise)
+            if run_steps < 1:
+                # Nothing to do - hand the incoming latent straight back rather than sampling with a
+                # schedule that would slice to the whole tensor and quietly ignore denoise entirely.
+                return io.NodeOutput(latent_image)
+            sigmas = sigmas[-(run_steps + 1):]
 
         noise = comfy.sample.prepare_noise(samples, seed, latent.get("batch_index", None))
         noise_mask = latent.get("noise_mask", None)

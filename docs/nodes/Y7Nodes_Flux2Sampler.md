@@ -16,6 +16,7 @@ Inputs:
   - `cfg`: Classifier-free guidance scale. Klein checkpoints are usually guidance-distilled, so the default `1.0` (negative conditioning skipped) is normally what you want. Raise it only on models that expect real CFG
   - `sampler_name`: Which k-diffusion sampler algorithm to step with. `euler` is the default
   - `steps`: Number of sampling steps. Distilled Klein checkpoints commonly need only ~4; non-distilled Flux.2 wants considerably more
+  - `denoise`: How much of the latent to redo. `1.0` (the default) starts from pure noise, which is what you want for normal generation; `0` hands the latent back untouched. Lowering it trims the front off the schedule, which shortens the run as well as the starting noise level. It is rarely the dial you want on Flux.2 — see the note below — so leave it at `1.0` unless you have a specific reason
 
 Outputs:
 
@@ -24,4 +25,7 @@ Outputs:
 Notes:
 
   - Any `noise_mask` carried on the incoming latent (as set by the Klein Edit node when a mask is painted) is honoured, so inpaint-style edits work without extra wiring
+  - `denoise` here does exactly what wiring a `SplitSigmasDenoise` node between `Flux2Scheduler` and the sampler and taking its `low_sigmas` output does — deliberately, so this node stays a faithful drop-in for that chain
+  - Do not expect it to work as an image-to-image strength dial. Flux.2 shifts its schedule hard toward the high-noise end (that shift is what lets distilled Klein checkpoints work in 4 steps), so at 1024x1024 / 4 steps the whole schedule is `1.000, 0.967, 0.908, 0.767, 0.000`. Trimming the front barely lowers where you start: `denoise 0.75` still begins at sigma `0.967` and keeps only ~3% of the image, while also cutting you to 3 steps. At `steps 4` there are only five reachable settings in total
+  - To preserve an existing image with a Flux.2 edit model, use the `Klein Edit` node's conditioning instead and leave `denoise` at `1.0`. Edit conditioning sets `concat_latent_image`, which the model reads on every step — that is what holds your source image, not the noise level. The two mechanisms fight each other, and the conditioning wins
   - The Flux.2 sigma schedule math is vendored from `Flux2Scheduler`, so this node doesn't depend on ComfyUI's internal `comfy_extras` module
