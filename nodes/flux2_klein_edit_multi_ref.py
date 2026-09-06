@@ -18,6 +18,34 @@
 # align to.
 #   reference_latents[1:] -> `ref_image_2`, `ref_image_3`, ... in socket order
 #
+# A socket carrying a batch of images is split into one reference latent per image: the model treats
+# each list entry as a separate reference rather than as a batch. Every reference also adds tokens to
+# the model's context, which makes `target_megapixels` the lever for both quality and VRAM - it caps
+# the oversized images and, just as importantly, brings undersized ones up to a resolution that
+# actually contributes detail.
+#
+# What the mask actually does (moved here from the user-facing doc, which does not need it):
+# Klein has no mask input of its own. It is not a fill/inpaint model - its in_channels match its
+# out_channels - so ComfyUI's Flux.concat_cond drops the concat_latent_image/concat_mask conditioning
+# this node sets. The mask survives only as the latent's noise_mask, which the sampler uses to restore
+# everything outside the painted area after each step (comfy/samplers.py: `out = out * denoise_mask +
+# latent_image * latent_mask`, a linear blend, so partial mask values do blend proportionally). That
+# composite happens in latent space, at 1/16 of the picture's resolution.
+#
+# Two consequences worth keeping straight, because they pull in opposite directions:
+#   - For sampling, feathering is close to a no-op. Blurring a hard edge and then running the same
+#     16x bilinear downsample this node does: 4px is bit-identical to no feather, 8px shifts one
+#     latent cell by 0.001, and where the painted edge lands mid-cell 4/8/16px are all identical.
+#     Only ~32px puts real intermediate values in more than one cell, and that crossfades
+#     partially-denoised latents, which decodes as a smeared seam rather than a blend.
+#   - For a pixel-space composite downstream (ImageCompositeMasked fed from `preview_mask`, or Y7
+#     Paste Cropped Image Back), the same feather survives at full resolution and 4-8px is the
+#     difference between a hard cut and a soft join. `binary_mask` thresholds last and would flatten
+#     that ramp before either consumer sees it, which is why it defaults to off.
+#
+# Sampler `denoise` belongs at 1.0. The unmasked area is restored every step regardless, so lowering
+# it to protect that area does nothing but weaken the edit.
+#
 # Prompting: there is no special syntax for addressing the references. Klein taps the Qwen3-VL LM with
 # the visual tower unused (comfy/sd.py: "Flux2 Klein reuses the Qwen3-VL LM ...; visual unused"), so the
 # text encoder never sees the images at all - they only reach the transformer as latent tokens appended
@@ -171,34 +199,38 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
                             "new thing needs more room than the old one. 0 turns it off. Like every "
                             "mask setting here, it only affects the picture being edited.",
                 ),
-                # Softens the mask edges with a Gaussian blur of this radius. Stays at 0 by default because the
-                # mask never reaches the model: Klein has no mask input (in_channels == out_channels, so
-                # Flux.concat_cond drops concat_mask), and the mask only drives the sampler's latent composite,
-                # which runs at 1/16 resolution. A feather under ~16px is erased by that downsample, and a wider
-                # one crossfades partially-denoised latents - which decodes as a smeared seam, not a blend.
-                # Soft edges belong in pixel space, after decoding (see Y7 Paste Cropped Image Back).
+                # Softens the mask edges with a Gaussian blur of this radius. Defaults to 8, which is chosen for
+                # the pixel-space composite rather than for sampling: the mask only drives the latent composite
+                # at 1/16 resolution, where 8px is very nearly a no-op (it shifts one latent cell by 0.001), so
+                # it costs the generation nothing. preview_mask carries the same feather at full resolution,
+                # where 8px is the difference between a hard cut and a soft join in a downstream composite
+                # (ImageCompositeMasked, Y7 Paste Cropped Image Back). Needs binary_mask off to survive, which
+                # is why that one defaults to off. Past ~32 the feather does start to reach the sampler, and
+                # there it crossfades partially-denoised latents into a smeared seam rather than a blend.
                 io.Int.Input(
-                    "feather_mask", default=0, min=0, max=256, step=1,
-                    tooltip="Softens the edge of the area you painted. Best left at 0: the mask is used at a "
-                            "much smaller size than your picture, so a small softening vanishes entirely and "
-                            "a large one smears the edge instead of blending it. To blend the edited part "
-                            "into the rest smoothly, do it after the picture is made (the Y7 Paste Cropped "
-                            "Image Back node). Above about 32 this acts as a loose, fuzzy edit area rather "
-                            "than a tidy edge.",
+                    "feather_mask", default=8, min=0, max=256, step=1,
+                    tooltip="Softens the edge of the area you painted. It makes almost no difference to what "
+                            "the model generates - the mask is used at a much smaller size there, so a small "
+                            "softening vanishes into it. It matters if you paste the result back over your "
+                            "original afterwards (ImageCompositeMasked, or Y7 Paste Cropped Image Back), where "
+                            "the default 8 gives a soft join instead of a hard cut. Needs `binary_mask` off, "
+                            "which is how it ships. Above about 32 this acts as a loose, fuzzy edit area "
+                            "rather than a tidy edge.",
                 ),
-                # Applied last, after expand/feather, so it always produces a hard-edged mask: everything at or
-                # above 0.5 becomes fully opaque, everything below fully transparent. Feathering still shapes the
-                # edge (rounding corners, smoothing jagged strokes) before the cut, but leaves no grey ramp.
-                # On by default: the mask editor's brush carries hardness and opacity settings, so painted masks
-                # are frequently soft-edged whether or not that was intended, and part-strength mask values only
-                # buy a muddy latent-space blend.
+                # Applied last, after expand/feather, so when on it always produces a hard-edged mask: everything
+                # at or above 0.5 becomes fully opaque, everything below fully transparent. Feathering still
+                # shapes the edge (rounding corners, smoothing jagged strokes) before the cut, but leaves no
+                # grey ramp. Off by default: it is the only thing standing between `feather_mask` and a
+                # pixel-space composite downstream, and the soft edge is worth more there than a hard latent
+                # mask is during sampling. Turn it on when a soft brush has left half-strength areas that come
+                # out muddy, or when a downstream node needs a strictly binary mask (LanPaint, for one).
                 io.Boolean.Input(
-                    "binary_mask", default=True,
+                    "binary_mask", default=False,
                     tooltip="Makes the mask edge hard, so every part you painted is either fully changed or "
-                            "left alone - nothing in between. On by default, because the mask brush can lay "
-                            "down soft, half-strength edges without you noticing, and half-strength areas "
-                            "come out muddy rather than blended. Turn it off only if you deliberately want "
-                            "an edit applied at part strength.",
+                            "left alone - nothing in between. Off by default, so that any softening from "
+                            "`feather_mask` survives to blend the edit back into the picture afterwards. "
+                            "Turn it on if the mask brush has left soft, half-strength areas that come out "
+                            "muddy, or if something further down the workflow needs a strictly hard mask.",
                 ),
                 # A mask made anywhere else - LoadImageMask on a mask file, a segmentation node, a
                 # threshold - as an alternative to painting one on the node. Takes over from the painted
@@ -261,8 +293,8 @@ class Y7Nodes_Flux2KleinEdit_MultiRef(io.ComfyNode):
         ref_megapixels=1.0,
         crop_2_nearest_16px=True,
         expand_mask=16,
-        feather_mask=0,
-        binary_mask=True,
+        feather_mask=8,
+        binary_mask=False,
         external_mask=None,
         ref_images=None,
         positive=None,
