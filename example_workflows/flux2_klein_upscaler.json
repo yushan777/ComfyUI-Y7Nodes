@@ -13,7 +13,7 @@
       ],
       "size": [
         400,
-        82
+        90
       ],
       "flags": {},
       "order": 0,
@@ -30,12 +30,17 @@
       ],
       "properties": {
         "cnr_id": "comfy-core",
+        "ver": "0.34.0",
         "Node name for S&R": "UNETLoader"
       },
       "widgets_values": [
         "Flux2-Klein/flux-2-klein-9b.safetensors",
         "default"
-      ]
+      ],
+      "widgets_values_named": {
+        "unet_name": "Flux2-Klein/flux-2-klein-9b.safetensors",
+        "weight_dtype": "default"
+      }
     },
     {
       "id": 2,
@@ -46,7 +51,7 @@
       ],
       "size": [
         400,
-        106
+        110
       ],
       "flags": {},
       "order": 1,
@@ -63,13 +68,19 @@
       ],
       "properties": {
         "cnr_id": "comfy-core",
+        "ver": "0.34.0",
         "Node name for S&R": "CLIPLoader"
       },
       "widgets_values": [
         "Flux2-Klein/qwen_3_8b.safetensors",
         "flux2",
         "default"
-      ]
+      ],
+      "widgets_values_named": {
+        "clip_name": "Flux2-Klein/qwen_3_8b.safetensors",
+        "type": "flux2",
+        "device": "default"
+      }
     },
     {
       "id": 3,
@@ -80,7 +91,7 @@
       ],
       "size": [
         400,
-        58
+        60
       ],
       "flags": {},
       "order": 2,
@@ -97,11 +108,15 @@
       ],
       "properties": {
         "cnr_id": "comfy-core",
+        "ver": "0.34.0",
         "Node name for S&R": "VAELoader"
       },
       "widgets_values": [
         "Flux2/flux2-klein-vae.safetensors"
-      ]
+      ],
+      "widgets_values_named": {
+        "vae_name": "Flux2/flux2-klein-vae.safetensors"
+      }
     },
     {
       "id": 4,
@@ -112,7 +127,7 @@
       ],
       "size": [
         400,
-        58
+        60
       ],
       "flags": {},
       "order": 3,
@@ -129,11 +144,15 @@
       ],
       "properties": {
         "cnr_id": "comfy-core",
+        "ver": "0.34.0",
         "Node name for S&R": "UpscaleModelLoader"
       },
       "widgets_values": [
         "4xRealWebPhoto_v4_dat2.safetensors"
-      ]
+      ],
+      "widgets_values_named": {
+        "model_name": "4xRealWebPhoto_v4_dat2.safetensors"
+      }
     },
     {
       "id": 5,
@@ -144,7 +163,7 @@
       ],
       "size": [
         400,
-        314
+        320
       ],
       "flags": {},
       "order": 4,
@@ -167,85 +186,16 @@
       ],
       "properties": {
         "cnr_id": "comfy-core",
+        "ver": "0.34.0",
         "Node name for S&R": "LoadImage"
       },
       "widgets_values": [
         "bike.png",
         "image"
-      ]
-    },
-    {
-      "id": 10,
-      "type": "CLIPTextEncode",
-      "pos": [
-        -140,
-        40
       ],
-      "size": [
-        420,
-        200
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip",
-          "type": "CLIP",
-          "link": 2
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "links": [
-            3,
-            4
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "Node name for S&R": "CLIPTextEncode"
-      },
-      "widgets_values": [
-        "a sharp, detailed photograph"
-      ]
-    },
-    {
-      "id": 11,
-      "type": "ConditioningZeroOut",
-      "pos": [
-        -140,
-        300
-      ],
-      "size": [
-        420,
-        26
-      ],
-      "flags": {},
-      "order": 6,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "conditioning",
-          "type": "CONDITIONING",
-          "link": 4
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "links": [
-            5
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "Node name for S&R": "ConditioningZeroOut"
+      "widgets_values_named": {
+        "image": "bike.png",
+        "upload": "image"
       }
     },
     {
@@ -260,7 +210,7 @@
         470
       ],
       "flags": {},
-      "order": 7,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
@@ -290,9 +240,9 @@
         },
         {
           "name": "upscale_model",
+          "shape": 7,
           "type": "UPSCALE_MODEL",
-          "link": 9,
-          "shape": 7
+          "link": 9
         }
       ],
       "outputs": [
@@ -319,22 +269,37 @@
       ],
       "properties": {
         "cnr_id": "comfyui-y7nodes",
+        "ver": "9a30e1099c75353dcc7800540335886319919722",
         "Node name for S&R": "Y7Nodes_Flux2KleinUpscaler"
       },
       "widgets_values": [
         12345,
         "fixed",
-        2.0,
+        2,
         1024,
         128,
         4,
-        1.0,
+        1,
         "euler",
-        1.0,
+        1,
         "mkl",
-        1.0,
+        1,
         "enlarged"
-      ]
+      ],
+      "widgets_values_named": {
+        "seed": 12345,
+        "randomize": "fixed",
+        "scale_factor": 2,
+        "tile_size": 1024,
+        "overlap": 128,
+        "steps": 4,
+        "cfg": 1,
+        "sampler_name": "euler",
+        "denoise": 1,
+        "color_match": "mkl",
+        "refine_strength": 1,
+        "reference_source": "enlarged"
+      }
     },
     {
       "id": 30,
@@ -348,7 +313,7 @@
         480
       ],
       "flags": {},
-      "order": 8,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {
@@ -357,14 +322,24 @@
           "link": 10
         }
       ],
-      "outputs": [],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
       "properties": {
         "cnr_id": "comfy-core",
+        "ver": "0.34.0",
         "Node name for S&R": "SaveImage"
       },
       "widgets_values": [
         "y7_klein_upscale"
-      ]
+      ],
+      "widgets_values_named": {
+        "filename_prefix": "y7_klein_upscale"
+      }
     },
     {
       "id": 31,
@@ -378,14 +353,14 @@
         320
       ],
       "flags": {},
-      "order": 9,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {
           "name": "anything",
+          "shape": 7,
           "type": "*",
-          "link": 12,
-          "shape": 7
+          "link": 12
         }
       ],
       "outputs": [
@@ -397,11 +372,19 @@
       ],
       "properties": {
         "cnr_id": "comfyui-y7nodes",
+        "ver": "9a30e1099c75353dcc7800540335886319919722",
         "Node name for S&R": "Y7Nodes_ShowAnything"
       },
       "widgets_values": [
-        ""
-      ]
+        "",
+        "11",
+        null
+      ],
+      "widgets_values_named": {
+        "text": "",
+        "font_size": "11",
+        "📋 Copy Text": null
+      }
     },
     {
       "id": 32,
@@ -415,7 +398,7 @@
         560
       ],
       "flags": {},
-      "order": 10,
+      "order": 13,
       "mode": 0,
       "inputs": [
         {
@@ -425,20 +408,58 @@
         },
         {
           "name": "image_b",
+          "shape": 7,
           "type": "IMAGE",
-          "link": 11,
-          "shape": 7
+          "link": 11
         }
       ],
       "outputs": [],
       "properties": {
         "cnr_id": "comfyui-y7nodes",
+        "ver": "9a30e1099c75353dcc7800540335886319919722",
         "Node name for S&R": "Y7Nodes_ImageCompare",
         "blend_mode": "normal"
       },
       "widgets_values": [
-        "normal"
-      ]
+        "normal",
+        null
+      ],
+      "widgets_values_named": {
+        "Blend Mode": "normal",
+        "Copy Image B to Clipboard": null
+      },
+      "isManuallyResized": true,
+      "slider_pos": 0.5
+    },
+    {
+      "id": 41,
+      "type": "Note",
+      "pos": [
+        -1170,
+        410
+      ],
+      "size": [
+        500,
+        410
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "Upscale Model",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "Note"
+      },
+      "widgets_values": [
+        "upscale_model - optional, but pick a CLEAN one, not a SHARP one\n\nThe enlargement is not the finished picture - it is the reference and the frozen context each tile is built on. So halos and invented texture get locked in and copied. Softness costs nothing; putting detail back is this node's whole job.\n\nGood: 4xRealWebPhoto_v4_dat2, 4xNomosUniDAT_otf, RealESRGAN_x4plus,\nrealesr-general-x4v3.\n\nAvoid anything built to look sharp on its own - 4x-UltraSharp, Remacri, NMKD-Siax, and anything with \"Sharp\" in the name.\n\nUse a model whose native scale is equal to or above scale_factor. A 4x model at scale_factor 2.0 is supersampling and looks very good.\n\nFull details: docs/nodes/Y7Nodes_Flux2KleinUpscaler.md"
+      ],
+      "widgets_values_named": {
+        "text": "upscale_model - optional, but pick a CLEAN one, not a SHARP one\n\nThe enlargement is not the finished picture - it is the reference and the frozen context each tile is built on. So halos and invented texture get locked in and copied. Softness costs nothing; putting detail back is this node's whole job.\n\nGood: 4xRealWebPhoto_v4_dat2, 4xNomosUniDAT_otf, RealESRGAN_x4plus,\nrealesr-general-x4v3.\n\nAvoid anything built to look sharp on its own - 4x-UltraSharp, Remacri, NMKD-Siax, and anything with \"Sharp\" in the name.\n\nUse a model whose native scale is equal to or above scale_factor. A 4x model at scale_factor 2.0 is supersampling and looks very good.\n\nFull details: docs/nodes/Y7Nodes_Flux2KleinUpscaler.md"
+      },
+      "color": "#432",
+      "bgcolor": "#653"
     },
     {
       "id": 40,
@@ -448,11 +469,11 @@
         40
       ],
       "size": [
-        420,
+        460,
         300
       ],
       "flags": {},
-      "order": 11,
+      "order": 6,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -461,60 +482,127 @@
         "Node name for S&R": "Note"
       },
       "widgets_values": [
-        "Y7 Flux.2 Klein Upscaler (Tiled) - example\n\nEverything sampling needs is inside the one node. Connect a model, a VAE,\na prompt and a picture, and it hands back the finished image.\n\nThe picture is enlarged, then repainted one tile at a time. Only one tile\nis on the graphics card at once, so memory is set by `tile_size`, not by\nthe size of the finished picture.\n\nRepoint the four loaders at your own files before running.\n\nSharpening without enlarging: set `scale_factor` to 1.0, unplug\nupscale_model, and use refine_strength around 0.90.\n\nFull details: docs/nodes/Y7Nodes_Flux2KleinUpscaler.md"
+        "Description\n\nEverything sampling-related is inside the one node. Connect a model, a VAE, a prompt and a picture, and it hands back the finished image.\n\nThe picture is enlarged/refined, then repainted one tile at a time. Only one tile\nis on the graphics card at once, so memory is set by `tile_size`, not by the size of the finished picture.\n\nRepoint the four loaders at your own files before running.\n\nSharpening without enlarging: set `scale_factor` to 1.0, unplug upscale_model, and use refine_strength around 0.90.\n\nFull details: docs/nodes/Y7Nodes_Flux2KleinUpscaler.md"
       ],
+      "widgets_values_named": {
+        "text": "Description\n\nEverything sampling-related is inside the one node. Connect a model, a VAE, a prompt and a picture, and it hands back the finished image.\n\nThe picture is enlarged/refined, then repainted one tile at a time. Only one tile\nis on the graphics card at once, so memory is set by `tile_size`, not by the size of the finished picture.\n\nRepoint the four loaders at your own files before running.\n\nSharpening without enlarging: set `scale_factor` to 1.0, unplug upscale_model, and use refine_strength around 0.90.\n\nFull details: docs/nodes/Y7Nodes_Flux2KleinUpscaler.md"
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
     {
-      "id": 41,
-      "type": "Note",
+      "id": 10,
+      "type": "CLIPTextEncode",
       "pos": [
-        -1180,
-        640
+        -140,
+        40
       ],
       "size": [
-        420,
-        340
+        410,
+        130
       ],
       "flags": {},
-      "order": 12,
+      "order": 9,
       "mode": 0,
-      "inputs": [],
-      "outputs": [],
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            3,
+            4
+          ]
+        }
+      ],
+      "title": "Prompt",
       "properties": {
         "cnr_id": "comfy-core",
-        "Node name for S&R": "Note"
+        "ver": "0.34.0",
+        "Node name for S&R": "CLIPTextEncode"
       },
       "widgets_values": [
-        "upscale_model - optional, but pick a CLEAN one, not a SHARP one\n\nThe enlargement is not the finished picture - it is the reference and the\nfrozen context each tile is built on. So halos and invented texture get\nlocked in and copied. Softness costs nothing; putting detail back is this\nnode's whole job.\n\nGood: 4xRealWebPhoto_v4_dat2, 4xNomosUniDAT_otf, RealESRGAN_x4plus,\nrealesr-general-x4v3.\n\nAvoid anything built to look sharp on its own - 4x-UltraSharp, Remacri,\nNMKD-Siax, and anything with \"Sharp\" in the name.\n\nUse a model whose native scale is equal to or above scale_factor. A 4x\nmodel at scale_factor 2.0 is supersampling and looks very good.\n\nFull details: docs/nodes/Y7Nodes_Flux2KleinUpscaler.md"
+        "a sharp, detailed photograph"
       ],
-      "color": "#432",
-      "bgcolor": "#653"
+      "widgets_values_named": {
+        "text": "a sharp, detailed photograph"
+      },
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 11,
+      "type": "ConditioningZeroOut",
+      "pos": [
+        80,
+        210
+      ],
+      "size": [
+        210,
+        30
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            5
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.34.0",
+        "Node name for S&R": "ConditioningZeroOut"
+      },
+      "color": "#322",
+      "bgcolor": "#533"
     },
     {
       "id": 42,
       "type": "Note",
       "pos": [
-        -140,
-        380
+        -150,
+        260
       ],
       "size": [
         420,
         220
       ],
       "flags": {},
-      "order": 13,
+      "order": 7,
       "mode": 0,
       "inputs": [],
       "outputs": [],
+      "title": "Prompt",
       "properties": {
         "cnr_id": "comfy-core",
         "Node name for S&R": "Note"
       },
       "widgets_values": [
-        "Keep this short and about the picture as a whole, or leave it empty.\n\nThe same prompt goes to every tile, so naming a specific object (\"a red\nbicycle\") tries to put it in all of them. \"sharp, detailed photograph\" is\nthe kind of thing that works.\n\nThe negative is zeroed out because Klein runs at cfg 1.0 and ignores it.\nReplace it with a real prompt only if you raise cfg above 1.0."
+        "Keep this short and about the picture as a whole, or leave it empty.\n\nThe same prompt goes to every tile, so naming a specific object (\"a red bicycle\") tries to put it in all of them. \"sharp, detailed photograph\" is the kind of thing that works the best.\n\nThe negative is zeroed out because Klein runs at cfg 1.0 and ignores it. Replace it with a real prompt only if you raise cfg above 1.0."
       ],
+      "widgets_values_named": {
+        "text": "Keep this short and about the picture as a whole, or leave it empty.\n\nThe same prompt goes to every tile, so naming a specific object (\"a red bicycle\") tries to put it in all of them. \"sharp, detailed photograph\" is the kind of thing that works the best.\n\nThe negative is zeroed out because Klein runs at cfg 1.0 and ignores it. Replace it with a real prompt only if you raise cfg above 1.0."
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -530,7 +618,7 @@
         380
       ],
       "flags": {},
-      "order": 14,
+      "order": 8,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -539,8 +627,11 @@
         "Node name for S&R": "Note"
       },
       "widgets_values": [
-        "The two settings that matter most\n\ntile_size - roughly how big each tile is, and what decides memory use.\nDOWN if you run out of memory. UP if tiles invent detail that does not\nbelong. The `report` output shows the size actually used.\n\noverlap - how far each tile sees past its own edges, so things crossing a\nseam stay joined up. Costs memory and time. 128 suits most pictures.\n\nThere is no mask_blur - tile weights always sum to 1.0, so the joins need\nno tuning. A visible seam means tiles drifting in tone, not the blend:\nraise `overlap`, lower `refine_strength`, or set `color_match`.\n\nToo sharp / too much invented detail? Check in this order:\n  1. the upscale model (see the note by its loader - most common cause)\n  2. refine_strength - try 0.92, then 0.88\n  3. tile_size - bigger tiles invent less fine detail\n\nNot denoise.\n\nFull details: docs/nodes/Y7Nodes_Flux2KleinUpscaler.md"
+        "The two settings that matter most\n\ntile_size - roughly how big each tile is, and what decides memory use. DOWN if you run out of memory. UP if tiles invent detail that does not\nbelong. \n\noverlap - how far each tile sees past its own edges, so things crossing a seam stay joined up. Costs memory and time. 128 suits most pictures.\n\nA visible seam means tiles drifting in tone, not the blend: raise `overlap`, lower `refine_strength`, or set `color_match`.\n\nToo sharp / too much invented detail? Check in this order:\n  1. the upscale model (see the note by its loader - most common cause)\n  2. refine_strength - try 0.92, then 0.88\n  3. tile_size - bigger tiles invent less fine detail\n\nFull details: docs/nodes/Y7Nodes_Flux2KleinUpscaler.md"
       ],
+      "widgets_values_named": {
+        "text": "The two settings that matter most\n\ntile_size - roughly how big each tile is, and what decides memory use. DOWN if you run out of memory. UP if tiles invent detail that does not\nbelong. \n\noverlap - how far each tile sees past its own edges, so things crossing a seam stay joined up. Costs memory and time. 128 suits most pictures.\n\nA visible seam means tiles drifting in tone, not the blend: raise `overlap`, lower `refine_strength`, or set `color_match`.\n\nToo sharp / too much invented detail? Check in this order:\n  1. the upscale model (see the note by its loader - most common cause)\n  2. refine_strength - try 0.92, then 0.88\n  3. tile_size - bigger tiles invent less fine detail\n\nFull details: docs/nodes/Y7Nodes_Flux2KleinUpscaler.md"
+      },
       "color": "#432",
       "bgcolor": "#653"
     }
@@ -647,12 +738,17 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.7,
+      "scale": 1.26247696,
       "offset": [
-        1300,
-        100
+        235.74813321666386,
+        0.17000993187855487
       ]
-    }
+    },
+    "frontendVersion": "1.51.9",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
   },
   "version": 0.4
 }
