@@ -27,10 +27,11 @@
 //     useful for further processing or analysis in the workflow.
 //
 // - Quality of Life Features:
+//   - A "Copy Image B to Clipboard" button copies the Image B preview as a PNG.
 //   - Automatic resizing of the node to match the aspect ratio of the input images.
 //   - State serialization: Slider position and blend mode are saved with the workflow.
 //
-// Version: 1.4.0
+// Version: 1.5.0
 //
 // ==========================================================================
 
@@ -44,8 +45,9 @@ app.registerExtension({
     nodeCreated(node) {
         if (node.comfyClass === "Y7Nodes_ImageCompare") {
             const PADDING = 10;
-            const HEADER_HEIGHT = 100;
-            const MIN_HEIGHT = 300;
+            // Room above the image area: input slots + the two widgets below.
+            const HEADER_HEIGHT = 124;
+            const MIN_HEIGHT = 324;
             const NEUTRALPOS = 0.5;
             const RESOLUTION_TEXT_HEIGHT = 20;
 
@@ -60,7 +62,7 @@ app.registerExtension({
             node.isDragging = false;
             node.isManuallyResized = false;
             node.slider_pos = NEUTRALPOS;
-            node.setSize([320, 440]);
+            node.setSize([320, 464]);
 
             const blendModes = ["normal", "difference"];
 
@@ -68,6 +70,75 @@ app.registerExtension({
                 node.properties.blend_mode = value;
                 node.setDirtyCanvas(true, true);
             }, { values: blendModes, property: "blend_mode" });
+
+            // Copies the image_b preview to the system clipboard so it can be
+            // pasted straight into another app (or another ComfyUI node).
+            // `report(message, ok)` is called exactly once with a short status,
+            // so the button and the context-menu entry can each show it their
+            // own way.
+            const COPY_LABEL = "Copy Image B to Clipboard";
+
+            const copyImageBToClipboard = (report) => {
+                const img = node.imageB;
+
+                if (!img || !img.complete || !img.naturalWidth) {
+                    report("No Image B to copy", false);
+                    return;
+                }
+
+                // The clipboard image API needs a secure context (https or
+                // localhost); on plain http it simply isn't there.
+                if (!navigator.clipboard?.write || typeof window.ClipboardItem === "undefined") {
+                    report("Clipboard unavailable (needs https)", false);
+                    return;
+                }
+
+                // Browsers only accept image/png on the clipboard, so re-encode
+                // through a canvas rather than copying the source bytes.
+                const canvas = document.createElement("canvas");
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                canvas.getContext("2d").drawImage(img, 0, 0);
+
+                const pngBlob = new Promise((resolve, reject) => {
+                    canvas.toBlob(
+                        (blob) => (blob ? resolve(blob) : reject(new Error("PNG encoding failed"))),
+                        "image/png"
+                    );
+                });
+
+                // Handing over the promise (not an awaited blob) keeps the write
+                // attached to the click that started it, which Safari requires.
+                navigator.clipboard.write([new ClipboardItem({ "image/png": pngBlob })])
+                    .then(() => report("Copied!", true))
+                    .catch((err) => {
+                        console.error("[Y7 ImageCompare] Clipboard copy failed:", err);
+                        report("Copy failed", false);
+                    });
+            };
+
+            node.copyImageBToClipboard = copyImageBToClipboard;
+
+            const copyWidget = node.addWidget("button", COPY_LABEL, null, () => {
+                // Ignore clicks while a result message is still showing.
+                if (copyWidget._busy) return;
+
+                const setLabel = (text) => {
+                    copyWidget.name = text;
+                    copyWidget.label = text;
+                    node.setDirtyCanvas(true, true);
+                };
+
+                // Show the result on the button itself, then restore the label.
+                copyImageBToClipboard((message) => {
+                    copyWidget._busy = true;
+                    setLabel(message);
+                    setTimeout(() => {
+                        copyWidget._busy = false;
+                        setLabel(COPY_LABEL);
+                    }, 1500);
+                });
+            });
 
             const autosize = (img) => {
                 if (!node.isManuallyResized && img) {
@@ -538,6 +609,32 @@ app.registerExtension({
                         link.click();
                         document.body.removeChild(link);
                         URL.revokeObjectURL(url);
+                    }
+                });
+
+                // "Copy Image B (clipboard)" — same action as the node button,
+                // greyed out until an Image B preview exists.
+                options.unshift({
+                    content: "Copy Image B (clipboard)",
+                    disabled: !this.imageB,
+                    callback: () => {
+                        this.copyImageBToClipboard((message, ok) => {
+                            // The menu closes on click, so report through a
+                            // toast where the frontend has one; otherwise stay
+                            // quiet on success and alert on failure.
+                            const toast = app.extensionManager?.toast;
+
+                            if (toast?.add) {
+                                toast.add({
+                                    severity: ok ? "success" : "warn",
+                                    summary: ok ? "Image B copied to clipboard" : message,
+                                    life: 2000,
+                                });
+                            }
+                            else if (!ok) {
+                                alert(message);
+                            }
+                        });
                     }
                 });
 

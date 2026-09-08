@@ -2,6 +2,9 @@
 - updated pad-image-for-outpainting with extras + updated to V3 schema
 - added Flux.2 Klein Edit Multi-Ref All-In-One node
 - added Flux.2 Sampler All-In-One node
+- added Flux.2 Klein Upscaler (Tiled) All-In-One node
+- updated Image Compare node with copy functionality to copy image B to clipboard
+- added more example workflows
 
 
 1.0.56

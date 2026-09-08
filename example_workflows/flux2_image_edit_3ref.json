@@ -1,0 +1,894 @@
+{
+  "id": "c4e69a10-7f52-4d31-8a6b-93d0e15c7f48",
+  "revision": 0,
+  "last_node_id": 43,
+  "last_link_id": 19,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "UNETLoader",
+      "pos": [
+        -620,
+        40
+      ],
+      "size": [
+        400,
+        82
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            1
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "UNETLoader"
+      },
+      "widgets_values": [
+        "Flux2-Klein/flux-2-klein-9b.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "CLIPLoader",
+      "pos": [
+        -620,
+        180
+      ],
+      "size": [
+        400,
+        106
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            2
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "CLIPLoader"
+      },
+      "widgets_values": [
+        "Flux2-Klein/qwen_3_8b.safetensors",
+        "flux2",
+        "default"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "VAELoader",
+      "pos": [
+        -620,
+        340
+      ],
+      "size": [
+        400,
+        58
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            6,
+            13
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "VAELoader"
+      },
+      "widgets_values": [
+        "Flux2/flux2-klein-vae.safetensors"
+      ]
+    },
+    {
+      "id": 10,
+      "type": "CLIPTextEncode",
+      "pos": [
+        -140,
+        40
+      ],
+      "size": [
+        420,
+        220
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            3,
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 11,
+      "type": "ConditioningZeroOut",
+      "pos": [
+        -140,
+        300
+      ],
+      "size": [
+        420,
+        26
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            5
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "ConditioningZeroOut"
+      }
+    },
+    {
+      "id": 5,
+      "type": "LoadImage",
+      "pos": [
+        -620,
+        440
+      ],
+      "size": [
+        400,
+        314
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            7
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "cottage01.png",
+        "image"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "LoadImage",
+      "pos": [
+        -620,
+        800
+      ],
+      "size": [
+        400,
+        314
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            8
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "cottage_garden2.png",
+        "image"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "Y7Nodes_Flux2KleinEdit_MultiRef",
+      "pos": [
+        360,
+        40
+      ],
+      "size": [
+        440,
+        640
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 6
+        },
+        {
+          "name": "external_mask",
+          "type": "MASK",
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "ref_image_2",
+          "type": "IMAGE",
+          "link": 7,
+          "shape": 7
+        },
+        {
+          "name": "ref_image_3",
+          "type": "IMAGE",
+          "link": 8,
+          "shape": 7
+        },
+        {
+          "name": "ref_image_4",
+          "type": "IMAGE",
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 3,
+          "shape": 7
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 5,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "reference_latent",
+          "type": "LATENT",
+          "links": [
+            9
+          ]
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            10
+          ]
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "links": [
+            11
+          ]
+        },
+        {
+          "name": "preview_image",
+          "type": "IMAGE",
+          "links": [
+            14
+          ]
+        },
+        {
+          "name": "preview_mask",
+          "type": "MASK",
+          "links": [
+            16,
+            19
+          ]
+        },
+        {
+          "name": "debug",
+          "type": "STRING",
+          "links": [
+            18
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "Node name for S&R": "Y7Nodes_Flux2KleinEdit_MultiRef"
+      },
+      "widgets_values": [
+        "bike.png",
+        "image",
+        1.0,
+        1.0,
+        true,
+        16,
+        8,
+        false
+      ]
+    },
+    {
+      "id": 21,
+      "type": "Y7Nodes_Flux2Sampler",
+      "pos": [
+        860,
+        40
+      ],
+      "size": [
+        400,
+        250
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 9
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 10
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 11
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": [
+            12
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "Node name for S&R": "Y7Nodes_Flux2Sampler"
+      },
+      "widgets_values": [
+        593847261,
+        "randomize",
+        1.0,
+        "euler",
+        4,
+        1.0
+      ]
+    },
+    {
+      "id": 22,
+      "type": "VAEDecode",
+      "pos": [
+        860,
+        480
+      ],
+      "size": [
+        400,
+        46
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 12
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            15
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 23,
+      "type": "ImageCompositeMasked",
+      "pos": [
+        860,
+        560
+      ],
+      "size": [
+        400,
+        130
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "destination",
+          "type": "IMAGE",
+          "link": 14
+        },
+        {
+          "name": "source",
+          "type": "IMAGE",
+          "link": 15
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 16,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            17
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "ImageCompositeMasked"
+      },
+      "widgets_values": [
+        0,
+        0,
+        false
+      ]
+    },
+    {
+      "id": 30,
+      "type": "SaveImage",
+      "pos": [
+        1320,
+        40
+      ],
+      "size": [
+        520,
+        560
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 17
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "y7_flux2_edit"
+      ]
+    },
+    {
+      "id": 31,
+      "type": "Y7Nodes_ShowAnything",
+      "pos": [
+        360,
+        720
+      ],
+      "size": [
+        440,
+        300
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 18,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "Node name for S&R": "Y7Nodes_ShowAnything"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 32,
+      "type": "MaskPreview",
+      "pos": [
+        1320,
+        640
+      ],
+      "size": [
+        320,
+        320
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "MaskPreview"
+      }
+    },
+    {
+      "id": 40,
+      "type": "Note",
+      "pos": [
+        -1180,
+        40
+      ],
+      "size": [
+        520,
+        620
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "Note"
+      },
+      "widgets_values": [
+        "Flux.2 Klein image edit - with two extra reference pictures\n\nThe picture being EDITED is the one picked on the Klein Edit node. The\ntwo Load Image nodes on the left are extra pictures for the model to\nlook at - a face, an outfit, a room, a style. They are never edited and\nnever appear in the result by themselves.\n\nRefer to them in the prompt by number: the one on the node is 1,\nref_image_2 is 2, ref_image_3 is 3. Always pair the number with a noun,\nfor example:\n\n  \"Have the man in Figure 1 put on the jacket from Figure 2, and change\n   the background to the room in Figure 3. Keep his face and pose.\"\n\nConnect one more picture and another empty socket appears, up to seven\nextras in total.\n\nRepoint the three loaders at your own files before running.\n\nThis example is set up for a distilled Flux.2 Klein checkpoint:\n\n  diffusion model - flux-2-klein-9b.safetensors\n  text encoder    - qwen_3_8b.safetensors  (type: flux2)\n  vae             - flux2-klein-vae.safetensors\n\nIf you run a NON-distilled Flux.2 model instead, raise `steps` on the\nsampler (20-30 is normal) and set `cfg` to something above 1.0."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 41,
+      "type": "Note",
+      "pos": [
+        -1180,
+        700
+      ],
+      "size": [
+        520,
+        560
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "Note"
+      },
+      "widgets_values": [
+        "Masking - only ever applies to the picture on this node\n\nThe extra reference pictures cannot be masked. They are there to be\nlooked at, nothing more.\n\n  target_megapixels - how big to make the picture being edited. This\n                      also decides how big your result comes out.\n                      Klein is built for about 1.0\n  ref_megapixels    - the same, for each reference picture. These add\n                      up, so turn this down first (try 0.5) if you run\n                      slow or run out of video memory\n  expand_mask       - grows what you painted outwards. 16 is a good\n                      start; 24-32 for hair, fur and soft edges\n  feather_mask      - softens the mask edge. Matters mostly for the\n                      composite at the end, not for the generation\n  binary_mask       - hard edge, no in-between. Off by default so the\n                      feather survives\n\nThe `debug` output below is a plain-text report of what the node\nactually did - sizes, mask state, every reference socket. Read it\nfirst when something looks wrong."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 42,
+      "type": "Note",
+      "pos": [
+        860,
+        720
+      ],
+      "size": [
+        400,
+        420
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "Note"
+      },
+      "widgets_values": [
+        "Why the composite at the end\n\nImage Composite Masked puts the edited area back over the ORIGINAL\npicture, using the same mask. Everything you did not paint is pinned\nto the untouched pixels, so the rest of the picture cannot drift in\ncolour or lose detail on its way through the VAE.\n\nEditing the WHOLE picture (no mask)? Then you do not want this:\nselect the Image Composite Masked node and press Ctrl+B to bypass it.\nWith no mask painted, the mask is all black and the composite would\nhand you back the original unchanged.\n\nThe negative prompt goes through ConditioningZeroOut because Klein is\nguidance-distilled and runs at cfg 1.0, where the negative is ignored\nanyway. If you raise cfg above 1.0, swap this for a real prompt."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 43,
+      "type": "Note",
+      "pos": [
+        860,
+        320
+      ],
+      "size": [
+        400,
+        130
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "Note"
+      },
+      "widgets_values": [
+        "cfg stays at 1.0 and steps at 4 for distilled Klein.\ndenoise stays at 1.0 - the edit is held by the conditioning,\nnot by the noise level."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      21,
+      0,
+      "MODEL"
+    ],
+    [
+      2,
+      2,
+      0,
+      10,
+      0,
+      "CLIP"
+    ],
+    [
+      3,
+      10,
+      0,
+      20,
+      5,
+      "CONDITIONING"
+    ],
+    [
+      4,
+      10,
+      0,
+      11,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      5,
+      11,
+      0,
+      20,
+      6,
+      "CONDITIONING"
+    ],
+    [
+      6,
+      3,
+      0,
+      20,
+      0,
+      "VAE"
+    ],
+    [
+      7,
+      5,
+      0,
+      20,
+      2,
+      "IMAGE"
+    ],
+    [
+      8,
+      6,
+      0,
+      20,
+      3,
+      "IMAGE"
+    ],
+    [
+      9,
+      20,
+      0,
+      21,
+      1,
+      "LATENT"
+    ],
+    [
+      10,
+      20,
+      1,
+      21,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      11,
+      20,
+      2,
+      21,
+      3,
+      "CONDITIONING"
+    ],
+    [
+      12,
+      21,
+      0,
+      22,
+      0,
+      "LATENT"
+    ],
+    [
+      13,
+      3,
+      0,
+      22,
+      1,
+      "VAE"
+    ],
+    [
+      14,
+      20,
+      3,
+      23,
+      0,
+      "IMAGE"
+    ],
+    [
+      15,
+      22,
+      0,
+      23,
+      1,
+      "IMAGE"
+    ],
+    [
+      16,
+      20,
+      4,
+      23,
+      2,
+      "MASK"
+    ],
+    [
+      17,
+      23,
+      0,
+      30,
+      0,
+      "IMAGE"
+    ],
+    [
+      18,
+      20,
+      5,
+      31,
+      0,
+      "*"
+    ],
+    [
+      19,
+      20,
+      4,
+      32,
+      0,
+      "MASK"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.7,
+      "offset": [
+        1300,
+        100
+      ]
+    }
+  },
+  "version": 0.4
+}

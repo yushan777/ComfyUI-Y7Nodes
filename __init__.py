@@ -24,6 +24,7 @@ from .nodes.resolutionselector import Y7Nodes_ResolutionSelector
 from .nodes.image_pad_for_outpaint import Y7Nodes_ImagePadForOutpaint
 from .nodes.flux2_klein_edit_multi_ref import Y7Nodes_Flux2KleinEdit_MultiRef
 from .nodes.flux2_sampler import Y7Nodes_Flux2Sampler
+from .nodes.flux2_klein_upscaler import Y7Nodes_Flux2KleinUpscaler
 
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageSizePresets": Y7Nodes_ImageSizePresets,
@@ -52,6 +53,7 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImagePadForOutpaint": Y7Nodes_ImagePadForOutpaint,
     "Y7Nodes_Flux2KleinEdit_MultiRef": Y7Nodes_Flux2KleinEdit_MultiRef,
     "Y7Nodes_Flux2Sampler": Y7Nodes_Flux2Sampler,
+    "Y7Nodes_Flux2KleinUpscaler": Y7Nodes_Flux2KleinUpscaler,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageSizePresets" : "Y7 Image Size (Presets)",
@@ -75,6 +77,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_CaptionSaver": "Y7 Caption Saver",
     "Y7Nodes_ImageStitcher": "Y7 Image Stitcher",
     "Y7Nodes_ImageCompare": "Y7 Image Compare",
+    "Y7Nodes_Flux2KleinUpscaler": "Y7 Flux.2 Klein Upscaler (Tiled)",
 }
 
 # Apply HTML-formatted documentation to node classes

@@ -1,0 +1,507 @@
+{
+  "id": "2f7a91c4-6d3e-4b8a-9c15-0e4d7b2a86f1",
+  "revision": 0,
+  "last_node_id": 42,
+  "last_link_id": 9,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "UNETLoader",
+      "pos": [
+        -620,
+        40
+      ],
+      "size": [
+        400,
+        82
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            1
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "UNETLoader"
+      },
+      "widgets_values": [
+        "Flux2-Klein/flux-2-klein-9b.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "CLIPLoader",
+      "pos": [
+        -620,
+        180
+      ],
+      "size": [
+        400,
+        106
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            2
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "CLIPLoader"
+      },
+      "widgets_values": [
+        "Flux2-Klein/qwen_3_8b.safetensors",
+        "flux2",
+        "default"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "VAELoader",
+      "pos": [
+        -620,
+        340
+      ],
+      "size": [
+        400,
+        58
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            8
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "VAELoader"
+      },
+      "widgets_values": [
+        "Flux2/flux2-klein-vae.safetensors"
+      ]
+    },
+    {
+      "id": 10,
+      "type": "CLIPTextEncode",
+      "pos": [
+        -140,
+        40
+      ],
+      "size": [
+        420,
+        220
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            3,
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "A tortoise wearing tiny brass spectacles reading a newspaper on a park bench at dawn, steam rising from a paper cup beside him, soft golden light, shallow depth of field, 35mm photograph"
+      ]
+    },
+    {
+      "id": 11,
+      "type": "ConditioningZeroOut",
+      "pos": [
+        -140,
+        300
+      ],
+      "size": [
+        420,
+        26
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            5
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "ConditioningZeroOut"
+      }
+    },
+    {
+      "id": 12,
+      "type": "EmptyFlux2LatentImage",
+      "pos": [
+        -140,
+        480
+      ],
+      "size": [
+        420,
+        106
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            6
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "EmptyFlux2LatentImage"
+      },
+      "widgets_values": [
+        1024,
+        1024,
+        1
+      ]
+    },
+    {
+      "id": 20,
+      "type": "Y7Nodes_Flux2Sampler",
+      "pos": [
+        360,
+        40
+      ],
+      "size": [
+        400,
+        250
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 6
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 3
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": [
+            7
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "Node name for S&R": "Y7Nodes_Flux2Sampler"
+      },
+      "widgets_values": [
+        593847261,
+        "randomize",
+        1.0,
+        "euler",
+        4,
+        1.0
+      ]
+    },
+    {
+      "id": 21,
+      "type": "VAEDecode",
+      "pos": [
+        360,
+        340
+      ],
+      "size": [
+        400,
+        46
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 7
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            9
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 30,
+      "type": "SaveImage",
+      "pos": [
+        820,
+        40
+      ],
+      "size": [
+        520,
+        560
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 9
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "y7_flux2_t2i"
+      ]
+    },
+    {
+      "id": 40,
+      "type": "Note",
+      "pos": [
+        -1180,
+        40
+      ],
+      "size": [
+        520,
+        360
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "Note"
+      },
+      "widgets_values": [
+        "Flux.2 text-to-image with the Y7 Flux.2 Sampler\n\nThe plainest possible Flux.2 setup: an empty latent, a prompt, and one\nsampler node that does the rest. Nothing else is wired.\n\nPress Run. To get a different picture, change the seed on the sampler\n(it is set to randomize, so every run already gives you a new one).\n\nRepoint the three loaders at your own files before running.\n\nThis example is set up for a distilled Flux.2 Klein checkpoint:\n\n  diffusion model - flux-2-klein-9b.safetensors\n  text encoder    - qwen_3_8b.safetensors  (type: flux2)\n  vae             - flux2-klein-vae.safetensors\n\nIf you run a NON-distilled Flux.2 model instead, raise `steps` on the\nsampler (20-30 is normal) and set `cfg` to something above 1.0."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 41,
+      "type": "Note",
+      "pos": [
+        360,
+        460
+      ],
+      "size": [
+        400,
+        480
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "Note"
+      },
+      "widgets_values": [
+        "Y7 Flux.2 Sampler\n\nThis one node replaces the five you would normally wire up for Flux.2:\nRandomNoise, KSamplerSelect, Flux2Scheduler, CFGGuider and\nSamplerCustomAdvanced. Give it a model, a latent and your two\nconditionings, and it hands back the finished latent to decode.\n\nThere is no width/height here on purpose. The schedule Flux.2 needs\ndepends on the picture size, and the node reads that straight off the\nlatent coming in, so the two can never disagree.\n\n  seed        - change it for a different picture\n  cfg         - leave at 1.0 for distilled Klein checkpoints. They are\n                trained so the negative prompt is ignored anyway\n  sampler_name- euler is the safe default\n  steps       - 4 is enough for distilled Klein. A full Flux.2 model\n                wants far more\n  denoise     - leave at 1.0. On Flux.2 this is NOT an image-to-image\n                strength dial; see the node's docs for why"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 42,
+      "type": "Note",
+      "pos": [
+        -140,
+        640
+      ],
+      "size": [
+        420,
+        240
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "Node name for S&R": "Note"
+      },
+      "widgets_values": [
+        "Size of the picture\n\nEmpty Flux 2 Latent sets how big the finished picture is. Width and\nheight must divide by 16. Flux.2 is built for around one megapixel, so\n1024 x 1024 (square), 1152 x 896 (landscape) or 896 x 1152 (portrait)\nare all good starting points. Much bigger and quality usually drops.\n\nThe negative prompt goes through ConditioningZeroOut because Klein is\nguidance-distilled and runs at cfg 1.0, where the negative is ignored\nanyway. If you raise cfg above 1.0, swap this for a real prompt."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      20,
+      0,
+      "MODEL"
+    ],
+    [
+      2,
+      2,
+      0,
+      10,
+      0,
+      "CLIP"
+    ],
+    [
+      3,
+      10,
+      0,
+      20,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      4,
+      10,
+      0,
+      11,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      5,
+      11,
+      0,
+      20,
+      3,
+      "CONDITIONING"
+    ],
+    [
+      6,
+      12,
+      0,
+      20,
+      1,
+      "LATENT"
+    ],
+    [
+      7,
+      20,
+      0,
+      21,
+      0,
+      "LATENT"
+    ],
+    [
+      8,
+      3,
+      0,
+      21,
+      1,
+      "VAE"
+    ],
+    [
+      9,
+      21,
+      0,
+      30,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.7,
+      "offset": [
+        1300,
+        100
+      ]
+    }
+  },
+  "version": 0.4
+}

@@ -20,6 +20,12 @@ This node has no outputs; it is a preview-only node for on-canvas comparison.
 
 Quality of life:
 
+  - **Copy Image B to Clipboard** button (also on the right-click menu as
+    **Copy Image B (clipboard)**): copies the `image_b` preview to your
+    clipboard as a PNG, ready to paste into any other app. The button briefly
+    says "Copied!" when it works. Your browser only allows clipboard copying on
+    a secure page, so if ComfyUI is open over plain `http://` (other than
+    `localhost`) the button will say the clipboard is unavailable.
   - The node auto-resizes to match the aspect ratio of the input images
   - Slider position and blend mode are saved with the workflow
 
