@@ -78,18 +78,51 @@ app.registerExtension({
             // own way.
             const COPY_LABEL = "Copy Image B to Clipboard";
 
+            // Fallback for pages that are not a secure context. The image is
+            // dropped into an off-screen editable element, selected, and copied
+            // with the legacy execCommand path - the browser turns that
+            // selection into a real image on the clipboard. Returns whether the
+            // copy was accepted.
+            const copyImageViaSelection = (dataUrl) => {
+                const holder = document.createElement("div");
+                holder.contentEditable = "true";
+                // Parked off-screen rather than hidden: display:none or
+                // visibility:hidden content cannot be selected.
+                holder.style.cssText = "position:fixed;left:-10000px;top:0;opacity:0;";
+
+                const clone = document.createElement("img");
+                clone.src = dataUrl;
+                holder.appendChild(clone);
+                document.body.appendChild(holder);
+
+                const selection = window.getSelection();
+                const savedRanges = [];
+                for (let i = 0; i < selection.rangeCount; i++) savedRanges.push(selection.getRangeAt(i));
+
+                const range = document.createRange();
+                range.selectNode(clone);
+                selection.removeAllRanges();
+                selection.addRange(range);
+
+                let copied = false;
+                try {
+                    copied = document.execCommand("copy");
+                } catch (err) {
+                    console.error("[Y7 ImageCompare] Fallback clipboard copy failed:", err);
+                }
+
+                selection.removeAllRanges();
+                for (const saved of savedRanges) selection.addRange(saved);
+                holder.remove();
+
+                return copied;
+            };
+
             const copyImageBToClipboard = (report) => {
                 const img = node.imageB;
 
                 if (!img || !img.complete || !img.naturalWidth) {
                     report("No Image B to copy", false);
-                    return;
-                }
-
-                // The clipboard image API needs a secure context (https or
-                // localhost); on plain http it simply isn't there.
-                if (!navigator.clipboard?.write || typeof window.ClipboardItem === "undefined") {
-                    report("Clipboard unavailable (needs https)", false);
                     return;
                 }
 
@@ -99,6 +132,22 @@ app.registerExtension({
                 canvas.width = img.naturalWidth;
                 canvas.height = img.naturalHeight;
                 canvas.getContext("2d").drawImage(img, 0, 0);
+
+                // The modern clipboard API only exists in a "secure context":
+                // https, or a page opened at localhost / 127.0.0.1. Reaching
+                // ComfyUI over plain http at a LAN address (192.168.x.x) is not
+                // one, so the API is simply missing there. In that case fall
+                // back to the older select-and-copy trick, which Chrome and Edge
+                // still accept for images. Firefox does not, and will report a
+                // failure instead.
+                if (!navigator.clipboard?.write || typeof window.ClipboardItem === "undefined") {
+                    if (copyImageViaSelection(canvas.toDataURL("image/png"))) {
+                        report("Copied!", true);
+                    } else {
+                        report("Copy needs https", false);
+                    }
+                    return;
+                }
 
                 const pngBlob = new Promise((resolve, reject) => {
                     canvas.toBlob(
