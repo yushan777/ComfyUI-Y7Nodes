@@ -1,6 +1,8 @@
 import re
 import hashlib
 
+from comfy_api.latest import io
+
 from ..utils.logger import logger
 from ..utils.colored_print import color, style
 
@@ -22,7 +24,7 @@ _UNCLOSED_THINK_RE = re.compile(r"<think>(.*)$", re.DOTALL | re.IGNORECASE)
 
 
 # =====================================================================================
-class Y7Nodes_PromptEnhancerNative:
+class Y7Nodes_PromptEnhancerNative(io.ComfyNode):
     """
     Prompt enhancer driven by a native ComfyUI text encoder (CLIP input).
 
@@ -33,36 +35,55 @@ class Y7Nodes_PromptEnhancerNative:
     """
 
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "clip": ("CLIP", {"tooltip": "A generation-capable text encoder loaded with CLIPLoader (Gemma 3/4, Qwen3, Qwen3-VL). T5/CLIP-L will not work."}),
-                "text": ("STRING", {"default": "", "multiline": True, "tooltip": "The basic prompt to enhance."}),
-                "instruction": ("STRING", {"default": DEFAULT_INSTRUCTION, "multiline": True, "tooltip": "System-style instruction placed before the text."}),
-                "max_length": ("INT", {"default": 2048, "min": 64, "max": 32768, "step": 64,
-                                       "tooltip": "Maximum NEW tokens to generate (not the context window). Reasoning is spent from this same budget. Costs ~84KB of VRAM per token in KV cache, reserved up front."}),
-                "temperature": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 2.0, "step": 0.01,
-                                          "tooltip": "1.0 is Google's recommended value for Gemma. 0 switches to greedy decoding, which ignores top_k/top_p entirely."}),
-                "top_k": ("INT", {"default": 64, "min": 0, "max": 1000,
-                                  "tooltip": "Keep only the k most likely tokens. 64 is Google's recommended value for Gemma. 0 disables the filter."}),
-                "top_p": ("FLOAT", {"default": 0.95, "min": 0.0, "max": 1.0, "step": 0.01,
-                                    "tooltip": "Nucleus sampling: keep the smallest set of tokens whose probabilities sum to p. 0.95 is Google's recommended value for Gemma. 1.0 disables the filter."}),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-            },
-            "optional": {
-                "thinking": ("BOOLEAN", {"default": False, "tooltip": "Let the model reason first. Its reasoning goes to the thinking output, never the prompt output."}),
-            },
-            "hidden": {},
-        }
-
-    RETURN_TYPES = ("STRING", "STRING",)
-    RETURN_NAMES = ("thinking_output", "enhanced_prompt",)
-    FUNCTION = "enhance"
-    CATEGORY = "Y7Nodes/Prompt"
-    OUTPUT_NODE = False
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_PromptEnhancerNative",
+            display_name="Y7 Prompt Enhancer (Native)",
+            category="Y7Nodes/Prompt",
+            description="Expand a prompt using a generation-capable ComfyUI text encoder.",
+            inputs=[
+                io.Clip.Input(
+                    "clip",
+                    tooltip="A generation-capable text encoder loaded with CLIPLoader (Gemma 3/4, Qwen3, Qwen3-VL). T5/CLIP-L will not work.",
+                ),
+                io.String.Input(
+                    "text", default="", multiline=True,
+                    tooltip="The basic prompt to enhance.",
+                ),
+                io.String.Input(
+                    "instruction", default=DEFAULT_INSTRUCTION, multiline=True,
+                    tooltip="System-style instruction placed before the text.",
+                ),
+                io.Int.Input(
+                    "max_length", default=2048, min=64, max=32768, step=64,
+                    tooltip="Maximum NEW tokens to generate (not the context window). Reasoning is spent from this same budget. Costs ~84KB of VRAM per token in KV cache, reserved up front.",
+                ),
+                io.Float.Input(
+                    "temperature", default=1.0, min=0.0, max=2.0, step=0.01,
+                    tooltip="1.0 is Google's recommended value for Gemma. 0 switches to greedy decoding, which ignores top_k/top_p entirely.",
+                ),
+                io.Int.Input(
+                    "top_k", default=64, min=0, max=1000,
+                    tooltip="Keep only the k most likely tokens. 64 is Google's recommended value for Gemma. 0 disables the filter.",
+                ),
+                io.Float.Input(
+                    "top_p", default=0.95, min=0.0, max=1.0, step=0.01,
+                    tooltip="Nucleus sampling: keep the smallest set of tokens whose probabilities sum to p. 0.95 is Google's recommended value for Gemma. 1.0 disables the filter.",
+                ),
+                io.Int.Input("seed", default=0, min=0, max=0xffffffffffffffff),
+                io.Boolean.Input(
+                    "thinking", optional=True, default=False,
+                    tooltip="Let the model reason first. Its reasoning goes to the thinking output, never the prompt output.",
+                ),
+            ],
+            outputs=[
+                io.String.Output(display_name="thinking_output"),
+                io.String.Output(display_name="enhanced_prompt"),
+            ],
+        )
 
     @classmethod
-    def IS_CHANGED(cls, **kwargs):
+    def fingerprint_inputs(cls, **kwargs):
         # clip is unhashable, and ComfyUI already tracks the model object itself,
         # so only the generation-affecting widgets go into the hash.
         parts = [
@@ -145,17 +166,18 @@ class Y7Nodes_PromptEnhancerNative:
 
     # ==================================================================================
 
-    def enhance(self, clip, text, instruction, max_length, temperature, top_k, top_p, seed, thinking=False):
+    @classmethod
+    def execute(cls, clip, text, instruction, max_length, temperature, top_k, top_p, seed, thinking=False) -> io.NodeOutput:
         if clip is None:
             raise ValueError("No CLIP provided. Load a text encoder with CLIPLoader.")
 
-        error = self._generation_error(clip)
+        error = cls._generation_error(clip)
         if error:
             raise ValueError(error)
 
         prompt = f"{instruction.strip()}\n\n{text.strip()}" if instruction.strip() else text.strip()
         if not prompt:
-            return ("", "")
+            return io.NodeOutput("", "")
 
         logger.info(f"Y7 Prompt Enhancer (Native): generating up to {max_length} tokens, thinking={thinking}")
 
@@ -193,11 +215,11 @@ class Y7Nodes_PromptEnhancerNative:
             raise
 
         generated_text = clip.decode(generated_ids)
-        thinking_output, enhanced_prompt = self._split_thinking(generated_text)
+        thinking_output, enhanced_prompt = cls._split_thinking(generated_text)
 
         if thinking_output:
             logger.info(f"Y7 Prompt Enhancer (Native): stripped {len(thinking_output)} chars of reasoning")
         if not enhanced_prompt:
             print("Y7 Prompt Enhancer (Native): model produced only reasoning - raise max_length or set temperature to 0", color.BRIGHT_YELLOW)
 
-        return (thinking_output, enhanced_prompt)
+        return io.NodeOutput(thinking_output, enhanced_prompt)

@@ -16,11 +16,12 @@
 # ==========================================================================
 
 
+from comfy_api.latest import io
 from nodes import PreviewImage  # type: ignore
 
 # Main class --------------
 
-class Y7Nodes_ImageCompare(PreviewImage):
+class Y7Nodes_ImageCompare(io.ComfyNode):
     """
     A custom node to compare two images with a
     draggable slider and selectable blend modes.
@@ -31,29 +32,29 @@ class Y7Nodes_ImageCompare(PreviewImage):
     """
 
     @classmethod
-    def INPUT_TYPES(cls):
-        blend_modes = ["normal", "difference"]
-        return {
-            "required": {
-                "image_a": ("IMAGE",),
-            },
-            "optional": {
-                "image_b": ("IMAGE",),
-            },
-            "hidden": {
-                "prompt": "PROMPT",
-                "extra_pnginfo": "EXTRA_PNGINFO",
-                "unique_id": "UNIQUE_ID",
-                "blend_mode": (blend_modes, {"default": "normal"})
-            },
-        }
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_ImageCompare",
+            display_name="Y7 Image Compare",
+            category="Y7Nodes/Image",
+            description="Compare two images with a draggable slider and selectable blend modes.",
+            is_output_node=True,
+            inputs=[
+                io.Image.Input("image_a"),
+                io.Image.Input("image_b", optional=True),
+            ],
+            outputs=[],
+            hidden=[
+                io.Hidden.prompt,
+                io.Hidden.extra_pnginfo,
+                io.Hidden.unique_id,
+            ],
+        )
 
-    RETURN_TYPES = ()
-    FUNCTION = "execute"
-    OUTPUT_NODE = True
-    CATEGORY = "Y7Nodes/Image"
-
-    def execute(self, image_a, image_b=None, prompt=None, extra_pnginfo=None, unique_id=None, blend_mode="normal"):
+    @classmethod
+    def execute(cls, image_a, image_b=None) -> io.NodeOutput:
+        prompt = cls.hidden.prompt
+        extra_pnginfo = cls.hidden.extra_pnginfo
         # Save previews to the temp folder and hand them back to the frontend
         # through the standard "ui" channel. ComfyUI stores these in
         # app.nodeOutputs[node_id] and restores them when the workflow tab is
@@ -61,12 +62,14 @@ class Y7Nodes_ImageCompare(PreviewImage):
         a_images = []
         b_images = []
 
+        # PreviewImage is only used here as a helper for writing previews to the temp
+        # folder; it keeps the original filename scheme and compression settings.
+        previewer = PreviewImage()
+
         if image_a is not None:
-            a_images = self.save_images(image_a, "y7_compare", prompt, extra_pnginfo)["ui"]["images"]
+            a_images = previewer.save_images(image_a, "y7_compare", prompt, extra_pnginfo)["ui"]["images"]
 
         if image_b is not None:
-            b_images = self.save_images(image_b, "y7_compare", prompt, extra_pnginfo)["ui"]["images"]
+            b_images = previewer.save_images(image_b, "y7_compare", prompt, extra_pnginfo)["ui"]["images"]
 
-        return {
-            "ui": {"a_images": a_images, "b_images": b_images},
-        }
+        return io.NodeOutput(ui={"a_images": a_images, "b_images": b_images})

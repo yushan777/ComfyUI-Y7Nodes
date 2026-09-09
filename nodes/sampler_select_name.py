@@ -1,4 +1,15 @@
 import comfy
+from comfy_api.latest import io
+
+
+# The output socket has to be typed as the sampler list itself, not as a plain "COMBO".
+# ComfyUI validates links by comparing the upstream RETURN_TYPES entry against the
+# downstream input type, and KSampler declares sampler_name as the raw SAMPLERS list.
+# A stock io.Combo.Output would report "COMBO" and fail that comparison, so declare a
+# custom type whose io_type *is* the list, exactly as the V1 RETURN_TYPES did.
+@io.comfytype(io_type=comfy.samplers.KSampler.SAMPLERS)
+class SamplerNameType(io.ComfyTypeIO):
+    Type = str
 
 
 # Exposes the sampler name as a linkable node output.
@@ -12,19 +23,23 @@ import comfy
 # This node works around that by declaring its output type as KSampler.SAMPLERS
 # (the same combo list), which ComfyUI recognises as a compatible type for any
 # node that accepts sampler_name. That gives it a linkable output socket.
-class SamplerSelect_Name:
+class SamplerSelect_Name(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "sampler_name": (comfy.samplers.KSampler.SAMPLERS,),  # dropdown of available samplers
-            }
-        }
+    def define_schema(cls):
+        return io.Schema(
+            node_id="SamplerSelect_Name",
+            display_name="Y7 Sampler Select (Name)",
+            category="Y7Nodes",
+            description="Exposes the sampler name as a linkable node output.",
+            inputs=[
+                # dropdown of available samplers
+                io.Combo.Input("sampler_name", options=comfy.samplers.KSampler.SAMPLERS),
+            ],
+            outputs=[
+                SamplerNameType.Output(display_name="sampler_name"),
+            ],
+        )
 
-    RETURN_TYPES = (comfy.samplers.KSampler.SAMPLERS,)
-    RETURN_NAMES = ("sampler_name",)
-    FUNCTION = "select_sampler"
-    CATEGORY = "Y7Nodes"
-
-    def select_sampler(self, sampler_name):
-        return (sampler_name,)
+    @classmethod
+    def execute(cls, sampler_name) -> io.NodeOutput:
+        return io.NodeOutput(sampler_name)

@@ -6,7 +6,6 @@ from .nodes.show_anything import Y7Nodes_ShowAnything
 from .nodes.prompt_enhancer_native import Y7Nodes_PromptEnhancerNative
 from .nodes.t5_token_count import Y7Nodes_T5_TokenCounter
 from .nodes.clip_token_count import Y7Nodes_CLIP_TokenCounter
-from .nodes.catch_edit_text_dual import Y7Nodes_CatchEditTextNodeDual
 from .nodes.image_size_presets import Y7Nodes_ImageSizePresets
 from .nodes.crop_to_nearest_multiple import Y7Nodes_CropToNearestMultiple
 from .nodes.color_match_masked import Y7Nodes_ColorMatchMasked
@@ -33,7 +32,6 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_PromptEnhancerNative": Y7Nodes_PromptEnhancerNative,
     "Y7Nodes_T5_TokenCounter": Y7Nodes_T5_TokenCounter,
     "Y7Nodes_CLIP_TokenCounter": Y7Nodes_CLIP_TokenCounter,
-    "Y7Nodes_CatchEditTextNodeDual": Y7Nodes_CatchEditTextNodeDual,
     "Y7Nodes_CropToNearestMultiple": Y7Nodes_CropToNearestMultiple,
     "Y7Nodes_ColorMatchMasked": Y7Nodes_ColorMatchMasked,
     "Y7Nodes_AspectRatioPicker": Y7Nodes_AspectRatioPicker,
@@ -62,7 +60,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_PromptEnhancerNative": "Y7 Prompt Enhancer (Native)",
     "Y7Nodes_T5_TokenCounter": "Y7 T5 Token Counter",
     "Y7Nodes_CLIP_TokenCounter": "Y7 CLIP Token Counter",    
-    "Y7Nodes_CatchEditTextNodeDual": "Y7 Catch and Edit Text (Dual)",
     "Y7Nodes_CropToNearestMultiple": "Y7 Crop to Nearest Multiple",
     "Y7Nodes_ColorMatchMasked": "Y7 Color Match (Masked)",
     "Y7Nodes_AspectRatioPicker": "Y7 Aspect Ratio Picker",

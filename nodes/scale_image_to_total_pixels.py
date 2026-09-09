@@ -1,40 +1,35 @@
 import math
 import comfy.utils
+from comfy_api.latest import io
 
 
-class Y7Nodes_ScaleImageToTotalPixels:
+class Y7Nodes_ScaleImageToTotalPixels(io.ComfyNode):
 
     UPSCALE_METHODS = ["nearest-exact", "bilinear", "area", "bicubic", "lanczos"]
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image": ("IMAGE",),
-                "upscale_method": (cls.UPSCALE_METHODS, {"default": "lanczos"}),
-                "megapixels": ("FLOAT", {
-                    "default": 1.0,
-                    "min": 0.01,
-                    "max": 16.0,
-                    "step": 0.01,
-                }),
-            },
-            "optional": {
-                "resolution_steps": ("INT", {
-                    "default": 8,
-                    "min": 1,
-                    "max": 256,
-                }),
-            },
-        }
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_ScaleImageToTotalPixels",
+            display_name="Y7 Scale Image to Total Pixels",
+            category="Y7Nodes/Image",
+            description="Scale an image to a target megapixel count, snapping the result to a step size.",
+            is_output_node=True,
+            inputs=[
+                io.Image.Input("image"),
+                io.Combo.Input("upscale_method", options=cls.UPSCALE_METHODS, default="lanczos"),
+                io.Float.Input("megapixels", default=1.0, min=0.01, max=16.0, step=0.01),
+                io.Int.Input("resolution_steps", optional=True, default=8, min=1, max=256),
+            ],
+            outputs=[
+                io.Image.Output(display_name="image"),
+                io.Int.Output(display_name="width"),
+                io.Int.Output(display_name="height"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE", "INT", "INT")
-    RETURN_NAMES = ("image", "width", "height")
-    FUNCTION = "execute"
-    CATEGORY = "Y7Nodes/image"
-    OUTPUT_NODE = True
-
-    def execute(self, image, upscale_method, megapixels, resolution_steps=8):
+    @classmethod
+    def execute(cls, image, upscale_method, megapixels, resolution_steps=8) -> io.NodeOutput:
         samples = image.movedim(-1, 1)
         total = megapixels * 1024 * 1024
 
@@ -44,4 +39,4 @@ class Y7Nodes_ScaleImageToTotalPixels:
 
         s = comfy.utils.common_upscale(samples, int(width), int(height), upscale_method, "disabled")
         s = s.movedim(1, -1)
-        return {"ui": {"text": [f"{int(width)} x {int(height)}"]}, "result": (s, int(width), int(height))}
+        return io.NodeOutput(s, int(width), int(height), ui={"text": [f"{int(width)} x {int(height)}"]})

@@ -6,6 +6,8 @@ from tempfile import NamedTemporaryFile
 import folder_paths
 from pathlib import Path
 
+from comfy_api.latest import io
+
 SCRIPT_DIR = Path(__file__).parent.parent  # points to comfyui-y7nodes root
 folder_paths.add_model_folder_path(
     "lms_config", (SCRIPT_DIR / "lms_config").as_posix())
@@ -17,17 +19,17 @@ folder_paths.add_model_folder_path(
 
 def _common_inputs():
     """Returns the input parameters shared by both Text and Vision nodes."""
-    return {
-        "model_identifier": ("STRING", {"default": ""}),
-        "reasoning_tag": ("STRING", {"default": "think"}),
-        "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-        "ip": ("STRING", {"default": "localhost"}),
-        "port": ("INT", {"default": 1234}),
-        "temperature": ("FLOAT", {"default": 0.7, "min": 0.01, "max": 1.0, "step": 0.01}),
-        "max_tokens": ("INT", {"default": 600, "min": -1, "max": 0xffffffffffffffff}),
-        "unload_llm": ("BOOLEAN", {"default": False}),
-        "unload_comfy_models": ("BOOLEAN", {"default": False}),
-    }
+    return [
+        io.String.Input("model_identifier", default=""),
+        io.String.Input("reasoning_tag", default="think"),
+        io.Int.Input("seed", default=0, min=0, max=0xffffffffffffffff),
+        io.String.Input("ip", default="localhost"),
+        io.Int.Input("port", default=1234),
+        io.Float.Input("temperature", default=0.7, min=0.01, max=1.0, step=0.01),
+        io.Int.Input("max_tokens", default=600, min=-1, max=0xffffffffffffffff),
+        io.Boolean.Input("unload_llm", default=False),
+        io.Boolean.Input("unload_comfy_models", default=False),
+    ]
 
 
 def _extract_reasoning(content, reasoning_tag):
@@ -52,41 +54,42 @@ def _prepare_unload(unload_comfy_models):
 # Text node – pure text prompts (no vision)
 # ---------------------------------------------------------------------------
 
-class Y7Nodes_LMStudioText:
-    def __init__(self):
-        pass
+class Y7Nodes_LMStudioText(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(s):
-        common = _common_inputs()
-        return {
-            "required": {
-                "prompt": ("STRING", {"forceInput": True}),
-                **common,
-                "draft_model": ("STRING", {"default": ""}),
-                "system_message": ("STRING", {
-                    "multiline": True,
-                    "default": (
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_LMStudioText",
+            display_name="Y7 LM Studio (Text)",
+            category="Y7Nodes/LMStudio",
+            description="Expand a text prompt using a local LM Studio model.",
+            inputs=[
+                io.String.Input("prompt", force_input=True),
+                *_common_inputs(),
+                io.String.Input("draft_model", default=""),
+                io.String.Input(
+                    "system_message",
+                    multiline=True,
+                    default=(
                         "You are an AI assistant specialized in generating detailed and creative image prompts for AI image "
                         "generation - specifically for Flux.2 Klein. Your task is to expand the given user prompt into a " 
                         "well-structured, vivid, and highly descriptive prompt while ensuring that all terms from the " 
                         "original prompt are included. Enhance the visual quality and artistic impact by adding relevant " 
                         "details including lighting conditions, but do not omit or alter any key elements provided by the " 
                         "user. Follow the given instructions or guidelines and respond only with the refined prompt."
-                    )
-                }),
-            },
-        }
+                    ),
+                ),
+            ],
+            outputs=[
+                io.String.Output(display_name="Extended Prompt"),
+                io.String.Output(display_name="Reasoning"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("Extended Prompt", "Reasoning")
-    OUTPUT_NODE = False
-    FUNCTION = "do_it"
-    CATEGORY = "Y7Nodes/LMStudio"
-
-    def do_it(self, prompt, model_identifier, draft_model, system_message,
-              reasoning_tag, seed, ip, port, temperature, max_tokens,
-              unload_llm, unload_comfy_models):
+    @classmethod
+    def execute(cls, prompt, model_identifier, draft_model, system_message,
+                reasoning_tag, seed, ip, port, temperature, max_tokens,
+                unload_llm, unload_comfy_models) -> io.NodeOutput:
 
         _prepare_unload(unload_comfy_models)
 
@@ -121,44 +124,45 @@ class Y7Nodes_LMStudioText:
             if unload_llm:
                 model.unload()
 
-        return (result, reasoning)
+        return io.NodeOutput(result, reasoning)
 
 
 # ---------------------------------------------------------------------------
 # Vision node – image + instruction (VL models)
 # ---------------------------------------------------------------------------
 
-class Y7Nodes_LMStudioVision:
-    def __init__(self):
-        pass
+class Y7Nodes_LMStudioVision(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(s):
-        common = _common_inputs()
-        return {
-            "required": {
-                "image": ("IMAGE",),
-                **common,
-                "system_message": ("STRING", {
-                    "multiline": True,
-                    "default": (
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_LMStudioVision",
+            display_name="Y7 LM Studio (Vision)",
+            category="Y7Nodes/LMStudio",
+            description="Describe an image using a local vision-enabled LM Studio model.",
+            inputs=[
+                io.Image.Input("image"),
+                *_common_inputs(),
+                io.String.Input(
+                    "system_message",
+                    multiline=True,
+                    default=(
                         "Describe this image in detail. Include the subject, "
                         "setting, lighting, colors, mood, composition, and "
                         "any notable artistic or stylistic qualities."
-                    )
-                }),
-            },
-        }
+                    ),
+                ),
+            ],
+            outputs=[
+                io.String.Output(display_name="Response"),
+                io.String.Output(display_name="Reasoning"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("Response", "Reasoning")
-    OUTPUT_NODE = False
-    FUNCTION = "do_it"
-    CATEGORY = "Y7Nodes/LMStudio"
-
-    def do_it(self, image, model_identifier, system_message,
-              reasoning_tag, seed, ip, port, temperature, max_tokens,
-              unload_llm, unload_comfy_models):
+    @classmethod
+    def execute(cls, image, model_identifier, system_message,
+                reasoning_tag, seed, ip, port, temperature, max_tokens,
+                unload_llm, unload_comfy_models) -> io.NodeOutput:
 
         _prepare_unload(unload_comfy_models)
 
@@ -196,16 +200,14 @@ class Y7Nodes_LMStudioVision:
             if unload_llm:
                 model.unload()
 
-        return (result, reasoning)
+        return io.NodeOutput(result, reasoning)
 
 
 # ---------------------------------------------------------------------------
 # Model selector (unchanged)
 # ---------------------------------------------------------------------------
 
-class Y7Nodes_SelectLMSModel:
-    def __init__(self):
-        pass
+class Y7Nodes_SelectLMSModel(io.ComfyNode):
 
     @classmethod
     def get_models(cls, id="models.txt"):
@@ -220,21 +222,24 @@ class Y7Nodes_SelectLMSModel:
             return ["(error reading models.txt)"]
 
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "model_id": (
-                    s.get_models(),
-                    {"tooltip": "Add your favorite model names to the models.txt file in comfyui-y7nodes/lms_config/"}
-                )
-            },
-        }
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_SelectLMSModel",
+            display_name="Y7 Select LM Studio Model",
+            category="Y7Nodes/LMStudio",
+            description="Pick a model name from lms_config/models.txt.",
+            inputs=[
+                io.Combo.Input(
+                    "model_id",
+                    options=cls.get_models(),
+                    tooltip="Add your favorite model names to the models.txt file in comfyui-y7nodes/lms_config/",
+                ),
+            ],
+            outputs=[
+                io.String.Output(display_name="model_id"),
+            ],
+        )
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("model_id",)
-    OUTPUT_NODE = False
-    FUNCTION = "do_it"
-    CATEGORY = "Y7Nodes/LMStudio"
-
-    def do_it(self, model_id):
-        return (model_id,)
+    @classmethod
+    def execute(cls, model_id) -> io.NodeOutput:
+        return io.NodeOutput(model_id)

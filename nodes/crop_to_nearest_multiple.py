@@ -1,42 +1,46 @@
 import torch
 
+from comfy_api.latest import io
 
-class Y7Nodes_CropToNearestMultiple:
+
+class Y7Nodes_CropToNearestMultiple(io.ComfyNode):
     """
     A node to crop images to align dimensions with the nearest multiple of a specified value
     """
     
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image": ("IMAGE",),
-                "multiple": ("INT", {
-                    "default": 16, 
-                    "min": 1, 
-                    "max": 1024, 
-                    "step": 1,
-                    "tooltip": "Image dimensions must be multiples of this value"
-                }),
-                "h_crop": (["center", "left", "right", "none"], {
-                    "default": "center",
-                    "tooltip": "Horizontal crop position: where to keep content when width needs adjustment (none = no cropping)"
-                }),
-                "v_crop": (["center", "top", "bottom", "none"], {
-                    "default": "center",
-                    "tooltip": "Vertical crop position: where to keep content when height needs adjustment (none = no cropping)"
-                }),
-            },
-        }
-    
-    RETURN_TYPES = ("IMAGE", "IMAGE", "STRING")
-    RETURN_NAMES = ("crop_preview", "cropped_image", "info")
-    
-    FUNCTION = "check_dimensions"
-    CATEGORY = "Y7Nodes"
-    OUTPUT_NODE = True  # Required to display UI data (dimensions) on the node
-    
-    def check_dimensions(self, image, multiple, h_crop, v_crop):
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_CropToNearestMultiple",
+            display_name="Y7 Crop to Nearest Multiple",
+            category="Y7Nodes",
+            description="Crop an image so its dimensions land on the nearest multiple of a value.",
+            # Required to display UI data (dimensions) on the node
+            is_output_node=True,
+            inputs=[
+                io.Image.Input("image"),
+                io.Int.Input(
+                    "multiple", default=16, min=1, max=1024, step=1,
+                    tooltip="Image dimensions must be multiples of this value",
+                ),
+                io.Combo.Input(
+                    "h_crop", options=["center", "left", "right", "none"], default="center",
+                    tooltip="Horizontal crop position: where to keep content when width needs adjustment (none = no cropping)",
+                ),
+                io.Combo.Input(
+                    "v_crop", options=["center", "top", "bottom", "none"], default="center",
+                    tooltip="Vertical crop position: where to keep content when height needs adjustment (none = no cropping)",
+                ),
+            ],
+            outputs=[
+                io.Image.Output(display_name="crop_preview"),
+                io.Image.Output(display_name="cropped_image"),
+                io.String.Output(display_name="info"),
+            ],
+        )
+
+    @classmethod
+    def execute(cls, image, multiple, h_crop, v_crop) -> io.NodeOutput:
         """
         Check image dimensions and process accordingly
         """
@@ -146,4 +150,4 @@ class Y7Nodes_CropToNearestMultiple:
         final_height = output_image.shape[1]
         final_width = output_image.shape[2]
         
-        return {"ui": {"text": [f"{final_width} x {final_height}"]}, "result": (crop_preview, output_image, info)}
+        return io.NodeOutput(crop_preview, output_image, info, ui={"text": [f"{final_width} x {final_height}"]})

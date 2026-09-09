@@ -1,10 +1,13 @@
 1.0.57
-- updated pad-image-for-outpainting with extras + updated to V3 schema
-- added Flux.2 Klein Edit Multi-Ref All-In-One node
-- added Flux.2 Sampler All-In-One node
-- added Flux.2 Klein Upscaler (Tiled) All-In-One node
-- updated Image Compare node with copy functionality to copy image B to clipboard
-- added more example workflows
+- All nodes updated to V3 schema
+- Added Flux.2 Klein Edit Multi-Ref All-In-One node
+- Added Flux.2 Sampler All-In-One node
+- Added Flux.2 Klein Upscaler (Tiled) All-In-One node
+- Updated Image Compare node with copy functionality to copy image B to clipboard
+- Added more example workflows
+- Removed Catch and Edit Text (Dual) node. Only really useful for Flux.1 workflows which i no longer use.
+  For single blocks of text, use the original CatchEditTextNode by ImagineerNL
+  (https://github.com/ImagineerNL/ComfyUI-IMGNR-Utils) which it was based on.
 
 
 1.0.56

@@ -1,8 +1,10 @@
 # Y7 Show Anything node
 import json
 import torch
-from ..utils.logger import logger
-from ..utils.colored_print import color, style
+
+from comfy_api.latest import io
+
+from ..utils.colored_print import color
 
 
 # Code based on :
@@ -15,45 +17,38 @@ from ..utils.colored_print import color, style
 # and 2 hidden input types used for state persistence.
 # The front-end widgets (Textbox, boolean switch and button) are handled in javascript 
 # =====================================================================================
-class AlwaysEqualProxy(str):
-    # AlwaysEqualProxy returns True for all equality checks and False for all inequality checks
-
-    def __eq__(self, _):
-        # Always True for == operations
-        return True
-
-    def __ne__(self, _):
-        # Always False for != operations
-        return False
-
-# Wildcard that matches any type
-any_type = AlwaysEqualProxy("*")
-
-# =====================================================================================
-class Y7Nodes_ShowAnything:
+class Y7Nodes_ShowAnything(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {}, 
-            "optional": {
-                "anything": (any_type, {"tooltip": "Any input type that you want to inspect or debug"}),
-            },
-            "hidden": {
-                "unique_id": "UNIQUE_ID", "extra_pnginfo": "EXTRA_PNGINFO",
-            }
-        }
-
-    RETURN_TYPES = (any_type,)
-    RETURN_NAMES = ('output',)
-    INPUT_IS_LIST = True
-    OUTPUT_NODE = True
-    FUNCTION = "log_input"
-    CATEGORY = "Y7Nodes/Utils"
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_ShowAnything",
+            display_name="Y7 Show Anything",
+            category="Y7Nodes/Utils",
+            description="Displays any input value for inspection or debugging.",
+            # io.AnyType is the "*" wildcard, replacing the hand-rolled AlwaysEqualProxy
+            inputs=[
+                io.AnyType.Input(
+                    "anything",
+                    optional=True,
+                    tooltip="Any input type that you want to inspect or debug",
+                ),
+            ],
+            outputs=[
+                io.AnyType.Output(display_name="output"),
+            ],
+            is_input_list=True,
+            is_output_node=True,
+            hidden=[
+                io.Hidden.unique_id,
+                io.Hidden.extra_pnginfo,
+            ],
+        )
 
     # ====================================================================================
     # Helper function to detect IMAGE tensors
-    def is_image_tensor(self, tensor):
+    @classmethod
+    def is_image_tensor(cls, tensor):
         """Check if a tensor matches the IMAGE datatype format"""
         return (
             isinstance(tensor, torch.Tensor) and 
@@ -64,7 +59,8 @@ class Y7Nodes_ShowAnything:
     
     # ====================================================================================
     # Helper function to detect MASK tensors
-    def is_mask_tensor(self, tensor):
+    @classmethod
+    def is_mask_tensor(cls, tensor):
         """Check if a tensor matches the MASK datatype format"""
         return (
             isinstance(tensor, torch.Tensor) and 
@@ -80,7 +76,8 @@ class Y7Nodes_ShowAnything:
     
     # ====================================================================================
     # Helper function to format IMAGE tensor information
-    def format_image_info(self, tensor):
+    @classmethod
+    def format_image_info(cls, tensor):
         """Format useful information about an IMAGE tensor"""
         b, h, w, c = tensor.shape
         
@@ -99,7 +96,8 @@ class Y7Nodes_ShowAnything:
     
     # ====================================================================================
     # Helper function to format MASK tensor information
-    def format_mask_info(self, tensor):
+    @classmethod
+    def format_mask_info(cls, tensor):
         """Format useful information about a MASK tensor"""
         if len(tensor.shape) == 2:
             h, w = tensor.shape
@@ -136,7 +134,8 @@ class Y7Nodes_ShowAnything:
         return "\n".join(info)
 
     # ====================================================================================
-    def format_latent_info(self, tensor):
+    @classmethod
+    def format_latent_info(cls, tensor):
         """Format useful information about a latent tensor"""
         b, c, h, w = tensor.shape
         
@@ -154,13 +153,18 @@ class Y7Nodes_ShowAnything:
     
     # ====================================================================================
     # main function
-    def log_input(self, unique_id=None, extra_pnginfo=None, **kwargs):
+    @classmethod
+    def execute(cls, anything=None) -> io.NodeOutput:
+        # unique_id and extra_pnginfo are declared as hidden inputs in the schema.
+        # is_input_list makes `anything` a list, but hidden values arrive unwrapped.
+        unique_id = cls.hidden.unique_id
+        extra_pnginfo = cls.hidden.extra_pnginfo
 
         # values list to be returned
         values = []
 
-        if "anything" in kwargs:
-            for val in kwargs['anything']:
+        if anything is not None:
+            for val in anything:
                 try:
                     
                     if isinstance(val, (str, int, float, bool)):
@@ -178,10 +182,10 @@ class Y7Nodes_ShowAnything:
                         for item in val:
                             if isinstance(item, torch.Tensor):
                                 # Convert tensor to a string representation
-                                if self.is_image_tensor(item):
-                                    processed_list.append(self.format_image_info(item))
-                                elif self.is_mask_tensor(item):
-                                    processed_list.append(self.format_mask_info(item))
+                                if cls.is_image_tensor(item):
+                                    processed_list.append(cls.format_image_info(item))
+                                elif cls.is_mask_tensor(item):
+                                    processed_list.append(cls.format_mask_info(item))
                                 else:
                                     try:
                                         tensor_info = f"Tensor: Shape={item.shape}, Type={item.dtype}, " \
@@ -204,16 +208,16 @@ class Y7Nodes_ShowAnything:
 
                     elif isinstance(val, torch.Tensor):
                         # if tensor has shape of image tensor
-                        if self.is_image_tensor(val):
+                        if cls.is_image_tensor(val):
                             # print(f"val is a {type(val)} (IMAGE)", color.YELLOW)
                             
                             # Format image information
-                            values.append(self.format_image_info(val))
+                            values.append(cls.format_image_info(val))
                             val = json.dumps(val)
                             values.append(str(val))
-                        elif self.is_mask_tensor(val):
+                        elif cls.is_mask_tensor(val):
                             # print(f"val is a {type(val)} (MASK)", color.YELLOW)
-                            values.append(self.format_mask_info(val))
+                            values.append(cls.format_mask_info(val))
                             val = json.dumps(val)
                             values.append(str(val))
                         else:                        
@@ -231,7 +235,7 @@ class Y7Nodes_ShowAnything:
 
                             # Check tensor dimensions - latent tensors are typically 4D with shape [B, C, H, W]
                             if len(tensor.shape) == 4:
-                                values.append(self.format_latent_info(tensor))
+                                values.append(cls.format_latent_info(tensor))
                                 val = json.dumps(tensor)
                                 values.append(str(val))
                             else:
@@ -268,17 +272,17 @@ class Y7Nodes_ShowAnything:
 
         if not extra_pnginfo:
             print("Error: extra_pnginfo is empty")
-        elif (not isinstance(extra_pnginfo[0], dict) or "workflow" not in extra_pnginfo[0]):
-            print("Error: extra_pnginfo[0] is not a dict or missing 'workflow' key")
+        elif (not isinstance(extra_pnginfo, dict) or "workflow" not in extra_pnginfo):
+            print("Error: extra_pnginfo is not a dict or missing 'workflow' key")
         else:
-            workflow = extra_pnginfo[0]["workflow"]
-            node = next((x for x in workflow["nodes"] if str(x["id"]) == unique_id[0]), None)
+            workflow = extra_pnginfo["workflow"]
+            node = next((x for x in workflow["nodes"] if str(x["id"]) == unique_id), None)
             if node:
                 node["widgets_values"] = [values]
         if isinstance(values, list) and len(values) == 1:
-            return {"ui": {"text": values}, "result": (values[0],), }
+            return io.NodeOutput(values[0], ui={"text": values})
         else:
-            return {"ui": {"text": values}, "result": (values,), }
+            return io.NodeOutput(values, ui={"text": values})
             
     # def log_input(self, unique_id=None, extra_pnginfo=None, **kwargs):
     #     # Initialize an empty list to store our processed values
@@ -290,13 +294,13 @@ class Y7Nodes_ShowAnything:
     #         for val in kwargs['anything']:
     #             try:
     #                 # Check if the value is an IMAGE tensor
-    #                 if isinstance(val, torch.Tensor) and self.is_image_tensor(val):
+    #                 if isinstance(val, torch.Tensor) and cls.is_image_tensor(val):
     #                     # Format image information
-    #                     values.append(self.format_image_info(val))
+    #                     values.append(cls.format_image_info(val))
     #                 # Check if the value is a MASK tensor
-    #                 elif isinstance(val, torch.Tensor) and self.is_mask_tensor(val):
+    #                 elif isinstance(val, torch.Tensor) and cls.is_mask_tensor(val):
     #                     # Format mask information
-    #                     values.append(self.format_mask_info(val))
+    #                     values.append(cls.format_mask_info(val))
     #                 # If the value is a list, just output a simple message
     #                 elif isinstance(val, list): # for conditioning
     #                     values.append("The input is a list, but could not be serialized.")

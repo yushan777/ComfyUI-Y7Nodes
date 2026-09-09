@@ -15,6 +15,8 @@ from PIL import Image, ImageDraw, ImageFilter
 import torch
 import numpy as np
 
+from comfy_api.latest import io
+
 
 def tensor2pil(image: torch.Tensor) -> Image.Image:
     """Convert a ComfyUI IMAGE tensor (B,H,W,C) to a PIL Image (first frame)."""
@@ -30,7 +32,7 @@ def pil2tensor(image: Image.Image) -> torch.Tensor:
     ).unsqueeze(0)
 
 
-class Y7Nodes_PasteCroppedImageBack:
+class Y7Nodes_PasteCroppedImageBack(io.ComfyNode):
     """
     Paste a crop image onto a base image at a region defined by edge-relative
     coordinates.  'right' and 'bottom' are pixel offsets measured inward from
@@ -38,75 +40,64 @@ class Y7Nodes_PasteCroppedImageBack:
     """
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image_orig": ("IMAGE", {
-                    "tooltip": "Base image to paste onto"
-                }),
-                "image_crop": ("IMAGE", {
-                    "tooltip": "Image to paste into the defined region (will be resized to fit)"
-                }),
-                "left": ("INT", {
-                    "default": 0, "min": 0, "max": 10000000, "step": 1,
-                    "tooltip": "Pixels from the left edge to the left of the paste region"
-                }),
-                "top": ("INT", {
-                    "default": 0, "min": 0, "max": 10000000, "step": 1,
-                    "tooltip": "Pixels from the top edge to the top of the paste region"
-                }),
-                "right": ("INT", {
-                    "default": 0, "min": 0, "max": 10000000, "step": 1,
-                    "tooltip": "Pixels inward from the RIGHT edge to the right of the paste region"
-                }),
-                "bottom": ("INT", {
-                    "default": 0, "min": 0, "max": 10000000, "step": 1,
-                    "tooltip": "Pixels inward from the BOTTOM edge to the bottom of the paste region"
-                }),
-                "crop_blending": ("FLOAT", {
-                    "default": 0.25, "min": 0.0, "max": 1.0, "step": 0.01,
-                    "tooltip": "Blending/feathering amount at the edges of the pasted region"
-                }),
-                "crop_sharpening": ("INT", {
-                    "default": 0, "min": 0, "max": 3, "step": 1,
-                    "tooltip": "Number of sharpening passes applied to the crop before pasting"
-                }),
-            }
-        }
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_PasteCroppedImageBack",
+            display_name="Y7 Paste Cropped Image Back",
+            category="Y7Nodes/Image",
+            description=(
+                "Pastes a crop image onto a base image at a region defined by edge-relative "
+                "coordinates. Unlike the WAS equivalent, 'right' and 'bottom' are offsets "
+                "measured inward from the RIGHT and BOTTOM edges of the base image."
+            ),
+            inputs=[
+                io.Image.Input("image_orig", tooltip="Base image to paste onto"),
+                io.Image.Input("image_crop", tooltip="Image to paste into the defined region (will be resized to fit)"),
+                io.Int.Input(
+                    "left", default=0, min=0, max=10000000, step=1,
+                    tooltip="Pixels from the left edge to the left of the paste region",
+                ),
+                io.Int.Input(
+                    "top", default=0, min=0, max=10000000, step=1,
+                    tooltip="Pixels from the top edge to the top of the paste region",
+                ),
+                io.Int.Input(
+                    "right", default=0, min=0, max=10000000, step=1,
+                    tooltip="Pixels inward from the RIGHT edge to the right of the paste region",
+                ),
+                io.Int.Input(
+                    "bottom", default=0, min=0, max=10000000, step=1,
+                    tooltip="Pixels inward from the BOTTOM edge to the bottom of the paste region",
+                ),
+                io.Float.Input(
+                    "crop_blending", default=0.25, min=0.0, max=1.0, step=0.01,
+                    tooltip="Blending/feathering amount at the edges of the pasted region",
+                ),
+                io.Int.Input(
+                    "crop_sharpening", default=0, min=0, max=3, step=1,
+                    tooltip="Number of sharpening passes applied to the crop before pasting",
+                ),
+            ],
+            # the second output is a mask rendered as an IMAGE, so it stays IMAGE-typed
+            outputs=[
+                io.Image.Output(display_name="IMAGE"),
+                io.Image.Output(display_name="MASK"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE", "IMAGE")
-    RETURN_NAMES = ("IMAGE", "MASK")
-    FUNCTION = "image_paste_crop_location"
-    CATEGORY = "Y7Nodes/Image"
-
-    DESCRIPTION = """
-Paste Cropped Image Back
-
-Pastes a crop image onto a base image at a region defined by edge-relative
-coordinates. Unlike the WAS equivalent, 'right' and 'bottom' are offsets
-measured inward from the RIGHT and BOTTOM edges of the base image.
-
-Example — to paste into the bottom-right 256×256 corner of any image:
-  top=0  left=0  right=256  bottom=256  (set top/left to img_height-256 / img_width-256 to be precise)
-
-Paste region:
-  x1 = left
-  y1 = top
-  x2 = image_width  - right
-  y2 = image_height - bottom
-"""
-
-    def image_paste_crop_location(self, image_orig, image_crop,
-                                  top=0, left=0, right=0, bottom=0,
-                                  crop_blending=0.25, crop_sharpening=0):
-        result_image, result_mask = self._paste_image(
+    @classmethod
+    def execute(cls, image_orig, image_crop,
+                top=0, left=0, right=0, bottom=0,
+                crop_blending=0.25, crop_sharpening=0) -> io.NodeOutput:
+        result_image, result_mask = cls._paste_image(
             tensor2pil(image_orig), tensor2pil(image_crop),
             top, left, right, bottom,
             crop_blending, crop_sharpening
         )
-        return (result_image, result_mask)
+        return io.NodeOutput(result_image, result_mask)
 
-    def _paste_image(self, image: Image.Image, crop_image: Image.Image,
+    @classmethod
+    def _paste_image(cls, image: Image.Image, crop_image: Image.Image,
                      top=0, left=0, right=0, bottom=0,
                      blend_amount=0.25, sharpen_amount=0):
 

@@ -1,5 +1,8 @@
 import json
 import os
+
+from comfy_api.latest import io
+
 from ..utils.colored_print import color, style
 script_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -179,7 +182,7 @@ video_dims = [
     { "label": "🁢 vertical 4K (9:16) - 2160x3840",    "value": "2160x3840" },
 ]
 
-class Y7Nodes_ImageSizePresets:
+class Y7Nodes_ImageSizePresets(io.ComfyNode):
 
     # Class variable to store the loaded custom dimensions (None if not found)
     custom_dims = None
@@ -223,7 +226,7 @@ class Y7Nodes_ImageSizePresets:
             return default_dims
 
     @classmethod
-    def INPUT_TYPES(cls):
+    def define_schema(cls):
         custom = cls.load_custom_dims()
 
         # Build combined dimension list (deduplicated by label)
@@ -239,55 +242,56 @@ class Y7Nodes_ImageSizePresets:
         dimension_options = [d["label"] for d in combined_dims]
         dimension_options.append("Custom")
 
-        return {
-            "required": {
-                "preset": (["Default", "SD1.5", "SDXL", "Flux.2", "Z-Image", "Qwen-Image", "Video", "Custom*"],),
-                "dimension": (dimension_options,),
-                "custom_w": ("INT", {
-                        "default": 1024,
-                        "min": 128,
-                        "max": 7680,
-                        "step": 16,
-                        "tooltip": "custom width"
-                    }),
-                "custom_h": ("INT", {
-                        "default": 1024,
-                        "min": 128,
-                        "max": 7680,
-                        "step": 16,
-                        "tooltip": "custom height"
-                    }),
-            },
-        }
+        return io.Schema(
+            node_id="Y7Nodes_ImageSizePresets",
+            display_name="Y7 Image Size (Presets)",
+            category="Y7Nodes/Utils",
+            description="Pick a width/height from a set of common resolution presets.",
+            inputs=[
+                io.Combo.Input(
+                    "preset",
+                    options=["Default", "SD1.5", "SDXL", "Flux.2", "Z-Image", "Qwen-Image", "Video", "Custom*"],
+                ),
+                io.Combo.Input("dimension", options=dimension_options),
+                io.Int.Input(
+                    "custom_w", default=1024, min=128, max=7680, step=16,
+                    tooltip="custom width",
+                ),
+                io.Int.Input(
+                    "custom_h", default=1024, min=128, max=7680, step=16,
+                    tooltip="custom height",
+                ),
+            ],
+            outputs=[
+                io.Int.Output(display_name="Width"),
+                io.Int.Output(display_name="Height"),
+            ],
+        )
 
-    RETURN_TYPES = ("INT", "INT")
-    RETURN_NAMES = ("Width", "Height")
-    FUNCTION = "generate"
-    CATEGORY = "Y7Nodes/Utilss"
-
-    def generate(self, preset, dimension, custom_w, custom_h):
+    @classmethod
+    def execute(cls, preset, dimension, custom_w, custom_h) -> io.NodeOutput:
         try:
             if preset == "Custom*" or dimension == "Custom":
-                return (custom_w, custom_h)
+                return io.NodeOutput(custom_w, custom_h)
 
             # Get dims for the selected preset
-            dims = self.get_dims_for_preset(preset)
+            dims = cls.get_dims_for_preset(preset)
 
             # Find matching entry in the preset's set
             entry = next((d for d in dims if d["label"] == dimension), None)
 
             # Fallback: search all sets if not found in the preset's set
             if entry is None:
-                all_dims = default_dims + sd15_dims + sdxl_dims + flux2_dims + zimage_dims + qwen_image_dims + video_dims + (self.load_custom_dims() or [])
+                all_dims = default_dims + sd15_dims + sdxl_dims + flux2_dims + zimage_dims + qwen_image_dims + video_dims + (cls.load_custom_dims() or [])
                 entry = next((d for d in all_dims if d["label"] == dimension), None)
 
             if entry:
                 width, height = [int(x.strip()) for x in entry["value"].split('x')]
-                return (width, height)
+                return io.NodeOutput(width, height)
             else:
                 print(f"Dimension not found: {dimension}", color.RED)
-                return (1024, 1024)
+                return io.NodeOutput(1024, 1024)
 
         except Exception as e:
             print(f"Error processing dimension: {str(e)}", color.RED)
-            return (1024, 1024)
+            return io.NodeOutput(1024, 1024)

@@ -1,48 +1,54 @@
 import torch
 import torch.nn.functional as F
 
+from comfy_api.latest import io
 
-class Y7Nodes_ImageStitcher:
+
+class Y7Nodes_ImageStitcher(io.ComfyNode):
     """Stitches 2–8 images together. The image_count widget controls how many input sockets are shown."""
 
     MAX_IMAGES = 8
 
     @classmethod
-    def INPUT_TYPES(cls):
-        optional = {f"image{i}": ("IMAGE",) for i in range(1, cls.MAX_IMAGES + 1)}
-        return {
-            "required": {
-                "image_count": ("INT", {
-                    "default": 2, "min": 2, "max": cls.MAX_IMAGES, "step": 1,
-                    "tooltip": "Number of image inputs to show",
-                }),
-                "orientation": (
-                    ["Side-by-Side (Horizontal)", "Top-and-Bottom (Vertical)"],
-                    {"default": "Side-by-Side (Horizontal)"},
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_ImageStitcher",
+            display_name="Y7 Image Stitcher",
+            category="Y7Nodes/Image",
+            description="Stitches 2-8 images together, horizontally or vertically.",
+            inputs=[
+                io.Int.Input(
+                    "image_count",
+                    default=2, min=2, max=cls.MAX_IMAGES, step=1,
+                    tooltip="Number of image inputs to show",
                 ),
-            },
-            "optional": optional,
-        }
+                io.Combo.Input(
+                    "orientation",
+                    options=["Side-by-Side (Horizontal)", "Top-and-Bottom (Vertical)"],
+                    default="Side-by-Side (Horizontal)",
+                ),
+                *[io.Image.Input(f"image{i}", optional=True) for i in range(1, cls.MAX_IMAGES + 1)],
+            ],
+            outputs=[
+                io.Image.Output(display_name="stitched_image"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("stitched_image",)
-    FUNCTION = "process"
-    CATEGORY = "Y7Nodes/Image"
-
-    def process(
-        self,
+    @classmethod
+    def execute(
+        cls,
         image_count,
         orientation,
         image1=None, image2=None, image3=None, image4=None,
         image5=None, image6=None, image7=None, image8=None,
-    ):
+    ) -> io.NodeOutput:
         all_slots = [image1, image2, image3, image4, image5, image6, image7, image8]
         images = [img for img in all_slots[:image_count] if img is not None]
 
         if not images:
             raise ValueError("Y7 Image Stitcher: no images connected.")
         if len(images) == 1:
-            return (images[0],)
+            return io.NodeOutput(images[0])
 
         # (B, H, W, C) → (B, C, H, W) for interpolation
         imgs_p = [img.permute(0, 3, 1, 2) for img in images]
@@ -75,4 +81,4 @@ class Y7Nodes_ImageStitcher:
                 resized.append(img)
             stitched = torch.cat(resized, dim=2)
 
-        return (stitched.permute(0, 2, 3, 1),)
+        return io.NodeOutput(stitched.permute(0, 2, 3, 1))

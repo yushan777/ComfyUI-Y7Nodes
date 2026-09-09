@@ -31,7 +31,7 @@ class Y7Nodes_LoadImage(io.ComfyNode):
         return io.Schema(
             node_id="Y7Nodes_LoadImage",
             display_name="Y7 Load Image (subfolders)",
-            category="Y7Nodes/image",
+            category="Y7Nodes/Image",
             inputs=[
                 io.Combo.Input(
                     "image",

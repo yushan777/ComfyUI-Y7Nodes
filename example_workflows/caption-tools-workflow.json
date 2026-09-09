@@ -1,0 +1,572 @@
+{
+  "id": "1676499d-750b-4a44-a2c4-6347ee38a426",
+  "revision": 0,
+  "last_node_id": 35,
+  "last_link_id": 36,
+  "nodes": [
+    {
+      "id": 8,
+      "type": "Label (rgthree)",
+      "pos": [
+        1740,
+        700
+      ],
+      "size": [
+        1520,
+        50
+      ],
+      "flags": {
+        "allow_interaction": true
+      },
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "Qwen VL - Vision Language, Prompt-Generator, Captioner Workflow",
+      "properties": {
+        "fontSize": 50,
+        "fontFamily": "Arial",
+        "fontColor": "#ffffff",
+        "textAlign": "left",
+        "backgroundColor": "transparent",
+        "padding": 0,
+        "borderRadius": 0,
+        "angle": 0
+      },
+      "color": "#fff0",
+      "bgcolor": "#fff0"
+    },
+    {
+      "id": 26,
+      "type": "ImageScaleToTotalPixels",
+      "pos": [
+        1970,
+        2380
+      ],
+      "size": [
+        270,
+        110
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 26
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            34
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.14.1",
+        "Node name for S&R": "ImageScaleToTotalPixels"
+      },
+      "widgets_values": [
+        "nearest-exact",
+        1,
+        16
+      ],
+      "widgets_values_named": {
+        "upscale_method": "nearest-exact",
+        "megapixels": 1,
+        "resolution_steps": 16
+      }
+    },
+    {
+      "id": 28,
+      "type": "Label (rgthree)",
+      "pos": [
+        1880,
+        1560
+      ],
+      "size": [
+        985.986328125,
+        60
+      ],
+      "flags": {
+        "allow_interaction": true
+      },
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "VL Captioner - Batch Mode Worfklow",
+      "properties": {
+        "fontSize": 60,
+        "fontFamily": "Arial",
+        "fontColor": "#ffffff",
+        "textAlign": "left",
+        "backgroundColor": "transparent",
+        "padding": 0,
+        "borderRadius": 0,
+        "angle": 0
+      },
+      "color": "#fff0",
+      "bgcolor": "#fff0"
+    },
+    {
+      "id": 30,
+      "type": "ttN text",
+      "pos": [
+        1550,
+        2580
+      ],
+      "size": [
+        840,
+        450
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            35
+          ]
+        }
+      ],
+      "title": "Prompt",
+      "properties": {
+        "cnr_id": "comfyui_tinyterranodes",
+        "ver": "2.0.10",
+        "Node name for S&R": "ttN text",
+        "ttNnodeVersion": "1.0.0"
+      },
+      "widgets_values": [
+        "Create a concise training caption for this image.\n\nRules:\n- Always begin with: <trigger-word>\n- Describe only visible, changeable details.\n- Include clothing, pose, expression, camera angle, framing, lighting, background, and notable objects.\n- Do not describe the person’s fixed facial identity, facial structure, attractiveness, ethnicity, age, or body type unless it is essential and visibly variable.\n- Do not use names.\n- Do not invent details.\n- Keep the caption natural and compact, ideally one sentence.\n- Do not mention image quality, resolution, watermark, or filename.\n\nOutput only the caption.\n\nExample:\n<trigger-wrod>, wearing a black coat, standing outdoors at night, looking at the camera, three-quarter view, soft street lighting, blurred city background"
+      ],
+      "widgets_values_named": {
+        "text": "Create a concise training caption for this image.\n\nRules:\n- Always begin with: <trigger-word>\n- Describe only visible, changeable details.\n- Include clothing, pose, expression, camera angle, framing, lighting, background, and notable objects.\n- Do not describe the person’s fixed facial identity, facial structure, attractiveness, ethnicity, age, or body type unless it is essential and visibly variable.\n- Do not use names.\n- Do not invent details.\n- Keep the caption natural and compact, ideally one sentence.\n- Do not mention image quality, resolution, watermark, or filename.\n\nOutput only the caption.\n\nExample:\n<trigger-wrod>, wearing a black coat, standing outdoors at night, looking at the camera, three-quarter view, soft street lighting, blurred city background"
+      }
+    },
+    {
+      "id": 33,
+      "type": "Note",
+      "pos": [
+        1970,
+        1900
+      ],
+      "size": [
+        470,
+        180
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "Load Clip Supports loading of some VLMs because it detects a multimodal model (like Qwen-VL or Gemma) rather than a standard text-only CLIP encoder.\n\nSince it is not connected to a diffusion model, Type can be left set to stable diffusion"
+      ],
+      "widgets_values_named": {
+        "text": "Load Clip Supports loading of some VLMs because it detects a multimodal model (like Qwen-VL or Gemma) rather than a standard text-only CLIP encoder.\n\nSince it is not connected to a diffusion model, Type can be left set to stable diffusion"
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 31,
+      "type": "CLIPLoader",
+      "pos": [
+        1990,
+        2140
+      ],
+      "size": [
+        420,
+        140
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            31
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.28.0",
+        "Node name for S&R": "CLIPLoader"
+      },
+      "widgets_values": [
+        "vlms/Qwen3-VL-8B-Instruct-heretic.safetensors",
+        "stable_diffusion",
+        "default"
+      ],
+      "widgets_values_named": {
+        "clip_name": "vlms/Qwen3-VL-8B-Instruct-heretic.safetensors",
+        "type": "stable_diffusion",
+        "device": "default"
+      }
+    },
+    {
+      "id": 35,
+      "type": "ShowText|pysssss",
+      "pos": [
+        3080.210670195454,
+        2315.911744305378
+      ],
+      "size": [
+        140,
+        26
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 36
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "609f3afaa74b2f88ef9ce8d939626065e3247469",
+        "Node name for S&R": "ShowText|pysssss"
+      }
+    },
+    {
+      "id": 32,
+      "type": "TextGenerate",
+      "pos": [
+        2530,
+        2210
+      ],
+      "size": [
+        430,
+        420
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 31
+        },
+        {
+          "name": "image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 34
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "audio",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": 35
+        }
+      ],
+      "outputs": [
+        {
+          "name": "generated_text",
+          "type": "STRING",
+          "links": [
+            32,
+            36
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.28.0",
+        "Node name for S&R": "TextGenerate"
+      },
+      "widgets_values": [
+        "",
+        1024,
+        "on",
+        0.7,
+        64,
+        0.95,
+        0.05,
+        1.05,
+        2,
+        0,
+        false,
+        true
+      ],
+      "widgets_values_named": {
+        "prompt": "",
+        "max_length": 1024,
+        "sampling_mode": "on",
+        "sampling_mode.temperature": 0.7,
+        "sampling_mode.top_k": 64,
+        "sampling_mode.top_p": 0.95,
+        "sampling_mode.min_p": 0.05,
+        "sampling_mode.repetition_penalty": 1.05,
+        "sampling_mode.seed": 2,
+        "sampling_mode.presence_penalty": 0,
+        "thinking": false,
+        "use_default_template": true
+      }
+    },
+    {
+      "id": 24,
+      "type": "Note",
+      "pos": [
+        1590,
+        2060
+      ],
+      "size": [
+        310,
+        150
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "Image Batch Path and Caption Saver can work with other VLM nodes that output a sting."
+      ],
+      "widgets_values_named": {
+        "text": "Image Batch Path and Caption Saver can work with other VLM nodes that output a sting."
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 21,
+      "type": "Y7Nodes_ImageBatchPath",
+      "pos": [
+        1520,
+        2270
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": [
+            26
+          ]
+        },
+        {
+          "name": "IMAGE_PATH",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            21
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "997906cf2ad787f9af3e0477b6bdd15853e5c644",
+        "Node name for S&R": "Y7Nodes_ImageBatchPath"
+      },
+      "widgets_values": [
+        "/home/johnl/Desktop/input",
+        0,
+        1,
+        "sequential"
+      ],
+      "widgets_values_named": {
+        "image_dir": "/home/johnl/Desktop/input",
+        "batch_size": 0,
+        "start_from": 1,
+        "sort_method": "sequential"
+      },
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 19,
+      "type": "Y7Nodes_CaptionSaver",
+      "pos": [
+        2990,
+        2130
+      ],
+      "size": [
+        270,
+        80
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "string",
+          "type": "STRING",
+          "link": 32
+        },
+        {
+          "name": "image_path",
+          "type": "STRING",
+          "link": 21
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfyui-y7nodes",
+        "ver": "997906cf2ad787f9af3e0477b6bdd15853e5c644",
+        "Node name for S&R": "Y7Nodes_CaptionSaver"
+      },
+      "widgets_values": [
+        true
+      ],
+      "widgets_values_named": {
+        "overwrite": true
+      },
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 34,
+      "type": "Note",
+      "pos": [
+        2540,
+        1970
+      ],
+      "size": [
+        400,
+        170
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "Generate Text node runs a text encoder as an LLM rather than as a conditioning encoder.\n\nSupported models that work\n(Qwen3 / Qwen3.5 etc.)\t\nGemma 4 (E2B/E4B/31B/12B)\t\nQwen3-VL 4B/8B\nGemma 3 12B, incl. the LTX2 AV text encoder\t"
+      ],
+      "widgets_values_named": {
+        "text": "Generate Text node runs a text encoder as an LLM rather than as a conditioning encoder.\n\nSupported models that work\n(Qwen3 / Qwen3.5 etc.)\t\nGemma 4 (E2B/E4B/31B/12B)\t\nQwen3-VL 4B/8B\nGemma 3 12B, incl. the LTX2 AV text encoder\t"
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      21,
+      21,
+      1,
+      19,
+      1,
+      "STRING"
+    ],
+    [
+      26,
+      21,
+      0,
+      26,
+      0,
+      "IMAGE"
+    ],
+    [
+      31,
+      31,
+      0,
+      32,
+      0,
+      "CLIP"
+    ],
+    [
+      32,
+      32,
+      0,
+      19,
+      0,
+      "STRING"
+    ],
+    [
+      34,
+      26,
+      0,
+      32,
+      1,
+      "IMAGE"
+    ],
+    [
+      35,
+      30,
+      0,
+      32,
+      4,
+      "STRING"
+    ],
+    [
+      36,
+      32,
+      0,
+      35,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.8576329331046304,
+      "offset": [
+        -1419.8666701954542,
+        -1846.5077443053765
+      ]
+    },
+    "frontendVersion": "1.51.9",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true,
+    "ue_links": [],
+    "links_added_by_ue": [],
+    "workflowRendererVersion": "LG"
+  },
+  "version": 0.4
+}

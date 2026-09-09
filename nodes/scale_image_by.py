@@ -1,42 +1,37 @@
 import comfy.utils
+from comfy_api.latest import io
 
 
-class Y7Nodes_ScaleImageBy:
+class Y7Nodes_ScaleImageBy(io.ComfyNode):
 
     UPSCALE_METHODS = ["nearest-exact", "bilinear", "area", "bicubic", "lanczos"]
 
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image": ("IMAGE",),
-                "upscale_method": (cls.UPSCALE_METHODS, {"default": "lanczos"}),
-                "scale_by": ("FLOAT", {
-                    "default": 1.0,
-                    "min": 0.01,
-                    "max": 8.0,
-                    "step": 0.01,
-                }),
-            },
-            "optional": {
-                "resolution_steps": ("INT", {
-                    "default": 8,
-                    "min": 1,
-                    "max": 256,
-                }),
-            },
-        }
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_ScaleImageBy",
+            display_name="Y7 Scale Image By",
+            category="Y7Nodes/Image",
+            description="Scale an image by a factor, snapping the result to a step size.",
+            is_output_node=True,
+            inputs=[
+                io.Image.Input("image"),
+                io.Combo.Input("upscale_method", options=cls.UPSCALE_METHODS, default="lanczos"),
+                io.Float.Input("scale_by", default=1.0, min=0.01, max=8.0, step=0.01),
+                io.Int.Input("resolution_steps", optional=True, default=8, min=1, max=256),
+            ],
+            outputs=[
+                io.Image.Output(display_name="image"),
+                io.Int.Output(display_name="width"),
+                io.Int.Output(display_name="height"),
+            ],
+        )
 
-    RETURN_TYPES = ("IMAGE", "INT", "INT")
-    RETURN_NAMES = ("image", "width", "height")
-    FUNCTION = "execute"
-    CATEGORY = "Y7Nodes/image"
-    OUTPUT_NODE = True
-
-    def execute(self, image, upscale_method, scale_by, resolution_steps=8):
+    @classmethod
+    def execute(cls, image, upscale_method, scale_by, resolution_steps=8) -> io.NodeOutput:
         samples = image.movedim(-1, 1)
         width = round(samples.shape[3] * scale_by / resolution_steps) * resolution_steps
         height = round(samples.shape[2] * scale_by / resolution_steps) * resolution_steps
         s = comfy.utils.common_upscale(samples, width, height, upscale_method, "disabled")
         s = s.movedim(1, -1)
-        return {"ui": {"text": [f"{width} x {height}"]}, "result": (s, width, height)}
+        return io.NodeOutput(s, width, height, ui={"text": [f"{width} x {height}"]})

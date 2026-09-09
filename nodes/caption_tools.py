@@ -7,6 +7,7 @@ import torch
 import numpy as np
 from PIL import Image, ImageOps
 
+from comfy_api.latest import io
 
 
 # Loads a batch of images from a directory and returns them as a list of image
@@ -14,36 +15,61 @@ from PIL import Image, ImageOps
 # and webp. Images are EXIF-transposed and converted to RGB float32 tensors.
 # Pair with CaptionSaver — the IMAGE_PATH output tells CaptionSaver where to
 # write each .txt file, and IMAGE feeds into a VLM node for captioning.
-class Y7Nodes_ImageBatchPath:
+class Y7Nodes_ImageBatchPath(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image_dir": ("STRING", {"default": "", "multiline": True, "placeholder": "Input directory containing images"}),
-            },
-            "optional": {
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_ImageBatchPath",
+            display_name="Y7 Image Batch Path",
+            category="Y7Nodes/CaptionTools",
+            description="Load a directory of images as a list, along with their file paths.",
+            inputs=[
+                io.String.Input(
+                    "image_dir",
+                    multiline=True,
+                    placeholder="Input directory containing images",
+                    default="",
+                ),
                 # 0 = load all images in the directory
-                "batch_size": ("INT", {"default": 0, "min": 0, "step": 1, "tooltip": "Number of images to load (0 = all)"}),
+                io.Int.Input(
+                    "batch_size",
+                    optional=True,
+                    default=0,
+                    min=0,
+                    step=1,
+                    tooltip="Number of images to load (0 = all)",
+                ),
                 # 1-based index of the first image to load (useful for resuming)
-                "start_from": ("INT", {"default": 1, "min": 1, "step": 1, "tooltip": "Start from Nth image (1 = first)"}),
-                # random forces re-evaluation on every run (IS_CHANGED returns NaN)
-                "sort_method": (["sequential", "reverse", "random"], {"default": "sequential"}),
-            },
-        }
-
-    RETURN_TYPES = ("IMAGE", "STRING")
-    RETURN_NAMES = ("IMAGE", "IMAGE_PATH")
-    OUTPUT_IS_LIST = (True, True)
-    FUNCTION = "load_image_batch"
-    CATEGORY = "Y7Nodes/CaptionTools"
+                io.Int.Input(
+                    "start_from",
+                    optional=True,
+                    default=1,
+                    min=1,
+                    step=1,
+                    tooltip="Start from Nth image (1 = first)",
+                ),
+                # random forces re-evaluation on every run (fingerprint_inputs returns NaN)
+                io.Combo.Input(
+                    "sort_method",
+                    optional=True,
+                    options=["sequential", "reverse", "random"],
+                    default="sequential",
+                ),
+            ],
+            outputs=[
+                io.Image.Output(display_name="IMAGE", is_output_list=True),
+                io.String.Output(display_name="IMAGE_PATH", is_output_list=True),
+            ],
+        )
 
     @classmethod
-    def IS_CHANGED(cls, **kwargs):
+    def fingerprint_inputs(cls, **kwargs):
         if kwargs.get("sort_method") == "random":
             return float("NaN")
         return hash(frozenset(kwargs))
 
-    def load_image_batch(self, image_dir, batch_size=0, start_from=1, sort_method="sequential"):
+    @classmethod
+    def execute(cls, image_dir, batch_size=0, start_from=1, sort_method="sequential") -> io.NodeOutput:
         image_dir = os.path.expanduser(image_dir)
         if not os.path.isdir(image_dir):
             raise FileNotFoundError(f"Directory '{image_dir}' cannot be found.")
@@ -78,7 +104,7 @@ class Y7Nodes_ImageBatchPath:
             except Exception as e:
                 print(f"[ImageBatchPath] Error loading {filename}: {e}")
 
-        return (images, image_paths)
+        return io.NodeOutput(images, image_paths)
 
 
 # Saves a caption string as a .txt file next to the source image, using the
@@ -88,26 +114,32 @@ class Y7Nodes_ImageBatchPath:
 # suffixed with a counter (cat_01.txt, cat_02.txt, etc.).
 # Compatible with any VLM node that outputs a STRING or list of STRINGs.
 # Examples: Florence2, MiniCPM, LLaVA, Qwen-VL, etc.
-class Y7Nodes_CaptionSaver:
+class Y7Nodes_CaptionSaver(io.ComfyNode):
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_CaptionSaver",
+            display_name="Y7 Caption Saver",
+            category="Y7Nodes/CaptionTools",
+            description="Write a caption to a .txt file alongside its source image.",
+            is_output_node=True,
+            inputs=[
                 # The caption text to write to the .txt file.
-                "string": ("STRING", {"forceInput": True}),
+                io.String.Input("string", force_input=True),
                 # String path to the source image (e.g. from ImageBatchPath). The .txt file
                 # is written to the same directory with the same stem (e.g. cat.jpg -> cat.txt).
-                "image_path": ("STRING", {"forceInput": True}),
-                "overwrite": ("BOOLEAN", {"default": True, "tooltip": "If false, appends a number to avoid overwriting existing files"}),
-            },
-        }
+                io.String.Input("image_path", force_input=True),
+                io.Boolean.Input(
+                    "overwrite",
+                    default=True,
+                    tooltip="If false, appends a number to avoid overwriting existing files",
+                ),
+            ],
+            outputs=[],
+        )
 
-    RETURN_TYPES = ()
-    FUNCTION = "save_caption"
-    CATEGORY = "Y7Nodes/CaptionTools"
-    OUTPUT_NODE = True
-
-    def _unique_path(self, base_path: Path) -> Path:
+    @staticmethod
+    def _unique_path(base_path: Path) -> Path:
         if not base_path.exists():
             return base_path
         counter = 1
@@ -117,13 +149,14 @@ class Y7Nodes_CaptionSaver:
                 return candidate
             counter += 1
 
-    def save_caption(self, string, image_path, overwrite=True):
+    @classmethod
+    def execute(cls, string, image_path, overwrite=True) -> io.NodeOutput:
         try:
             image_path = Path(image_path)
             txt_path = image_path.with_suffix(".txt")
 
             if not overwrite:
-                txt_path = self._unique_path(txt_path)
+                txt_path = cls._unique_path(txt_path)
 
             with open(txt_path, "w", encoding="utf-8") as f:
                 f.write(string)
@@ -132,4 +165,4 @@ class Y7Nodes_CaptionSaver:
         except Exception as e:
             print(f"[CaptionSaver] Error: {e}")
 
-        return ()
+        return io.NodeOutput()

@@ -1,46 +1,53 @@
-import argparse
-import os
-import json
+from functools import lru_cache
+
 from transformers import T5Tokenizer
-from ..utils.logger import logger
-from ..utils.colored_print import color, style
+from comfy_api.latest import io
+
+from ..utils.colored_print import color
 
 # This node has 1 backend input and 1 backend output 
 # other widgets (frontend) are added in the corresponding javascript file
 # 2 hidden input types are used for state persistence.
 
 # =====================================================================================
-class Y7Nodes_T5_TokenCounter:
+class Y7Nodes_T5_TokenCounter(io.ComfyNode):
 
     @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {}, 
-            "optional": {
-                "text_in": ("STRING", {"default": "", "forceInput": True, "tooltip": "Text input to count tokens for using the T5 tokenizer"}),                   
-            },
-            "hidden": {
-                # these are used to help restore state
-                "unique_id": "UNIQUE_ID", 
-                "extra_pnginfo": "EXTRA_PNGINFO",
-            }
-        }
-
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ('text_out',)
-    OUTPUT_NODE = True
-    FUNCTION = "count_tokens_T5"
-    CATEGORY = "Y7Nodes/Utils"
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_T5_TokenCounter",
+            display_name="Y7 T5 Token Counter",
+            category="Y7Nodes/Utils",
+            description="Count T5 tokens for a text input and show the tokenised result.",
+            is_output_node=True,
+            inputs=[
+                io.String.Input(
+                    "text_in",
+                    optional=True,
+                    default="",
+                    force_input=True,
+                    tooltip="Text input to count tokens for using the T5 tokenizer",
+                ),
+            ],
+            outputs=[
+                io.String.Output(display_name="text_out"),
+            ],
+            # these are used to help restore state
+            hidden=[
+                io.Hidden.unique_id,
+                io.Hidden.extra_pnginfo,
+            ],
+        )
 
     # ====================================================================================
     # main function
-    def count_tokens_T5(self, **kwargs):
-
-        # Debug prints to check if these values are still available
-        unique_id = kwargs.get('unique_id')
-        extra_pnginfo = kwargs.get('extra_pnginfo')
+    @classmethod
+    def execute(cls, text_in="") -> io.NodeOutput:
+        # unique_id and extra_pnginfo are declared as hidden inputs in the schema
+        unique_id = cls.hidden.unique_id
+        extra_pnginfo = cls.hidden.extra_pnginfo
         # Get the input string
-        string_input = kwargs.get('text_in', '')        
+        string_input = text_in or ""
 
         # Normalize en/em dashes(U+2013 or U+2014) to standard hyphen (U+002D)
         # cos they might come out looking lik âĢĶ
@@ -54,21 +61,11 @@ class Y7Nodes_T5_TokenCounter:
         if string_input:
             
             # Initialize tokenizer
-            tokenizer = self.load_tokenizer()
-            tokenizer_max_length = tokenizer.model_max_length
+            tokenizer = cls.load_tokenizer()
             num_of_special_tokens = 1
 
-            # print(f"tokenizer_max_length = {tokenizer_max_length}", color.YELLOW)
-            # print(f"T5 appends an EOS special token but has no BOS as shown below:", color.YELLOW)
-            bos_input_id = tokenizer.encode(f'{tokenizer.bos_token}', add_special_tokens=False)
-            eos_input_id = tokenizer.encode(f'{tokenizer.eos_token}', add_special_tokens=False)
-            bos_token = tokenizer.decode(bos_input_id)
-            eos_token = tokenizer.decode(eos_input_id)
-            # print(f"T5 BOS = {bos_input_id} '{bos_token}'", color.YELLOW)            
-            # print(f"T5 EOS = {eos_input_id} '{eos_token}'", color.YELLOW)          
-
             # user-defined token limit or length
-            token_sequence_length = self.get_tokens_limit_val(extra_pnginfo, unique_id)
+            token_sequence_length = cls.get_tokens_limit_val(extra_pnginfo, unique_id)
 
             # Tokenize the text (both original and truncated versions)
             raw_input_original = tokenizer(string_input, padding=False, truncation=False, max_length=token_sequence_length)
@@ -80,34 +77,25 @@ class Y7Nodes_T5_TokenCounter:
 
             # Get token counts
             token_count_original = len(input_ids_original)
-            token_count_truncated = len(input_ids_truncated)
 
-            # Convert all token IDs to tokens
-            tokens_original = [tokenizer.convert_ids_to_tokens(token_id) for token_id in input_ids_original]            
-            # Convert first (or up to) 512 token IDs to tokens
-            tokens_truncated = [tokenizer.convert_ids_to_tokens(token_id) for token_id in input_ids_truncated]
+            # Convert the truncated token IDs to tokens (one call takes the whole list)
+            tokens_truncated = tokenizer.convert_ids_to_tokens(input_ids_truncated)
 
-            # Process limit token information
+            # Process limit token information. Truncating to token_sequence_length guarantees
+            # the sequence fits, so the only question is whether it reached the limit.
             last_token = ""
             context_limit_token = ""
-                            
-            #  =================================================================================
-            # Check if token count is within max length
-            
-            if token_count_truncated <= token_sequence_length:
-                index = token_sequence_length - num_of_special_tokens -1
-                last_token = tokens_truncated[index] if index < len(tokens_truncated) else ""
+            index = token_sequence_length - num_of_special_tokens - 1
+            if index < len(tokens_truncated):
+                last_token = tokens_truncated[index]
 
                 # Get context around the limit token
                 selected_token_ids = input_ids_truncated[(token_sequence_length-9):index + 1]
                 context_limit_token = tokenizer.decode(selected_token_ids, clean_up_tokenization_spaces=True).strip()
-            elif token_count_truncated > token_sequence_length:
-                print(f"tokens over limit ", color.RED)                  
 
-            # Get formatting settings
-            max_tokens_per_line = self.get_tokens_per_line_val(extra_pnginfo, unique_id) 
-            tokens_truncated_formatted = self.format_tokens_T5(tokens_truncated, max_tokens_per_line, start_index=0)            
-            tokens_overflow_formatted = self.format_tokens_T5(tokens_original,  max_tokens_per_line, start_index=(token_sequence_length-1))      
+            # Locate this node in the workflow once; used both for reading the widget values
+            # the frontend created and for writing the result back
+            workflow_node = cls.find_workflow_node(extra_pnginfo, unique_id)
 
             output_text = ""
 
@@ -122,21 +110,27 @@ class Y7Nodes_T5_TokenCounter:
             output_text += f"Token Count: {token_count_original} / {token_sequence_length}"
             over_limit = token_count_original - token_sequence_length
             output_text += f": >>{over_limit} over limit<<\n" if over_limit > 0 else "\n"
-            output_text += "\n" if last_token else "\n"
+            output_text += "\n"
 
             # Add limit token information if it exists
             if last_token:
                 output_text += f'Last Token: "{last_token}" | "...{context_limit_token}"\n\n'
 
             # Show tokens if the widget is enabled
-            show_tokens = self.get_show_tokens_val(extra_pnginfo, unique_id)        
+            show_tokens = cls.get_show_tokens_val(workflow_node)
             if show_tokens:
-                # print(f"token_count_original = {token_count_original} ", color.YELLOW)
-                # print(f"token_count_truncated = {token_count_truncated} ", color.YELLOW)
-                
+
+                # Formatting the token listing is only worth doing if it gets displayed
+                max_tokens_per_line = cls.get_tokens_per_line_val(workflow_node)
+                tokens_original = tokenizer.convert_ids_to_tokens(input_ids_original)
+                tokens_truncated_formatted = cls.format_tokens_T5(tokens_truncated, max_tokens_per_line, start_index=0)
+                tokens_overflow_formatted = cls.format_tokens_T5(
+                    tokens_original, max_tokens_per_line, start_index=(token_sequence_length - 1)
+                )
+
                 # Set appropriate title based on truncation
-                title = (f"Tokens (Truncated - Showing first {token_sequence_length})\n==========================================\n" 
-                        if token_count_original > tokenizer_max_length 
+                title = (f"Tokens (Truncated - Showing first {token_sequence_length})\n==========================================\n"
+                        if token_count_original > token_sequence_length
                         else f"Tokens\n==========================================\n")
                 
                 # Add tokens section
@@ -158,21 +152,19 @@ class Y7Nodes_T5_TokenCounter:
                 print("Error: extra_pnginfo is empty")
             elif (not isinstance(extra_pnginfo, dict) or "workflow" not in extra_pnginfo):
                 print("Error: extra_pnginfo is not a dict or missing 'workflow' key")
-            else:
-                workflow = extra_pnginfo["workflow"]
-                node = next((x for x in workflow["nodes"] if str(x["id"]) == unique_id), None)
-                if node:
-                    node["widgets_values"] = [output_text]
+            elif workflow_node:
+                workflow_node["widgets_values"] = [output_text]
 
         else:            
             output_text = "No input text provided."        
         
         # Pass the token count info (output_text) to the UI but return the original string_input as output
         # This allows the node to be used as a pass-through while still showing token info
-        return {"ui": {"text": output_text}, "result": (string_input,)}
+        return io.NodeOutput(string_input, ui={"text": output_text})
 
     # ===================================================================================
-    def format_tokens_T5(self, tokens, max_tokens_per_line=4, start_index=0):
+    @classmethod
+    def format_tokens_T5(cls, tokens, max_tokens_per_line=4, start_index=0):
 
         # Format tokens  into a string with padding, indices, and number of tokens per line.
         # only include tokens that fit into the tokenizer_max_length, ignoring the rest
@@ -189,16 +181,13 @@ class Y7Nodes_T5_TokenCounter:
             return ""
         
         # Calculate the maximum token length for padding
-        max_str_length = max(len(token) for token in tokens) if tokens else 0
+        max_str_length = max(len(token) for token in tokens)
         
         # get token length 
         tokens_length = len(tokens)
         
         # Determine the index formatting based on number of tokens
-        if tokens_length <= 99:
-            index_format = "{:2d}"
-        elif tokens_length > 99:
-            index_format = "{:3d}"    
+        index_format = "{:2d}" if tokens_length <= 99 else "{:3d}"
 
         # Format tokens into a string with padding, indices, and tokens per line
         tokens_formatted = ""
@@ -216,22 +205,34 @@ class Y7Nodes_T5_TokenCounter:
 
     
     # ========================================================================================
-    def get_show_tokens_val(self, extra_pnginfo, unique_id):
-        
-        # Get the value of show_tokens widget using the index stored in node properties.
-        # that was set in the frontend javascripts.  We find the correct node in the workflow using
-        # unique_id        
+    @classmethod
+    def find_workflow_node(cls, extra_pnginfo, unique_id):
+
+        # Find this node's entry in the workflow carried by extra_pnginfo, or None.
         # Args:
         #  - extra_pnginfo: The extra PNG info containing workflow data
-        #  - unique_id: The unique ID of this node                
-        # Returns: 
-        #  - The bool from the show_tokens widget, or False if not found
-        
+        #  - unique_id: The unique ID of this node
+        # Returns:
+        #  - The node dict from the workflow, or None if it can't be found
 
-        # For widgets created in JavaScript, we can access their vals using the widget 
+        if not extra_pnginfo or "workflow" not in extra_pnginfo:
+            return None
+
+        # find the node in the WF that matches our unique_id for this node
+        # return the first match & convert the id to str
+        return next((x for x in extra_pnginfo["workflow"]["nodes"] if str(x["id"]) == unique_id), None)
+
+    # ========================================================================================
+    @classmethod
+    def get_widget_val(cls, node, property_name, default, cast=None):
+
+        # Get the value of a widget that was created in the frontend javascript, using the
+        # index the frontend stored in the node's properties.
+        #
+        # For widgets created in JavaScript, we can access their vals using the widget
         # index that is stored in the extra_pnginfo dictionary:
         #   extra_pnginfo-> workflow -> nodes -> properties
-
+        #
         # Example:
         # node
         # ├── id
@@ -241,8 +242,8 @@ class Y7Nodes_T5_TokenCounter:
         # ├── properties
         # │   ├── various properties including "show_tokens_index"
         # └── widgets_values
-        #     └── array of widget values      
-        #   
+        #     └── array of widget values
+        #
         # {
         #     'workflow': {
         #         'nodes': [
@@ -263,75 +264,50 @@ class Y7Nodes_T5_TokenCounter:
         #                 },
         #                 'widgets_values': ['hello', False, '10', None, None]
         #             },
-
+        #
         #         ],
         #         .....
         #     }
-        # }        
-        
-        property_name = "show_tokens_index"
+        # }
+        #
+        # Args:
+        #  - node: The node dict from the workflow (see find_workflow_node)
+        #  - property_name: The property holding the widget's index, e.g. "show_tokens_index"
+        #  - default: Returned if anything is missing or out of range
+        #  - cast: Optional callable applied to the value before returning it
+        # Returns:
+        #  - The widget's value, or default
 
-        # Check if extra_pnginfo exists and it contains workflow info
-        if extra_pnginfo and "workflow" in extra_pnginfo:
-            # Extract the workflow object from extra_pnginfo
-            workflow = extra_pnginfo["workflow"]
-            
-            # find the node in the WF that matches our unique_id for this node
-            # return the first match & convert the id to str
-            node = next((x for x in workflow["nodes"] if str(x["id"]) == unique_id), None)
-            
-            # check node is truthy and it has widgets_values key
-            if node and "widgets_values" in node:
+        # check node is truthy and it has widgets_values key
+        if not node or "widgets_values" not in node:
+            return default
 
-                # now check if the node has properties key and contains the show_tokens_index custom property
-                if "properties" in node and property_name in node["properties"]:
-                    # if so get the value 
-                    index = node["properties"][property_name]
-                                        
-                    # make sure the index is within bounds for the widgets_values array
-                    if index < len(node["widgets_values"]):
-                        # return the value at that index (should be a boolean in this case)
-                        return node["widgets_values"][index]
+        # now check if the node has properties key and contains the custom property
+        # we are after (as defined by property_name)
+        index = node.get("properties", {}).get(property_name)
 
-        # If anything fails (missing data, index out of range, etc.), return False as default
-        return False
-        
-    # ===================================================================================
-    def get_tokens_per_line_val(self, extra_pnginfo, unique_id):
-        # similar in functionality to get_show_tokens_val() above
-        # gets value from widget named tokens_per_line
+        # make sure the index is within bounds for the widgets_values array
+        if not isinstance(index, int) or index >= len(node["widgets_values"]):
+            return default
 
-        property_name = "tokens_per_line_index"
+        value = node["widgets_values"][index]
+        return cast(value) if cast else value
 
-        # Check if extra_pnginfo exists and it contains workflow info
-        if extra_pnginfo and "workflow" in extra_pnginfo:
-            # Extract the workflow object from extra_pnginfo
-            workflow = extra_pnginfo["workflow"]
-            
-            # find the node in the WF that matches our unique_id for this node
-            # return the first match & convert the id to str
-            node = next((x for x in workflow["nodes"] if str(x["id"]) == unique_id), None)
-            
-            # check node is truthy and it has widgets_values key
-            if node and "widgets_values" in node:
-
-                # now check if the node has properties key and contains the custom property 
-                # we are after (as defined by property_name)
-                if "properties" in node and property_name in node["properties"]:
-                    # if so get the value 
-                    index = node["properties"][property_name]
-
-
-                    # make sure the index is within bounds for the widgets_values array
-                    if index < len(node["widgets_values"]):
-                        # return the value at that index. (converted to int) 
-                        return int(node["widgets_values"][index])
-
-        # If anything fails (missing data, index out of range, etc.), return 4 as default
-        return 4
+    # ========================================================================================
+    @classmethod
+    def get_show_tokens_val(cls, node):
+        # The bool from the show_tokens widget, or False if not found
+        return cls.get_widget_val(node, "show_tokens_index", False)
 
     # ===================================================================================
-    def get_tokens_limit_val(self, extra_pnginfo, unique_id):
+    @classmethod
+    def get_tokens_per_line_val(cls, node):
+        # The number of tokens to print per line, or 4 if not found
+        return cls.get_widget_val(node, "tokens_per_line_index", 4, cast=int)
+
+    # ===================================================================================
+    @classmethod
+    def get_tokens_limit_val(cls, extra_pnginfo, unique_id):
         # similar in functionality to get_show_tokens_val() above
         # gets value from widget named token_limit
 
@@ -390,48 +366,57 @@ class Y7Nodes_T5_TokenCounter:
  
             
     # ===================================================================================
-    def load_tokenizer(self):
+    @classmethod
+    def load_tokenizer(cls):
+        # Returns the T5 tokenizer, loading it on first use.
+        # ComfyUI hands execute() a fresh clone of this class on every run, so the cache
+        # lives at module level rather than on the class.
+        return load_t5_tokenizer()
 
-        # Load the T5 tokenizer from local dir    
-        # Returns the loaded T5 tokenizer
 
-        # FALLBACK_HF_MODEL = "t5-large"
-        FALLBACK_HF_MODEL = "google/t5-v1_1-xxl"
+# =====================================================================================
+@lru_cache(maxsize=1)
+def load_t5_tokenizer():
+
+    # Load the T5 tokenizer from local dir
+    # Returns the loaded T5 tokenizer
+
+    # FALLBACK_HF_MODEL = "t5-large"
+    FALLBACK_HF_MODEL = "google/t5-v1_1-xxl"
+
+    try:
+        # Use Path to get the absolute path to the tokenizer directory
+        # This matches the approach used in __init__.py for web routes
+        from pathlib import Path
+        current_dir = Path(__file__).parent.parent.absolute()
+        local_tokenizer_path = (current_dir / "text_encoders" / "t5_tokenizer").as_posix()
+        # print(f"Loading tokenizer from local path: {local_tokenizer_path}")
+        return T5Tokenizer.from_pretrained(local_tokenizer_path)
+
+    except Exception as e:
+        print(f"Unable loading local tokenizer: files may be missing or corrupt.", color.ORANGE)
+        print(f"Downloading from {FALLBACK_HF_MODEL} tokenizer on HuggingFace", color.ORANGE)
 
         try:
-            # Use Path to get the absolute path to the tokenizer directory
-            # This matches the approach used in __init__.py for web routes
+
+            # Download the tokenizer
+            tokenizer = T5Tokenizer.from_pretrained(FALLBACK_HF_MODEL)
+
+            # Create the local directory if it doesn't exist
             from pathlib import Path
             current_dir = Path(__file__).parent.parent.absolute()
-            local_tokenizer_path = (current_dir / "text_encoders" / "t5_tokenizer").as_posix()
-            # print(f"Loading tokenizer from local path: {local_tokenizer_path}")
-            tokenizer = T5Tokenizer.from_pretrained(local_tokenizer_path)
+            local_tokenizer_path = (current_dir / "text_encoders" / "t5_tokenizer")
+            local_tokenizer_path.mkdir(parents=True, exist_ok=True)
+
+            # Save the tokenizer to the local directory
+            print(f"Saving tokenizer to local path: {local_tokenizer_path.as_posix()}", color.BRIGHT_GREEN)
+            tokenizer.save_pretrained(local_tokenizer_path.as_posix())
+            print(f"Tokenizer saved successfully!", color.BRIGHT_GREEN)
+
             return tokenizer
 
-        except Exception as e:
-            print(f"Unable loading local tokenizer: files may be missing or corrupt.", color.ORANGE)
-            print(f"Downloading from openai/clip-vit-large-patch14 tokenizer on HuggingFace", color.ORANGE)
-            
-            try:
+        except Exception as save_error:
+            print(f"Error saving tokenizer locally: {save_error}\nUsing cached copy.", color.ORANGE)
 
-                # Download the tokenizer
-                tokenizer = T5Tokenizer.from_pretrained(FALLBACK_HF_MODEL)
-                
-                # Create the local directory if it doesn't exist
-                from pathlib import Path
-                current_dir = Path(__file__).parent.parent.absolute()
-                local_tokenizer_path = (current_dir / "text_encoders" / "t5_tokenizer")
-                local_tokenizer_path.mkdir(parents=True, exist_ok=True)
-                
-                # Save the tokenizer to the local directory
-                print(f"Saving tokenizer to local path: {local_tokenizer_path.as_posix()}", color.BRIGHT_GREEN)
-                tokenizer.save_pretrained(local_tokenizer_path.as_posix())
-                print(f"Tokenizer saved successfully!", color.BRIGHT_GREEN)
-                
-                return tokenizer
-                
-            except Exception as save_error:
-                print(f"Error saving tokenizer locally: {save_error}\nUsing cached copy.", color.ORANGE)
-                
-                # If saving fails, still return the downloaded tokenizer
-                return T5Tokenizer.from_pretrained(FALLBACK_HF_MODEL)
+            # If saving fails, still return the downloaded tokenizer
+            return T5Tokenizer.from_pretrained(FALLBACK_HF_MODEL)

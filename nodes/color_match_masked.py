@@ -14,69 +14,73 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 
+from comfy_api.latest import io
 
-class Y7Nodes_ColorMatchMasked:
+
+class Y7Nodes_ColorMatchMasked(io.ComfyNode):
     """Color match images while excluding masked regions from the calculation."""
     
     @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image_ref": ("IMAGE", {
-                    "tooltip": "Reference image for color matching (e.g., original before inpainting)"
-                }),
-                "image_target": ("IMAGE", {
-                    "tooltip": "Target image to apply color correction to (e.g., result after inpainting)"
-                }),
-                "method": ([
-                    'mkl',
-                    'hm', 
-                    'reinhard', 
-                    'mvgd', 
-                    'hm-mvgd-hm', 
-                    'hm-mkl-hm',
-                ], {
-                    "default": 'mkl',
-                    "tooltip": "Color transfer method: mkl (Monge-Kantorovich), hm (histogram), reinhard, mvgd (Multi-Variate Gaussian)"
-                }),
-            },
-            "optional": {
-                "mask": ("MASK", {
-                    "tooltip": "Mask where white (1.0) = areas to exclude from color matching (e.g., inpainted region). If not provided, color matching is applied to the entire image."
-                }),
-                "strength": ("FLOAT", {
-                    "default": 1.0, 
-                    "min": 0.0, 
-                    "max": 1.0, 
-                    "step": 0.01,
-                    "tooltip": "Blend strength between original and color-matched result (0=no change, 1=full correction)"
-                }),
-                "feather": ("INT", {
-                    "default": 0, 
-                    "min": 0, 
-                    "max": 100, 
-                    "step": 1,
-                    "tooltip": "Feather/blur radius for the mask edge transition in pixels"
-                }),
-            }
-        }
-    
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("image",)
-    FUNCTION = "color_match_masked"
-    CATEGORY = "Y7Nodes/Image"
-    
-    DESCRIPTION = """
-Color Match (Masked) - Color matches the target image to the reference while 
-excluding masked regions from BOTH images during the color transfer calculation.
+    def define_schema(cls):
+        return io.Schema(
+            node_id="Y7Nodes_ColorMatchMasked",
+            display_name="Y7 Color Match (Masked)",
+            category="Y7Nodes/Image",
+            description=(
+                "Color Match (Masked) - Color matches the target image to the reference while "
+                "excluding masked regions from BOTH images during the color transfer calculation.\n\n"
+                "Use case: After inpainting (e.g., changing a red car to blue), the rest of the "
+                "image may have a color shift. This node calculates color correction using only "
+                "the non-masked areas (background), then applies that correction to the non-masked "
+                "areas while keeping the inpainted region (the blue car) unchanged."
+            ),
+            inputs=[
+                io.Image.Input(
+                    "image_ref",
+                    tooltip="Reference image for color matching (e.g., original before inpainting)",
+                ),
+                io.Image.Input(
+                    "image_target",
+                    tooltip="Target image to apply color correction to (e.g., result after inpainting)",
+                ),
+                io.Combo.Input(
+                    "method",
+                    options=[
+                        'mkl',
+                        'hm',
+                        'reinhard',
+                        'mvgd',
+                        'hm-mvgd-hm',
+                        'hm-mkl-hm',
+                    ],
+                    default='mkl',
+                    tooltip="Color transfer method: mkl (Monge-Kantorovich), hm (histogram), reinhard, mvgd (Multi-Variate Gaussian)",
+                ),
+                io.Mask.Input(
+                    "mask",
+                    optional=True,
+                    tooltip="Mask where white (1.0) = areas to exclude from color matching (e.g., inpainted region). If not provided, color matching is applied to the entire image.",
+                ),
+                io.Float.Input(
+                    "strength",
+                    optional=True,
+                    default=1.0, min=0.0, max=1.0, step=0.01,
+                    tooltip="Blend strength between original and color-matched result (0=no change, 1=full correction)",
+                ),
+                io.Int.Input(
+                    "feather",
+                    optional=True,
+                    default=0, min=0, max=100, step=1,
+                    tooltip="Feather/blur radius for the mask edge transition in pixels",
+                ),
+            ],
+            outputs=[
+                io.Image.Output(display_name="image"),
+            ],
+        )
 
-Use case: After inpainting (e.g., changing a red car to blue), the rest of the 
-image may have a color shift. This node calculates color correction using only 
-the non-masked areas (background), then applies that correction to the non-masked 
-areas while keeping the inpainted region (the blue car) unchanged.
-"""
-
-    def _gaussian_blur_mask(self, mask: torch.Tensor, radius: int) -> torch.Tensor:
+    @classmethod
+    def _gaussian_blur_mask(cls, mask: torch.Tensor, radius: int) -> torch.Tensor:
         """Apply Gaussian blur to a mask tensor for feathering edges."""
         if radius <= 0:
             return mask
@@ -109,7 +113,8 @@ areas while keeping the inpainted region (the blue car) unchanged.
         # Return in original shape
         return blurred.squeeze(1) if blurred.shape[1] == 1 else blurred
 
-    def color_match_masked(self, image_ref, image_target, method, mask=None, strength=1.0, feather=0):
+    @classmethod
+    def execute(cls, image_ref, image_target, method, mask=None, strength=1.0, feather=0) -> io.NodeOutput:
         """
         Perform color matching while excluding masked regions.
         
@@ -173,7 +178,7 @@ areas while keeping the inpainted region (the blue car) unchanged.
                 output_images.append(torch.from_numpy(result.astype(np.float32)))
             
             output = torch.stack(output_images, dim=0)
-            return (output,)
+            return io.NodeOutput(output)
         
         # Mask is provided - process with masking logic
         mask = mask.cpu()
@@ -196,7 +201,7 @@ areas while keeping the inpainted region (the blue car) unchanged.
         
         # Apply feathering to mask
         if feather > 0:
-            mask = self._gaussian_blur_mask(mask, feather)
+            mask = cls._gaussian_blur_mask(mask, feather)
             # Ensure values are still in 0-1 range after blur
             mask = torch.clamp(mask.squeeze(1) if mask.dim() == 4 else mask, 0, 1)
         
@@ -278,4 +283,4 @@ areas while keeping the inpainted region (the blue car) unchanged.
             output_images.append(torch.from_numpy(result.astype(np.float32)))
         
         output = torch.stack(output_images, dim=0)
-        return (output,)
+        return io.NodeOutput(output)

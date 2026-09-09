@@ -150,24 +150,6 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ------
 
-### Catch and Edit Text (Dual)
-> Based on the original ![CatchEditTextNode by ImagineerNL](https://github.com/ImagineerNL/ComfyUI-IMGNR-Utils)
-> A node that catches and shows text(s) generated from a previous node and enables editing the text for subsequent runs. Using the edited text also mutes the input node.  Modified from the original to take two text inputs to work with the Prompt Enhancer node and provide two text outputs.
-> 
-> <img src="assets/prompt_enhancer_flux_with_catch_edit_text.jpg" alt="catch edit text" width="100%"/>
-> <details>
->   <summary>ℹ️ <i>See More Information</i></summary>
->
->   This node acts as a receiver and editor for text sent from two sources.
-action widget:
-- use_input: pass the input text as it without modification.
-- use_edit_mute_input: pass the edited texts in the widgets and mute the source node of the input(s).
-
-If you just need one text input then I recommend using [ImagineerNL's original node](https://github.com/ImagineerNL/ComfyUI-IMGNR-Utils).
-> </details>
-
-------
-
 ### Y7 Prompt Enhancer (Native)
 
 > Takes any basic prompt and enhances it using a text encoder that ComfyUI has already loaded, via a `CLIP` input. Downloads nothing, loads nothing, and leaves all VRAM management to ComfyUI. Reasoning is separated from the prompt automatically.
