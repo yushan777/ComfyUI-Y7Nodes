@@ -10,7 +10,6 @@ from .nodes.image_size_presets import Y7Nodes_ImageSizePresets
 from .nodes.crop_to_nearest_multiple import Y7Nodes_CropToNearestMultiple
 from .nodes.color_match_masked import Y7Nodes_ColorMatchMasked
 from .nodes.aspect_ratio_picker import Y7Nodes_AspectRatioPicker
-from .nodes.lm_studio import Y7Nodes_LMStudioText, Y7Nodes_LMStudioVision, Y7Nodes_SelectLMSModel
 from .nodes.sampler_select_name import SamplerSelect_Name
 from .nodes.paste_cropped_image_back import Y7Nodes_PasteCroppedImageBack
 from .nodes.scale_image_to_total_pixels import Y7Nodes_ScaleImageToTotalPixels
@@ -35,9 +34,6 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_CropToNearestMultiple": Y7Nodes_CropToNearestMultiple,
     "Y7Nodes_ColorMatchMasked": Y7Nodes_ColorMatchMasked,
     "Y7Nodes_AspectRatioPicker": Y7Nodes_AspectRatioPicker,
-    "Y7Nodes_LMStudioText": Y7Nodes_LMStudioText,
-    "Y7Nodes_LMStudioVision": Y7Nodes_LMStudioVision,
-    "Y7Nodes_SelectLMSModel": Y7Nodes_SelectLMSModel,
     "SamplerSelect_Name": SamplerSelect_Name,
     "Y7Nodes_PasteCroppedImageBack": Y7Nodes_PasteCroppedImageBack,
     "Y7Nodes_ScaleImageToTotalPixels": Y7Nodes_ScaleImageToTotalPixels,
@@ -63,9 +59,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_CropToNearestMultiple": "Y7 Crop to Nearest Multiple",
     "Y7Nodes_ColorMatchMasked": "Y7 Color Match (Masked)",
     "Y7Nodes_AspectRatioPicker": "Y7 Aspect Ratio Picker",
-    "Y7Nodes_LMStudioText": "Y7 LM Studio (Text)",
-    "Y7Nodes_LMStudioVision": "Y7 LM Studio (Vision)",
-    "Y7Nodes_SelectLMSModel": "Y7 Select LMS Model",
     "SamplerSelect_Name": "Sampler Select (Name)",
     "Y7Nodes_PasteCroppedImageBack": "Y7 Paste Cropped Image Back",
     "Y7Nodes_ScaleImageToTotalPixels": "Y7 Scale Image to Total Pixels",

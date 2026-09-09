@@ -62,7 +62,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ---
 
-### Show Anything
+### Y7 Show Anything
 
 > Takes input from any (most?) nodes and displays it in a readable format and provides a Copy Text button for easily copying the displayed content.
 >
@@ -73,6 +73,12 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   - Based on other nodes that already work just fine. I just always wanted one with a `copy text` button for easy copying of long generated prompts (for editing or use elsewhere). It will primarily show `string, integer, float and boolean` values directly but will also (try to) display tensor data.
 >
 > </details>
+
+---
+
+### Y7 Text
+
+> A plain multiline text box that passes its contents straight through to a `STRING` output. Useful as a shared prompt source that several nodes can read from.
 
 ---
 
@@ -112,7 +118,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ---
 
-### CLIP Token Counter
+### Y7 CLIP Token Counter
 
 > Takes text (string) as input and, using the CLIP tokenizer, displays token count and more:
 > 
@@ -131,7 +137,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ---
 
-### T5 Token Counter
+### Y7 T5 Token Counter
 
 > Takes text (string) as input and, using the T5 XXL tokenizer, displays token count and more:
 > 
@@ -215,145 +221,6 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ------
 
-### LM Studio Nodes — Prerequisites
-
-> The **LM Studio (Text)**, **LM Studio (Vision)**, and **Select LMS Model** nodes all require a running [LM Studio](https://lmstudio.ai/) server. LM Studio is a free desktop application for running LLMs locally.
->
-> <details>
->   <summary>ℹ️ <i>LM Studio Server Setup</i></summary>
->   
->   **Local Setup (same machine as ComfyUI):**
->   
->   1. Download and install [LM Studio](https://lmstudio.ai/)
->   2. Download a model through the LM Studio interface (for vision nodes, ensure you pick a VL model, e.g. Qwen2.5-VL, Gemma3, etc.)
->   3. Load the model in LM Studio
->   4. Start the local server: go to the **Developer** tab (or **Local Server** in older versions) and click **Start Server**
->   5. By default, the server runs on `localhost:1234` — this matches the default `ip` and `port` values in the nodes
->   
->   **Network Setup (LM Studio on a different machine):**
->   
->   If LM Studio is running on another machine on your network:
->   
->   1. In LM Studio's server settings, enable **Serve on Local Network** (this binds the server to `0.0.0.0` instead of `127.0.0.1`)
->   2. Note the IP address of the machine running LM Studio (e.g., `192.168.1.100`)
->   3. In the ComfyUI node, set the `ip` field to that machine's IP address and ensure the `port` matches (default: `1234`)
->   4. Make sure there are no firewall rules blocking the port between the two machines
->   
->   **Model Identifier:**
->   
->   The `model_identifier` should match the model name as it appears in LM Studio. You can use the **Select LMS Model** node to pick from a predefined list stored in `comfyui-y7nodes/lms_config/models.txt` (one model name per line).
->   
->   **Python Package:**
->   
->   These nodes require the `lmstudio` Python SDK: `pip install lmstudio`
->
-> </details>
-
----
-
-### Y7 LM Studio (Text)
-
-> Send text prompts to a local LM Studio server for text generation and prompt enhancement using any LLM loaded in LM Studio. Supports speculative decoding via a draft model.
->
-> <details>
->   <summary>ℹ️ <i>See More Information</i></summary>
->   
->   Connects to an LM Studio server and sends a text prompt along with a system message to guide the model's behavior. The default system message is optimized for AI image prompt enhancement, but can be customized for any text generation task.
->   
->   **Key Features:**
->   
->   - **System Message**: Customizable system prompt that guides the LLM's behavior (default: image prompt enhancement)
->   - **Draft Model**: Optional speculative decoding support for faster generation
->   - **Reasoning Extraction**: Automatically separates thinking/reasoning blocks from the response
->   - **Memory Management**: Options to unload the LLM after generation and/or free ComfyUI VRAM beforehand
->   - **Fallback Handling**: Automatically retries with an alternative chat template if the first attempt fails
->   
->   **Inputs:**
->   
->   - `prompt`: The text prompt to send to the LLM (connected from another node)
->   - `model_identifier`: The model name/identifier loaded in LM Studio (connect a Select LMS Model node or type manually)
->   - `draft_model`: Optional speculative decoding draft model name (leave empty to disable)
->   - `system_message`: System prompt that guides the LLM's behavior
->   - `reasoning_tag`: Tag name used to extract reasoning blocks (e.g., `think` for `<think>...</think>`)
->   - `ip` / `port`: LM Studio server address (default: localhost:1234)
->   - `temperature`: Controls randomness (0.01–1.0, default 0.7)
->   - `max_tokens`: Maximum tokens to generate (-1 for unlimited)
->   - `unload_llm`: Unload the LLM from LM Studio after generation
->   - `unload_comfy_models`: Free VRAM by unloading ComfyUI models before running the LLM
->   
->   **Outputs:**
->   
->   - `Extended Prompt`: The generated text with reasoning blocks removed
->   - `Reasoning`: The extracted reasoning content (if present)
->   
->   **Requirements:**
->   
->   - LM Studio running locally (or on a network-accessible machine)
->
-> </details>
-
----
-
-### Y7 LM Studio (Vision)
-
-> Send an image to a vision-capable LLM (VL model) in LM Studio for analysis and description. The instruction is provided via the system message — no separate text prompt input.
->
-> <details>
->   <summary>ℹ️ <i>See More Information</i></summary>
->   
->   Connects to an LM Studio server and sends an image along with an instruction to a vision-language (VL) model. The system message acts as the sole instruction for how the model should interpret the image. The model must be vision-enabled or an error will be raised.
->   
->   **Key Features:**
->   
->   - **Vision-First Design**: Image is a required input — purpose-built for VL models
->   - **Instruction via System Message**: The system message is sent alongside the image as the user instruction (default: detailed image description)
->   - **Model Validation**: Checks that the loaded model supports vision before proceeding
->   - **Reasoning Extraction**: Automatically separates thinking/reasoning blocks from the response
->   - **Memory Management**: Options to unload the LLM after generation and/or free ComfyUI VRAM beforehand
->   
->   **Inputs:**
->   
->   - `image`: The image to analyze (required)
->   - `model_identifier`: The VL model name/identifier loaded in LM Studio (connect a Select LMS Model node or type manually)
->   - `system_message`: The instruction sent alongside the image (default: describe the image in detail)
->   - `reasoning_tag`: Tag name used to extract reasoning blocks (e.g., `think` for `<think>...</think>`)
->   - `ip` / `port`: LM Studio server address (default: localhost:1234)
->   - `temperature`: Controls randomness (0.01–1.0, default 0.7)
->   - `max_tokens`: Maximum tokens to generate (-1 for unlimited)
->   - `unload_llm`: Unload the LLM from LM Studio after generation
->   - `unload_comfy_models`: Free VRAM by unloading ComfyUI models before running the LLM
->   
->   **Outputs:**
->   
->   - `Response`: The model's analysis/description with reasoning blocks removed
->   - `Reasoning`: The extracted reasoning content (if present)
->   
->   **Requirements:**
->   
->   - LM Studio running locally (or on a network-accessible machine)
->   - A vision-capable model loaded in LM Studio (non-vision models will raise an error)`
->
-> </details>
-
----
-
-### Y7 Select LMS Model
-
-> Select an LM Studio model from a predefined list stored in a text file. Outputs the model identifier string to connect to the LM Studio Text or Vision nodes.
->
-> <details>
->   <summary>ℹ️ <i>See More Information</i></summary>
->   
->   Provides a dropdown of model identifiers loaded from `comfyui-y7nodes/lms_config/models.txt`. Add your favorite model names (one per line) to this file.
->   
->   **Output:**
->   
->   - `model_id`: The selected model identifier string
->
-> </details>
-
----
-
 ### Y7 Image Batch Path
 
 > Load a batch of images from a directory and output them as a list of image tensors with matching file paths. Designed to pair with Caption Saver and a VLM node for batch captioning workflows.
@@ -406,7 +273,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ---
 
-### Y7 Image Size Presets
+### Y7 Image Size (Presets)
 > Select predefined image size/aspect ratios from a named preset set. Provides width and height outputs.
 >
 > <details>
@@ -497,7 +364,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ---
 
-### Y7 Crop to Resolution
+### Y7 Crop to Nearest Multiple
 > Automatically crops images to ensure dimensions are divisible by a specified value (e.g., 8 or 16), with visual preview of crop areas and independent horizontal/vertical control.
 >
 > <details>
@@ -517,13 +384,13 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   **Inputs:**
 >   
 >   - `multiple`: The value dimensions must be a multiple of (default: 16). Common values are 8 or 16 for most AI models
->   - `horizontal_crop`: Where to keep content when width needs adjustment - `center`, `left`, `right`, or `none`
->   - `vertical_crop`: Where to keep content when height needs adjustment - `center`, `top`, `bottom`, or `none`
+>   - `h_crop`: Where to keep content when width needs adjustment - `center`, `left`, `right`, or `none`
+>   - `v_crop`: Where to keep content when height needs adjustment - `center`, `top`, `bottom`, or `none`
 >   
 >   **Outputs:**
 >   
 >   - `crop_preview`: Original image with red overlay showing what will be cropped (useful for previewing before committing)
->   - `image`: The cropped result (or original if no cropping needed)
+>   - `cropped_image`: The cropped result (or original if no cropping needed)
 >   - `info`: Status message with dimension details and cropping information
 >   
 >   **Behavior Notes:**
@@ -538,6 +405,34 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   - Preparing images for models that require specific dimension constraints
 >   - Cropping images from one dimension while keeping the other intact
 >   - Quick visual verification of crop areas before applying
+>
+> </details>
+
+---
+
+### Y7 Color Match (Masked)
+
+> Colour matches a target image to a reference while excluding masked regions from the calculation on **both** images.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   The use case is inpainting. Change a red car to blue and the rest of the image often picks up a colour shift, but a plain colour-match node will read the new blue car as part of the picture and skew the correction. This node calculates the transfer from the non-masked areas only (the background), applies it to those same areas, and leaves the inpainted region untouched.
+>
+>   **Inputs:**
+>
+>   - `image_ref`: Reference image — e.g. the original, before inpainting
+>   - `image_target`: Image to correct — e.g. the result after inpainting
+>   - `method`: Colour transfer method — `mkl`, `hm`, `reinhard`, `mvgd`, `hm-mvgd-hm`, or `hm-mkl-hm`
+>   - `mask` (optional): White (1.0) marks the region to **exclude** from matching. With no mask connected, the whole image is matched
+>   - `strength` (optional): Blend between the original and the corrected result (0.0–1.0, default 1.0)
+>   - `feather` (optional): Blur radius in pixels for the mask edge transition (0–100, default 0)
+>
+>   **Outputs:**
+>
+>   - `image`: The colour-corrected image
+>
+>   Requires the `color-matcher` package (included in `requirements.txt`). Based on the ColorMatch node from kijai's ComfyUI-KJNodes.
 >
 > </details>
 
@@ -584,13 +479,168 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ---
 
+### Y7 Pad Image for Outpainting
+
+> Pads an image ready for outpainting, with the padding snapped to a chosen step and a choice of what to fill the new area with.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   A rework of ComfyUI's built-in `ImagePadForOutpaint`. Three differences: padding is rounded to a multiple of `step` so the padded canvas stays a size the model is happy with, the new area can be filled with something more useful than flat grey, and the feathering is vectorised rather than looping over every pixel in Python.
+>
+>   The fill matters more than it sounds like it should — it all gets painted over during the outpaint, but a plausible starting colour tends to give a better result than flat grey.
+>
+>   **Inputs:**
+>
+>   - `image`: The image to pad
+>   - `step`: Padding is rounded to a multiple of this value (default 16). Also sets how far the +/- arrows move each side
+>   - `fill`: What to put in the new area — `grey` (flat 50%, same as the built-in node), `edge replicate` (smears the outermost pixels outwards), `mirror` (reflects the image back on itself), `blurred edge` (a soft blur of the nearby colours), or `noise` (random noise in the image's own colours)
+>   - `feathering`: Width in pixels of the soft fade at the join between the original image and the new area (default 40; 0 gives a hard edge)
+>   - `left` / `top` / `right` / `bottom`: Pixels to add to each edge
+>
+>   **Outputs:**
+>
+>   - `image (original)`: The image exactly as it came in, unpadded
+>   - `image (padded)`: The image on the enlarged canvas, with the new area filled
+>   - `mask`: White over the new area, black over the original image, feathered ramp in between
+>   - `width` / `height`: Dimensions of the padded image (INT)
+>
+> </details>
+
+---
+
 ### Sampler Select (Name)
 
 > Select a sampler by name and output it as a linkable string — works around ComfyUI's built-in KSampler nodes not exposing sampler name as a connectable input.
 
 ---
 
-### Y7 Load Image
+### Y7 Flux.2 Klein Edit Multi-Ref
+
+> All-in-one image editing for Flux.2 Klein with multiple reference images. Pick the image to edit on the node, mask it, wire in extra references, and get back a ready-to-sample reference latent plus patched positive/negative conditioning.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   Flux.2 / Klein accepts a *list* of reference latents on the conditioning, so extra images can be wired in as additional visual context — a character sheet, a style reference, a product shot — alongside the image actually being edited. The list is ordered: the on-node `image` is reference 1, then `ref_image_2`, `ref_image_3` and so on in socket order. The extra sockets grow as you connect them, up to `ref_image_8`.
+>
+>   **Masking** applies to the on-node image and nothing else, whichever route it arrives by — painted in the mask editor, or wired into `external_mask`. The extra references are IMAGE-only and have no mask of their own; a mask ends up as the latent's `noise_mask`, which has to line up cell-for-cell with the latent being denoised, and an arbitrary reference image at an arbitrary size has nothing to align to.
+>
+>   Klein has no mask input of its own and is not a fill/inpaint model, so the mask survives only as that `noise_mask`: the sampler restores everything outside the painted area after each step, in latent space at 1/16 resolution. Two consequences that pull in opposite directions:
+>
+>   - For sampling, feathering is close to a no-op — 4px is bit-identical to no feather once the mask is downsampled 16x, and only ~32px puts real intermediate values into more than one latent cell (where it crossfades partially-denoised latents into a smeared seam rather than a blend).
+>   - For a pixel-space composite downstream (`ImageCompositeMasked`, or **Y7 Paste Cropped Image Back**), the same feather survives at full resolution, where 4–8px is the difference between a hard cut and a soft join. That is why `binary_mask` defaults to off — it would flatten the ramp before either consumer sees it.
+>
+>   Leave the sampler's `denoise` at 1.0. The unmasked area is restored every step regardless, so lowering it does nothing but weaken the edit.
+>
+>   **Prompting:** there is no special syntax for addressing the references. The text encoder never sees the images — they reach the transformer only as latent tokens appended to the sequence, in list order. Refer to them in plain English by position, always paired with a noun: *"Have the man in Figure 1 put on the clothes from Figure 2, and change the background to a savannah"*. `Figure N` is the wording in ComfyUI's own multi-reference Klein template; `image 1` / `the first image` is the same kind of positional reference. Neither is a real token, so both are worth trying if a prompt is not binding to the reference you meant.
+>
+>   **Inputs:**
+>
+>   - `vae`: Used to encode the edited image and every reference
+>   - `image`: The image to edit, picked from the ComfyUI input folder (with upload button and preview). Right-click → Open in MaskEditor to paint a mask
+>   - `target_megapixels`: Resamples the edited image to this pixel budget before encoding (default 1.0; 0 leaves it alone). This is the latent actually being denoised, so it also sets the output resolution. Klein is built for around 1.0
+>   - `ref_megapixels`: The same budget, applied to each reference separately (default 1.0; 0 leaves them alone). It does *not* affect output size. One image plus six references at 1.0 is seven megapixels of work — turn this down first (try 0.5) if you run slow or run out of VRAM
+>   - `crop_2_nearest_16px`: Centre-crops the edited image, its mask and every reference down to a multiple of 16 before encoding (default on)
+>   - `expand_mask`: Grows the painted mask outwards by this many pixels (default 16 — one full latent cell, which compensates for a tightly painted edge being clipped inward by the downsample). Try 24–32 for hair, fur or soft edges
+>   - `feather_mask`: Gaussian softening of the mask edge (default 8). See the note above on where this actually matters
+>   - `binary_mask`: Applied last — thresholds the mask to hard edges (default off)
+>   - `external_mask` (optional): A mask from anywhere else, used instead of a painted one. Note: with Load Image (as Mask) on a plain black-and-white file, set its channel to `red` — on `alpha` it hands back an empty mask
+>   - `ref_image_2` … `ref_image_8` (optional): Extra reference images. Connect one and another empty socket appears
+>   - `positive` / `negative` (optional): Conditioning to extend with the reference latents
+>
+>   **Outputs:**
+>
+>   - `reference_latent`: The encoded (and resampled) edited image, ready to sample
+>   - `positive` / `negative`: Conditioning with the reference latents attached
+>   - `preview_image`: The edited image as it was actually encoded
+>   - `preview_mask`: The processed mask, after expand/feather/binary
+>   - `debug`: What the node actually did — sizes in and out, mask state, every reference socket, and the token cost of the whole reference list. Wire it into **Y7 Show Anything** when something looks wrong
+>
+>   Works with all flux.2-klein variants (base, distilled, 4B/8B text encoder).
+>
+> </details>
+
+---
+
+### Y7 Flux.2 Sampler
+
+> All-in-one Flux.2 sampler: `RandomNoise`, `KSamplerSelect`, `Flux2Scheduler`, `CFGGuider` and `SamplerCustomAdvanced` compacted into a single node.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   Sampling a Flux.2 (including Klein) model normally means wiring five nodes together. This node takes one input side — model, positive, negative, latent — and gives back the denoised latent, ready for VAE decode.
+>
+>   There are no width/height widgets. `Flux2Scheduler`'s are dropped because the sigma schedule's `seq_len` is derived from `latent_image`'s own dimensions instead, so it cannot drift out of sync with the latent being sampled.
+>
+>   **Inputs:**
+>
+>   - `model`: The diffusion model to sample with
+>   - `latent_image`: The latent to denoise — e.g. from Empty Flux.2 Latent Image, or from the Klein Edit node
+>   - `positive` / `negative`: Conditioning. The negative is ignored by the guider when `cfg` is 1.0
+>   - `seed`: Seed for the initial noise
+>   - `cfg`: Guidance scale (default 1.0 — Klein checkpoints are typically guidance-distilled)
+>   - `sampler_name`: Which sampler algorithm to step with (default `euler`)
+>   - `steps`: Sampling steps (default 4 — distilled Klein checkpoints commonly need no more)
+>   - `denoise`: How much of the schedule to run (default 1.0). It shortens the run as well as the noise level, so at 4 steps only a handful of settings are reachable, and Flux.2's schedule means even 0.5 keeps under 10% of the incoming image. Leave it at 1.0 unless you specifically want this
+>
+>   **Outputs:**
+>
+>   - `output`: The denoised latent
+>
+> </details>
+
+---
+
+### Y7 Flux.2 Klein Upscaler (Tiled)
+
+> Enlarges an image and repaints it one tile at a time with Flux.2 Klein, so you can go far past the size the model or the card could manage in one pass. The sampler, scheduler and guider are built in.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   Each tile is treated as a small inpaint: the middle is regenerated while a band of surrounding pixels is held frozen as context, so neighbouring tiles agree with each other instead of each inventing its own idea of what is there. Nothing larger than a single tile is ever encoded or decoded, which is what keeps VRAM flat as the canvas grows — `tile_size`, not the finished size, is what determines peak memory.
+>
+>   Ported from [ComfyUI_KleinTiledUpscaler](https://github.com/Gavr728/ComfyUI_KleinTiledUpscaler) by Gavr728 (MIT). The frozen-padding anchoring, the separable blend profiles and the shared canvas noise field are that project's ideas. What is done differently here:
+>
+>   - **All-in-one.** Upstream needs CFGGuider + KSamplerSelect + Flux2Scheduler (and usually SplitSigmasDenoise) wired in front of it. This node builds the guider, the sampler and the schedule itself, and gives the negative conditioning the same per-tile treatment as the positive.
+>   - **Per-tile sigma schedule.** Flux.2's schedule shift is a function of how many tokens are being sampled, and a tile is not the whole canvas. Every tile gets a schedule built from its own latent size.
+>   - **Partition-of-unity blending** instead of sequential lerp plus a `mask_blur` widget. Tile weights are complementary raised-cosine ramps centred on each shared boundary, summing to exactly 1.0, so seams are correct by construction and there is nothing to tune.
+>   - **No full-canvas VAE encode**, which is the exact thing tiling exists to avoid.
+>   - **Tile layout rewritten** — the grid is derived once, the remainder spread evenly across tiles, and the result printed in the report.
+>   - **Per-tile sampler seed**, so ancestral and SDE samplers do not repeat the same texture across the picture.
+>
+>   **Inputs:**
+>
+>   - `model` / `vae`: The Klein model and the VAE used for every tile encode/decode
+>   - `image`: The picture to enlarge. A batch is processed one image at a time
+>   - `positive`: Keep it a short description of the picture as a whole, or leave it empty — it is applied to every tile, so anything naming a specific object will try to put that object in all of them
+>   - `negative`: Ignored unless `cfg` is above 1.0
+>   - `seed`
+>   - `scale_factor`: How much bigger to make the picture (default 2.0). **1.0 is a useful setting** — no enlargement, but every tile is still repainted, which turns the node into a sharpen/refine pass. With 1.0, leave `upscale_model` unplugged and use `refine_strength` (0.85–0.92) to control how much changes
+>   - `tile_size`: Roughly how big each tile is (default 1024). This is what decides VRAM. Turn it down if you run out of memory, up if tiles are inventing detail that does not belong
+>   - `overlap`: How far each tile looks past its own edges (default 128). Raising it helps things that run across a seam — a roofline, a horizon — stay joined up
+>   - `steps`: Per tile (default 4)
+>   - `cfg`: Leave at 1.0 for distilled checkpoints. Above 1.0 every tile costs twice as much
+>   - `sampler_name`
+>   - `denoise`: How much each tile may change (default 1.0, which is normally what you want here)
+>   - `color_match`: Nudges each finished tile back towards the colours of the enlarged original so tiles do not drift apart in tone (default `mkl`; `off` disables)
+>   - `refine_strength` *(advanced)*: Restrains the model at every sampler step rather than fading the finished tile afterwards, which makes it a better detail dial than `denoise`. 1.0 repaints completely; 0.92 is a good first try; 0.85 is strongly held back
+>   - `reference_source` *(advanced)*: What each tile is told it is looking at — `enlarged` (always the plain enlargement, predictable) or `progressive` (the tile's surroundings as they stand, including finished neighbours; more consistent, but mistakes can compound). Try `enlarged` first
+>   - `upscale_model` *(optional)*: An ESRGAN-style upscaler to enlarge with before the tiles are repainted; plain bicubic is used without one. Pick a clean, neutral model rather than a sharp one — the enlargement becomes the frozen context and the reference every tile works from, so halos and invented texture get copied rather than fixed. `4xRealWebPhoto_v4_dat2`, `4xNomosUniDAT_otf` and `RealESRGAN_x4plus` are good; anything with "Sharp" in the name is not. Its result is always resized to exactly `scale_factor`, so a 4x model at scale_factor 2 is fine (better, even), but a 2x model at scale_factor 4 leaves half the enlargement to bicubic
+>
+>   **Outputs:**
+>
+>   - `image`: The finished picture
+>   - `latent`: The same picture in latent form, blended with identical geometry, so it can be fed onward without a re-encode
+>   - `report`: Canvas size, the grid chosen, tile and crop sizes, and a check that the blend weights really do sum to 1
+>
+> </details>
+
+---
+
+### Y7 Load Image (subfolders)
 
 > The native ComfyUI Load Image node only lists files directly in the `input` folder. This node is identical except it walks the full `input` directory tree, so images organised into subdirectories appear in the dropdown.
 >
@@ -600,7 +650,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ## Example Workflows
 
-Example workflows can be found in the `workflows` directory. 
+Example workflows can be found in the `example_workflows` directory. 
 
 ## License
 
@@ -610,3 +660,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - ShowAnything node is based on "Show Any" from yolain's ComfyUI-Easy-Use custom nodes and "Show Any To JSON" from crystian's ComfyUI-Crystools custom nodes, with additional formatting controls and a Copy Text button.
 - Help popup system is based on the implementation from Kosinkadink's ComfyUI-VideoHelperSuite.
+- Color Match (Masked) is based on the ColorMatch node from kijai's ComfyUI-KJNodes, using the [color-matcher](https://github.com/hahnec/color-matcher) library.
+- Flux.2 Klein Upscaler (Tiled) is ported from [ComfyUI_KleinTiledUpscaler](https://github.com/Gavr728/ComfyUI_KleinTiledUpscaler) by Gavr728 (MIT).

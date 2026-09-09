@@ -1,14 +1,16 @@
 1.0.57
-- All nodes updated to V3 schema
 - Added Flux.2 Klein Edit Multi-Ref All-In-One node
 - Added Flux.2 Sampler All-In-One node
 - Added Flux.2 Klein Upscaler (Tiled) All-In-One node
 - Updated Image Compare node with copy functionality to copy image B to clipboard
 - Added more example workflows
+- Removed LM Studio nodes (Text, Vision, Select LMS Model). The native Prompt Enhancer and
+  ComfyUI's own Load CLIP + Generate Text cover the same ground without a second server.
+  Drops the lmstudio SDK dependency.
 - Removed Catch and Edit Text (Dual) node. Only really useful for Flux.1 workflows which i no longer use.
   For single blocks of text, use the original CatchEditTextNode by ImagineerNL
   (https://github.com/ImagineerNL/ComfyUI-IMGNR-Utils) which it was based on.
-
+- All remaining nodes updated to V3 schema
 
 1.0.56
 - updated Load Image (subfolders) node to V3 schema
