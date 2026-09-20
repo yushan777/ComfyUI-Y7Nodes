@@ -1,3 +1,7 @@
+1.0.58
+- Added Float Node with increment/decrement functionality
+- Added customised Save Image Node
+
 1.0.57
 - Added Flux.2 Klein Edit Multi-Ref All-In-One node
 - Added Flux.2 Sampler All-In-One node

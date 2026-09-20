@@ -2,6 +2,7 @@
 # from .nodes.template_node import Y7_TemplateNode
 from .nodes.documentation import format_descriptions
 from .nodes.text import Y7Nodes_Text
+from .nodes.float import Y7Nodes_Float
 from .nodes.show_anything import Y7Nodes_ShowAnything
 from .nodes.prompt_enhancer_native import Y7Nodes_PromptEnhancerNative
 from .nodes.t5_token_count import Y7Nodes_T5_TokenCounter
@@ -16,6 +17,7 @@ from .nodes.scale_image_to_total_pixels import Y7Nodes_ScaleImageToTotalPixels
 from .nodes.scale_image_by import Y7Nodes_ScaleImageBy
 from .nodes.caption_tools import Y7Nodes_ImageBatchPath, Y7Nodes_CaptionSaver
 from .nodes.load_image import Y7Nodes_LoadImage
+from .nodes.save_image import Y7Nodes_SaveImage
 from .nodes.image_stitcher import Y7Nodes_ImageStitcher
 from .nodes.image_compare import Y7Nodes_ImageCompare
 from .nodes.resolutionselector import Y7Nodes_ResolutionSelector
@@ -27,6 +29,7 @@ from .nodes.flux2_klein_upscaler import Y7Nodes_Flux2KleinUpscaler
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageSizePresets": Y7Nodes_ImageSizePresets,
     "Y7Nodes_Text": Y7Nodes_Text,
+    "Y7Nodes_Float": Y7Nodes_Float,
     "Y7Nodes_ShowAnything": Y7Nodes_ShowAnything,
     "Y7Nodes_PromptEnhancerNative": Y7Nodes_PromptEnhancerNative,
     "Y7Nodes_T5_TokenCounter": Y7Nodes_T5_TokenCounter,
@@ -41,6 +44,7 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageBatchPath": Y7Nodes_ImageBatchPath,
     "Y7Nodes_CaptionSaver": Y7Nodes_CaptionSaver,
     "Y7Nodes_LoadImage": Y7Nodes_LoadImage,
+    "Y7Nodes_SaveImage": Y7Nodes_SaveImage,
     "Y7Nodes_ImageStitcher": Y7Nodes_ImageStitcher,
     "Y7Nodes_ImageCompare": Y7Nodes_ImageCompare,
     "Y7Nodes_ResolutionSelector": Y7Nodes_ResolutionSelector,
@@ -52,6 +56,7 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageSizePresets" : "Y7 Image Size (Presets)",
     "Y7Nodes_Text": "Y7 Text",
+    "Y7Nodes_Float": "Y7 Float",
     "Y7Nodes_ShowAnything": "Y7 Show Anything",
     "Y7Nodes_PromptEnhancerNative": "Y7 Prompt Enhancer (Native)",
     "Y7Nodes_T5_TokenCounter": "Y7 T5 Token Counter",

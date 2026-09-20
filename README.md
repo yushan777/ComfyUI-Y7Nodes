@@ -82,6 +82,22 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ---
 
+### Y7 Float
+
+> The native Float node with a `control_after_generate` widget: `fixed` (the default) leaves the value alone, `increment` and `decrement` move it by `step` each time a prompt is queued. Unlike the seed widget it copies, the amount is yours to set - `step` is a widget on the node rather than the value widget's own step size - so a run can walk `denoise`, a LoRA strength or a CFG value across whatever range you like. `value` is shown to 2 decimal places.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   - Whether the value moves before or after the prompt is sent follows ComfyUI's own `Widget Control Mode` setting. On `after` (the default) the number on the node is the one that will be used next; on `before` it's the one that was just used.
+>   - With a batch count the value moves once per prompt, so each queued prompt gets its own number.
+>   - `value` steps by `0.01` when dragged or typed into, which is where the 2 decimal places come from. A finer `step` still works, but the displayed number will be rounded.
+>   - Converting `value` to an input and connecting something to it turns the stepping off - the incoming link supplies the number instead.
+>
+> </details>
+
+---
+
 ### Y7 Image Stitcher
 
 > Stitches 2–8 images side-by-side or top-to-bottom. The `image_count` widget controls how many image sockets are shown on the node.
@@ -645,6 +661,52 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 > The native ComfyUI Load Image node only lists files directly in the `input` folder. This node is identical except it walks the full `input` directory tree, so images organised into subdirectories appear in the dropdown.
 >
 > Outputs `image` (IMAGE) and `mask` (MASK), same as the built-in node.
+
+---
+
+### Y7 Save Image
+
+> The native ComfyUI Save Image node, plus `sub_folder`, counter and `bit_depth` options, and a `save_or_preview` switch: `preview` shows the images on the node like Preview Image without writing them to `output`, so one node covers both trying things out and keeping results. `sub_folder` sets the folder inside `output` to save to, instead of writing it into the filename (`a/b/name`, which still works too). `8-bit` writes the same file as the built-in node; `16-bit` writes a 16-bit PNG, keeping the finer tonal steps the image carries so smooth gradients hold up better under later grading or editing, at roughly 4–5× the file size.
+>
+> `filename_prefix` tokens (`%date:yyyy-MM-dd%`, `%Empty Latent Image.width%`, …) and the embedded prompt/workflow metadata behave as they do in the built-in node, in both modes. One addition: in `%Node.widget%`, `widget` can also be a name you've renamed a widget to. The real name is tried first, then renamed labels, so `%Float.denoise%` finds a Float node whose `value` widget you renamed to `denoise`. `Node` can also be a node ID, e.g. `%73.denoise%`, for top-level nodes only; a node titled `73` takes priority. IDs change when a node is copied or pasted into another workflow, so titles are the safer choice for reuse. Add `:N` after the widget to round a number to N decimal places, e.g. `%Float.value:2%` gives `0.80` rather than `0.8`, so names sort and line up.
+>
+> The counter is padded to `counter_digits` (default 4) with no trailing underscore: `img_0001.png` rather than `img_00001_.png`. With `counter_per_folder` on (the default), one counter runs through every image in the folder whatever its prefix, carrying on from any files already there; off gives each prefix its own counter, as the built-in node does.
+>
+> The defaults save to a folder per day, named by the time the prompt was queued: `sub_folder` = `foldername/%date:yyyy-MM-dd%` and `filename_prefix` = `img_%date:hhmmss%` give `output/foldername/2026-09-19/img_140507_0001.png`, then `img_140512_0002.png` and so on through the day.
+>
+> <details>
+>   <summary>ℹ️ <i>Date and time in folder and file names</i></summary>
+>
+>   Both `sub_folder` and `filename_prefix` accept date and time tokens, and the two kinds can be mixed.
+>
+>   **`%date:FORMAT%`** is filled in when the prompt is queued. FORMAT is built from:
+>
+>   | Token | Meaning | Example |
+>   | --- | --- | --- |
+>   | `yyyy` / `yy` | year | `2026` / `26` |
+>   | `MM` / `M` | month (zero-padded / not) | `09` / `9` |
+>   | `dd` / `d` | day | `19` |
+>   | `hh` / `h` | hour, 24-hour clock | `14` |
+>   | `mm` / `m` | minute (lower case, unlike month) | `05` |
+>   | `ss` / `s` | second | `07` |
+>
+>   **`%year%`, `%month%`, `%day%`, `%hour%`, `%minute%`, `%second%`** are a fixed-format alternative, already zero-padded, filled in when the file is saved.
+>
+>   **Examples:**
+>
+>   - `sub_folder` = `%date:yyyy-MM-dd%` → `output/2026-09-19/`
+>   - `sub_folder` = `renders/%date:yyyy-MM%/%date:dd%` → `output/renders/2026-09/19/`
+>   - `filename_prefix` = `%date:yyyy-MM-dd_hhmmss%_flux` → `2026-09-19_140507_flux_0001.png`
+>   - `sub_folder` = `%year%-%month%-%day%`, `filename_prefix` = `img_%hour%%minute%%second%`
+>
+>   **Things to avoid:**
+>
+>   - Dots inside `%date:…%`. Dots separate `%Node.widget%` references, so `%date:yyyy.MM.dd%` comes out as just the year and `%date:yyyy.MM%` isn't replaced at all. Use `-` or `_`, or put the dot outside the token: `%date:yyyy%.%date:MM%`
+>   - Colons in the time (`hh:mm`). Linux accepts them but they're invalid in Windows file names
+>   - `%date:…%` uses the browser's clock when you queue; the `%year%`-style tokens use the server's clock when the file is saved. This only matters if ComfyUI runs on another machine or time zone, or the job waits a long time in the queue
+>   - API and scripted runs: "Export (API)" goes through the browser, so it saves the date and time of the export into the JSON, and every run of that file uses them. To get the run's own date, put the raw token (e.g. `%date:yyyy-MM-dd%`) back into the exported JSON: the node fills in any `%date:…%` that arrives unreplaced, using the server's clock when the file is saved. `%Node.widget%` tokens are browser-only and have no such fallback
+>
+> </details>
 
 ---
 
