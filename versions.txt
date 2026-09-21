@@ -1,3 +1,6 @@
+1.0.59
+- Update to Float Node
+
 1.0.58
 - Added Float Node with increment/decrement functionality
 - Added customised Save Image Node
