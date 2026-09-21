@@ -23,24 +23,34 @@ function collectAllNodes(graph) {
     return nodes;
 }
 
-// The first widget, across `nodes`, whose label is `label`. Renaming a widget keeps its real name
-// and stores the new one as a label on the widget or its input socket.
+// The input socket the frontend gives a widget, which carries its type (INT, FLOAT, ...)
+function widgetInput(node, widget) {
+    return node.inputs?.find((i) => i.widget?.name === widget.name);
+}
+
+// The first widget, across `nodes`, whose label is `label`, with its node. Renaming a widget keeps
+// its real name and stores the new one as a label on the widget or its input socket.
 function findWidgetByLabel(nodes, label) {
     for (const node of nodes) {
         for (const widget of node.widgets ?? []) {
-            const input = node.inputs?.find((i) => i.widget?.name === widget.name);
-            if (widget.label === label || input?.label === label) {
-                return widget;
+            if (widget.label === label || widgetInput(node, widget)?.label === label) {
+                return { node, widget };
             }
         }
     }
     return null;
 }
 
-// A widget value as text, rounded to `decimals` places when it's a number and decimals is set
-function formatValue(value, decimals) {
-    if (decimals !== null && typeof value === "number" && Number.isFinite(value)) {
-        return value.toFixed(decimals);
+// A widget value as text, rounded to `decimals` places when it's a number and decimals is set.
+// Without decimals, a FLOAT keeps at least one decimal place, so 1.0 gives "1.0" rather than "1".
+function formatValue(value, decimals, isFloat) {
+    if (typeof value === "number" && Number.isFinite(value)) {
+        if (decimals !== null) {
+            return value.toFixed(decimals);
+        }
+        if (isFloat && Number.isInteger(value)) {
+            return value.toFixed(1);
+        }
     }
     return String(value ?? "");
 }
@@ -57,9 +67,10 @@ function formatValue(value, decimals) {
 //      used. Subgraph nodes are skipped because their IDs can repeat those at the top level.
 //      Checked last, so a node titled "73" still wins over node 73.
 //   3. If the first matching node has a widget with that real name, it is used. For S&R and
-//      title matches the token goes to the frontend unchanged, so %KSampler.denoise% and
-//      %Float.value% behave exactly as native; ID matches are resolved here, as the frontend
-//      can't find them.
+//      title matches of non-FLOAT widgets the token goes to the frontend unchanged, so
+//      %KSampler.seed% behaves exactly as native; ID matches and FLOAT widgets are resolved
+//      here, the first because the frontend can't find them, the second so they keep a
+//      decimal place (the frontend writes 1.0 as "1").
 //   4. Otherwise the first widget across all matching nodes whose label (on the widget or its
 //      input socket) matches is used, so with two Floats %Float.denoise% finds the renamed one.
 //   5. Otherwise the token goes to the frontend, which leaves it as is, as native does.
@@ -88,14 +99,14 @@ function replaceTokens(graph, value, applyTextReplacements) {
             }
 
             const realNameWidget = matches[0]?.widgets?.find((w) => w.name === widgetName);
-            let widget = null;
-            if (!realNameWidget) {
-                widget = findWidgetByLabel(matches, widgetName);
-            } else if (matchedById || decimals !== null) {
-                widget = realNameWidget;
-            }
-            if (widget) {
-                return formatValue(widget.value, decimals).replace(UNSAFE_FILENAME_CHARS, "_");
+            const found = realNameWidget
+                ? { node: matches[0], widget: realNameWidget }
+                : findWidgetByLabel(matches, widgetName);
+            if (found) {
+                const isFloat = widgetInput(found.node, found.widget)?.type === "FLOAT";
+                if (!realNameWidget || matchedById || decimals !== null || isFloat) {
+                    return formatValue(found.widget.value, decimals, isFloat).replace(UNSAFE_FILENAME_CHARS, "_");
+                }
             }
         }
         // Everything else (real widget names, %date:...%, unknown tokens) is left to the frontend
