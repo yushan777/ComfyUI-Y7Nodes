@@ -531,6 +531,22 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ---
 
+### Switch (model)
+
+> Several `MODEL` sockets and a `select` number: only the selected model comes out. A new empty socket appears each time the last one is connected, up to ten. The inputs are lazy, so the loaders feeding the unselected sockets never run and their weights are never read from disk - handy for flipping between diffusion models without re-wiring or paying to load all of them.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   - `select` is 1-based: `1` picks `model_1`, and so on. The socket number actually used comes out on the `selected_index` output.
+>   - The sockets only accept `MODEL`, so a Load Diffusion Model (or Load Checkpoint / LoRA) output connects and anything else is refused.
+>   - The `select` widget follows the connected sockets: its maximum tracks the highest connected socket, and an out-of-range value is moved down to a connected one when sockets are connected/disconnected or the workflow loads.
+  - If a linked `select` value points at a socket with nothing connected, the node falls back to the highest connected socket below it (so a `select` past the last model picks the last one), or the lowest connected socket if there's none below. It only errors when no model is connected at all.
+>
+> </details>
+
+---
+
 ### Y7 Flux.2 Klein Edit Multi-Ref
 
 > All-in-one image editing for Flux.2 Klein with multiple reference images. Pick the image to edit on the node, mask it, wire in extra references, and get back a ready-to-sample reference latent plus patched positive/negative conditioning.
@@ -723,4 +739,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ShowAnything node is based on "Show Any" from yolain's ComfyUI-Easy-Use custom nodes and "Show Any To JSON" from crystian's ComfyUI-Crystools custom nodes, with additional formatting controls and a Copy Text button.
 - Help popup system is based on the implementation from Kosinkadink's ComfyUI-VideoHelperSuite.
 - Color Match (Masked) is based on the ColorMatch node from kijai's ComfyUI-KJNodes, using the [color-matcher](https://github.com/hahnec/color-matcher) library.
+- Switch (model) is based on "Switch (Any)" from ltdrdata's ComfyUI-Impact-Pack, limited to `MODEL` inputs.
 - Flux.2 Klein Upscaler (Tiled) is ported from [ComfyUI_KleinTiledUpscaler](https://github.com/Gavr728/ComfyUI_KleinTiledUpscaler) by Gavr728 (MIT).

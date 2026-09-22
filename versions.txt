@@ -1,3 +1,6 @@
+1.0.60
+- Added Switch (model) node
+
 1.0.59
 - Update to Float Node
 
