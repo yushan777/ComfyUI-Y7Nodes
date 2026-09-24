@@ -1,24 +1,7 @@
-1.0.62
-- Caption Saver now only writes a caption next to an existing image file (jpg, jpeg, png, webp)
-  and refuses any other path. Previously any path could be passed in, so a workflow could write
-  arbitrary text to any .txt file.
-- Code tidy-up: the inline code CSS in documentation.py is now a CODE_STYLE constant, and the
-  Aspect Ratio Picker's value prompts now use arrow functions. No behaviour change.
-
-1.0.61
-- Republished: 1.0.60 package was missing switch_model.py
-
-1.0.60
+1.0.63
 - Added Switch (model) node
-
-1.0.59
-- Update to Float Node
-
-1.0.58
 - Added Float Node with increment/decrement functionality
 - Added customised Save Image Node
-
-1.0.57
 - Added Flux.2 Klein Edit Multi-Ref All-In-One node
 - Added Flux.2 Sampler All-In-One node
 - Added Flux.2 Klein Upscaler (Tiled) All-In-One node
@@ -31,10 +14,13 @@
   For single blocks of text, use the original CatchEditTextNode by ImagineerNL
   (https://github.com/ImagineerNL/ComfyUI-IMGNR-Utils) which it was based on.
 - All remaining nodes updated to V3 schema
-
-1.0.56
 - updated Load Image (subfolders) node to V3 schema
-
+- Caption Saver now only writes a caption next to an existing image file (jpg, jpeg, png, webp)
+  and refuses any other path. Previously any path could be passed in, so a workflow could write
+  arbitrary text to any .txt file.
+- Code tidy-up: the inline code CSS in documentation.py is now a CODE_STYLE constant, and the
+  Aspect Ratio Picker's value prompts now use arrow functions. No behaviour change.
+  
 1.0.55
 - fixes
 
