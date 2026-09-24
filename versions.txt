@@ -1,3 +1,11 @@
+1.0.62
+- Caption Saver now only writes a caption next to an existing image file (jpg, jpeg, png, webp)
+  and refuses any other path. Previously any path could be passed in, so a workflow could write
+  arbitrary text to any .txt file.
+- Code tidy-up: the inline code CSS in documentation.py is now a CODE_STYLE constant, and the
+  Aspect Ratio Picker's value prompts use arrow functions instead of .bind(this). No behaviour
+  change.
+
 1.0.61
 - Republished: 1.0.60 package was missing switch_model.py
 

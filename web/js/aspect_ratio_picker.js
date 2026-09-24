@@ -147,12 +147,12 @@ class Y7AspectRatioPicker
             {
                 if (e.canvasY - this.pos[1] - 5 < shX)
                 {
-                    canvas.prompt("valueX", this.properties.valueX, function(v) {if (!isNaN(Number(v))) { this.properties.valueX = Math.round(Number(v)); this.onPropertyChanged("valueX");}}.bind(this), e);
+                    canvas.prompt("valueX", this.properties.valueX, (v) => {if (!isNaN(Number(v))) { this.properties.valueX = Math.round(Number(v)); this.onPropertyChanged("valueX");}}, e);
                     return true;
                 }
                 else if (e.canvasY - this.pos[1] - 5 < shY)
                 {
-                    canvas.prompt("valueY", this.properties.valueY, function(v) {if (!isNaN(Number(v))) { this.properties.valueY = Math.round(Number(v)); this.onPropertyChanged("valueY");}}.bind(this), e);
+                    canvas.prompt("valueY", this.properties.valueY, (v) => {if (!isNaN(Number(v))) { this.properties.valueY = Math.round(Number(v)); this.onPropertyChanged("valueY");}}, e);
                     return true;
                 }
             }

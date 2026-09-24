@@ -280,7 +280,7 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 >   **Inputs:**
 >
 >   - `string`: The caption text to write (must be connected)
->   - `image_path`: Full path to the source image (must be connected — e.g. from Image Batch Path)
+>   - `image_path`: Full path to the source image (must be connected — e.g. from Image Batch Path). Must be an existing `.jpg`, `.jpeg`, `.png` or `.webp` file; any other path is refused and nothing is written
 >   - `overwrite`: If true, overwrites any existing `.txt` file. If false, appends a counter to avoid overwriting (e.g. `cat_01.txt`, `cat_02.txt`)
 >
 >   This node has no outputs — it is a terminal/output node.

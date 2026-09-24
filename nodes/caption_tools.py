@@ -9,6 +9,8 @@ from PIL import Image, ImageOps
 
 from comfy_api.latest import io
 
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+
 
 # Loads a batch of images from a directory and returns them as a list of image
 # tensors and a matching list of their full file paths. Supports jpg, jpeg, png,
@@ -74,8 +76,7 @@ class Y7Nodes_ImageBatchPath(io.ComfyNode):
         if not os.path.isdir(image_dir):
             raise FileNotFoundError(f"Directory '{image_dir}' cannot be found.")
 
-        valid_extensions = {".jpg", ".jpeg", ".png", ".webp"}
-        image_files = [f for f in os.listdir(image_dir) if Path(f).suffix.lower() in valid_extensions]
+        image_files = [f for f in os.listdir(image_dir) if Path(f).suffix.lower() in IMAGE_EXTENSIONS]
 
         if not image_files:
             raise FileNotFoundError(f"No valid images found in '{image_dir}'.")
@@ -153,6 +154,12 @@ class Y7Nodes_CaptionSaver(io.ComfyNode):
     def execute(cls, string, image_path, overwrite=True) -> io.NodeOutput:
         try:
             image_path = Path(image_path)
+            # Only write next to an existing image. image_path can come from any
+            # STRING node, so without this a workflow could write arbitrary text
+            # to any .txt path (e.g. a custom node's requirements.txt).
+            if image_path.suffix.lower() not in IMAGE_EXTENSIONS or not image_path.is_file():
+                raise ValueError(f"'{image_path}' is not an existing image file")
+
             txt_path = image_path.with_suffix(".txt")
 
             if not overwrite:

@@ -29,11 +29,20 @@ INDENT_PX = 20  # px added per indent level
 SPACES_PER_INDENT = 2  # leading spaces in the Markdown that make up one indent level
 
 
+# Theme-agnostic inline code styling. Kept as a list
+CODE_STYLE = "; ".join([
+    "border: 1px solid #666",
+    "border-radius: 3px",
+    "padding: 0px 1px",
+    "font-family: monospace",
+    "display: inline-block",
+])
+
+
 def process_highlights(text):
     """Convert `highlighted` parts to code style that works in both light and dark themes"""
     pattern = r'`([^`]+)`'
-    # Theme-agnostic styling:
-    return re.sub(pattern, r'<code style="border: 1px solid #666; border-radius: 3px; padding: 0px 1px; font-family: monospace; display: inline-block;">\1</code>', text)
+    return re.sub(pattern, rf'<code style="{CODE_STYLE}">\1</code>', text)
 
 
 def _short_desc(text):

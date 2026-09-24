@@ -11,7 +11,7 @@ Example: `cat.jpg` → `cat.txt` saved in the same directory.
 Inputs:
 
   - `string`: The caption text to write (required, must be connected)
-  - `image_path`: Full path to the source image (required, must be connected — e.g. from ImageBatchPath)
+  - `image_path`: Full path to the source image (required, must be connected — e.g. from ImageBatchPath). Must be an existing `.jpg`, `.jpeg`, `.png` or `.webp` file; any other path is refused and nothing is written
   - `overwrite`: If true, overwrites any existing .txt file. If false, appends a counter to avoid overwriting (e.g. `cat_01.txt`, `cat_02.txt`)
 
 This node has no outputs — it is a terminal/output node.
