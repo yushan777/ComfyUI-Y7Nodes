@@ -454,6 +454,35 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ---
 
+### Y7 Klein & Qwen Edit Align
+
+> Snaps an edited image back onto the original's geometry and colour-matches it to the original's unedited background.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   Flux.2 Klein and Qwen-Image-Edit often return the whole frame slightly shifted, rescaled or tinted. This node finds a single SIFT homography (translation, scale, rotation, mild perspective) from the edited image to the original and warps it into place, then applies a Reinhard colour transfer in LAB fitted on the unedited background only. With `two_pass` on, alignment is re-run using only background keypoints so the edit itself can't bias the solve. It does not correct uneven local warping, and it does no compositing.
+>
+>   **Inputs:**
+>
+>   - `edited_image`: The edit model's output
+>   - `original_image`: The image that was edited (resized to match if needed)
+>   - `color_match_strength`: 0.0 = off, 1.0 = full transfer (default 1.0)
+>   - `two_pass`: Re-align on background only (default on)
+>   - `edit_mask` (optional): White marks the edited region, overriding the automatic detection
+>
+>   **Outputs:**
+>
+>   - `aligned_image`: The aligned, colour-matched image
+>   - `valid_mask`: 0 where the warp pulled from outside the frame (those pixels are reflection-filled)
+>   - `report`: Inliers per pass, homography determinant, and whether colour match ran
+>
+>   Requires `opencv-python-headless` (included in `requirements.txt`). Alignment and colour match extracted from comfyui-klein-edit-composite.
+>
+> </details>
+
+---
+
 ### Y7 Paste Cropped Image Back
 
 > <img src="assets/paste_cropped_image_back.jpg" alt="paste cropped image back" width="100%"/>

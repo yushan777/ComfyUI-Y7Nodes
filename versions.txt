@@ -1,3 +1,7 @@
+1.0.64
+- Added Klein & Qwen Edit Align node (SIFT homography alignment + background colour match for edit-model output)
+- Added opencv-python to requirements (used by Klein & Qwen Edit Align)
+
 1.0.63
 - Added Switch (model) node
 - Added Float Node with increment/decrement functionality

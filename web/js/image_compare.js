@@ -47,6 +47,7 @@ app.registerExtension({
             const PADDING = 10;
             // Room above the image area: input slots + the two widgets below.
             const HEADER_HEIGHT = 124;
+            const MIN_WIDTH = 300;
             const MIN_HEIGHT = 324;
             const NEUTRALPOS = 0.5;
             const RESOLUTION_TEXT_HEIGHT = 20;
@@ -237,6 +238,9 @@ app.registerExtension({
             node.onResize = function () {
                 this.isManuallyResized = true;
 
+                if (this.size[0] < MIN_WIDTH) {
+                    this.size[0] = MIN_WIDTH;
+                }
                 if (this.size[1] < MIN_HEIGHT) {
                     this.size[1] = MIN_HEIGHT;
                 }

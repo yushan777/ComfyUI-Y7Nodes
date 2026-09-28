@@ -10,6 +10,7 @@ from .nodes.clip_token_count import Y7Nodes_CLIP_TokenCounter
 from .nodes.image_size_presets import Y7Nodes_ImageSizePresets
 from .nodes.crop_to_nearest_multiple import Y7Nodes_CropToNearestMultiple
 from .nodes.color_match_masked import Y7Nodes_ColorMatchMasked
+from .nodes.klein_qwen_edit_align import Y7Nodes_KleinQwenEditAlign
 from .nodes.aspect_ratio_picker import Y7Nodes_AspectRatioPicker
 from .nodes.sampler_select_name import SamplerSelect_Name
 from .nodes.paste_cropped_image_back import Y7Nodes_PasteCroppedImageBack
@@ -37,6 +38,7 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_CLIP_TokenCounter": Y7Nodes_CLIP_TokenCounter,
     "Y7Nodes_CropToNearestMultiple": Y7Nodes_CropToNearestMultiple,
     "Y7Nodes_ColorMatchMasked": Y7Nodes_ColorMatchMasked,
+    "Y7Nodes_KleinQwenEditAlign": Y7Nodes_KleinQwenEditAlign,
     "Y7Nodes_AspectRatioPicker": Y7Nodes_AspectRatioPicker,
     "SamplerSelect_Name": SamplerSelect_Name,
     "Y7Nodes_PasteCroppedImageBack": Y7Nodes_PasteCroppedImageBack,
@@ -65,6 +67,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_CLIP_TokenCounter": "Y7 CLIP Token Counter",    
     "Y7Nodes_CropToNearestMultiple": "Y7 Crop to Nearest Multiple",
     "Y7Nodes_ColorMatchMasked": "Y7 Color Match (Masked)",
+    "Y7Nodes_KleinQwenEditAlign": "Y7 Klein & Qwen Edit Align",
     "Y7Nodes_AspectRatioPicker": "Y7 Aspect Ratio Picker",
     "SamplerSelect_Name": "Sampler Select (Name)",
     "Y7Nodes_PasteCroppedImageBack": "Y7 Paste Cropped Image Back",
