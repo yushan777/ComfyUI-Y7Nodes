@@ -27,6 +27,10 @@ from .nodes.flux2_klein_edit_multi_ref import Y7Nodes_Flux2KleinEdit_MultiRef
 from .nodes.flux2_sampler import Y7Nodes_Flux2Sampler
 from .nodes.flux2_klein_upscaler import Y7Nodes_Flux2KleinUpscaler
 from .nodes.switch_model import Y7Nodes_SwitchModel
+from .nodes.prompt_library import Y7Nodes_PromptLibrary
+from .nodes.krea2_multi_stage_sampler import Y7Nodes_Krea2_TwoStageSampler, Y7Nodes_Krea2_ThreeStageSampler
+from .nodes.dual_resolution_selector import Y7Nodes_DualResolutionSelector
+from .nodes.krea2_raw_sampling_shift import Y7Nodes_Krea2_RawSamplingShift
 
 NODE_CLASS_MAPPINGS = {
     "Y7Nodes_ImageSizePresets": Y7Nodes_ImageSizePresets,
@@ -56,6 +60,11 @@ NODE_CLASS_MAPPINGS = {
     "Y7Nodes_Flux2Sampler": Y7Nodes_Flux2Sampler,
     "Y7Nodes_Flux2KleinUpscaler": Y7Nodes_Flux2KleinUpscaler,
     "Y7Nodes_SwitchModel": Y7Nodes_SwitchModel,
+    "Y7Nodes_PromptLibrary": Y7Nodes_PromptLibrary,
+    "Y7Nodes_Krea2_TwoStageSampler": Y7Nodes_Krea2_TwoStageSampler,
+    "Y7Nodes_Krea2_ThreeStageSampler": Y7Nodes_Krea2_ThreeStageSampler,
+    "Y7Nodes_DualResolutionSelector": Y7Nodes_DualResolutionSelector,
+    "Y7Nodes_Krea2_RawSamplingShift": Y7Nodes_Krea2_RawSamplingShift,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Y7Nodes_ImageSizePresets" : "Y7 Image Size (Presets)",

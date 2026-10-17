@@ -328,6 +328,31 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ---
 
+### Y7 Dual Resolution Selector
+
+> Gives a base and a final width/height for one aspect ratio at two megapixel targets.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   Made for the Krea 2 Two/Three-Stage Samplers: wire `base_width` / `base_height` to the empty latent and `final_width` / `final_height` to the sampler, so stage 1 runs small and the later stages finish large.
+>
+>   **Inputs:**
+>
+>   - `aspect_ratio`: `1:1`, `4:5`, `5:4`, `2:3`, `3:2`, `3:4`, `4:3`, `9:16`, `16:9`, `2.35:1` or `21:9`
+>   - `base_megapixels`: Size of the base resolution (default 1.0, i.e. 1024x1024 worth of pixels)
+>   - `final_megapixels`: Size of the final resolution (default 2.0)
+>   - `multiple`: Both dimensions are rounded to this (default 16)
+>
+>   **Outputs:**
+>
+>   - `base_width` / `base_height`: The base resolution (INT)
+>   - `final_width` / `final_height`: The final resolution (INT)
+>
+> </details>
+
+---
+
 ### Y7 Scale Image By
 
 > Scales an image by a multiplier while preserving aspect ratio.
@@ -701,6 +726,87 @@ A collection of utility / quality-of-life nodes for ComfyUI - Probably only usef
 
 ---
 
+### Y7 Krea 2 Raw Sampling Shift
+
+> Sets the sampling shift for Krea 2 Raw: resolution-dependent, or manual.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   ComfyUI loads every Krea 2 model with a fixed shift of `1.15`, which suits Turbo but not Raw. Put this on the Raw model (e.g. stage 1 of the Krea 2 Two/Three-Stage Sampler); the Turbo model needs no patch.
+>
+>   **Inputs:**
+>
+>   - `model`: The model to patch
+>   - `sampling_mode`: `raw_dynamic` (default) follows Krea 2's Raw schedule, from shift `0.5` at 256x256 up to `1.15` at 1280x1280. `manual` uses `manual_shift`
+>   - `width` / `height`: The sampling resolution. Only used by `raw_dynamic`
+>   - `manual_shift` *(advanced)*: The shift for `manual` mode (default 1.15)
+>
+>   **Outputs:**
+>
+>   - `MODEL`: The model with the shift applied
+>
+> </details>
+
+---
+
+### Y7 Krea 2 Two-Stage Sampler
+
+> Samples with one model up to `handoff_percent`, then finishes with a second model from the exact sigma where the first stopped, optionally at a higher resolution.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   A typical pairing is a raw/base model for stage 1 (better variation between seeds) and a turbo model or LoRA for stage 2 (speed and finish). Each stage keeps its own steps, cfg, sampler and scheduler; stage 2's schedule is cut at its step nearest the handoff sigma, so the two can use different step counts.
+>
+>   Without a resize, stage 1's leftover noise carries straight into stage 2. With a resize, stage 1 runs to a clean estimate, the latent is resized, and stage 2 adds fresh noise at the handoff sigma.
+>
+>   **Inputs:**
+>
+>   - `stage1_model` / `stage2_model`: The model for each stage. Can be the same model with different settings
+>   - `positive` / `negative`: Conditioning for stage 1 (and stage 2 unless overridden)
+>   - `latent_image`: Starting latent, at the base resolution
+>   - `seed`
+>   - `handoff_percent`: Where stage 1 hands off (default 12). 25% = stage 1 does the first quarter of denoising. 0% runs only stage 2; 100% runs only stage 1
+>   - `stage1_steps` / `stage1_cfg` / `stage1_sampler_name` / `stage1_scheduler`: Stage 1 settings (defaults 52 steps, cfg 4.0). Steps cover the whole schedule, not just this stage's share
+>   - `stage2_steps` / `stage2_cfg` / `stage2_sampler_name` / `stage2_scheduler`: Stage 2 settings (defaults 8 steps, cfg 1.0). At cfg 1 the stage 2 negative is zeroed
+>   - `final_width` / `final_height`: Resize the latent at the handoff so stage 2 runs at this size. 0 for one dimension keeps the aspect ratio; 0 for both (default) disables the resize
+>   - `upscale_method` *(advanced)*: Latent resize method used at the handoff (default `bislerp`)
+>   - `stage2_positive_optional` / `stage2_negative_optional` *(optional)*: Separate conditioning for stage 2. Unconnected inputs reuse `positive` / `negative`
+>
+>   **Outputs:**
+>
+>   - `latent`: The finished latent, ready for VAE decode
+>
+>   Both models need compatible model sampling (shift) settings, or the handoff sigma may fall outside stage 2's schedule and raise an error.
+>
+> </details>
+
+---
+
+### Y7 Krea 2 Three-Stage Sampler
+
+> The Krea 2 Two-Stage Sampler plus a final pass that reuses all of stage 1's settings from `stage3_handoff_percent` onward.
+>
+> <details>
+>   <summary>ℹ️ <i>See More Information</i></summary>
+>
+>   Stage 1 runs up to `handoff_percent`, stage 2 up to `stage3_handoff_percent`, then stage 1's model, steps, cfg, sampler and scheduler finish the job. Useful when you want negative conditioning (stage 1 cfg) at the start and end of a generation but a fast cfg-1 model in the middle.
+>
+>   **Inputs** (as on the Two-Stage Sampler, plus):
+>
+>   - `stage3_handoff_percent`: Stage 2 to stage 3 handoff (default 83.33). Must be at or after `handoff_percent`. 100% means no stage 3 (identical to the Two-Stage Sampler); equal to `handoff_percent` skips stage 2
+>
+>   Stages 1 and 3 always use `positive` / `negative`; the `stage2_*_optional` inputs only affect stage 2. Any resize happens at the first handoff and later stages continue at the final size. The two handoffs must land on different sigmas; if they round to the same step, move them farther apart.
+>
+>   **Outputs:**
+>
+>   - `latent`: The finished latent, ready for VAE decode
+>
+> </details>
+
+---
+
 ### Y7 Load Image (subfolders)
 
 > The native ComfyUI Load Image node only lists files directly in the `input` folder. This node is identical except it walks the full `input` directory tree, so images organised into subdirectories appear in the dropdown.
@@ -770,3 +876,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Color Match (Masked) is based on the ColorMatch node from kijai's ComfyUI-KJNodes, using the [color-matcher](https://github.com/hahnec/color-matcher) library.
 - Switch (model) is based on "Switch (Any)" from ltdrdata's ComfyUI-Impact-Pack, limited to `MODEL` inputs.
 - Flux.2 Klein Upscaler (Tiled) is ported from [ComfyUI_KleinTiledUpscaler](https://github.com/Gavr728/ComfyUI_KleinTiledUpscaler) by Gavr728 (MIT).
+

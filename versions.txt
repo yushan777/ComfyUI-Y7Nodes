@@ -1,3 +1,11 @@
+1.0.65
+- Added Prompt Library node (visual library of saved prompts with optional example images)
+- Added Krea 2 Two-Stage Sampler and Krea 2 Three-Stage Sampler nodes (sigma-locked multi-model
+  sampling with an optional resolution change at the handoff)
+- Added Krea 2 Raw Sampling Shift node (resolution-dependent or manual shift for Krea 2 Raw)
+- Added Dual Resolution Selector node (base and final resolution for one aspect ratio)
+- Krea 2 nodes and Dual Resolution Selector cloned from krea2-twostage-sampler by Auryg (MIT)
+
 1.0.64
 - Added Klein & Qwen Edit Align node (SIFT homography alignment + background colour match for edit-model output)
 - Added opencv-python to requirements (used by Klein & Qwen Edit Align)
